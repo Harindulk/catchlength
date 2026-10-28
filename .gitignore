@@ -7,3 +7,12 @@ __pycache__/
 *.mov
 data/raw/
 .DS_Store
+
+# private: never in the public repo
+CLAUDE.md
+notes/
+research/
+data/cache/
+runs/
+.taste-skill/
+.claude/
