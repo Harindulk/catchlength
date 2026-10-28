@@ -31,6 +31,8 @@ Every run ends with an audit receipt: the clip's hash, the models used, the cali
 
 Field results from fish measured at the Peliyagoda fish market will be added here after 1 November 2026. The console's Benchmark tab reads `web/benchmark.json`.
 
+How much error the camera and the marker tiles add on their own, before any model is involved: on 112 synthetic fish in 30 scenes degraded like a 1080p phone frame from about 1 m (blur, sensor noise, JPEG), measured from each fish's true outline, the mean length error is 0.16 cm (90th percentile 0.31 cm, worst 0.53 cm). This is a synthetic test of the geometry only (`scripts/geometry_budget.py`); the field benchmark measures the whole agent.
+
 ## Run it
 
 ```bash
