@@ -13,6 +13,7 @@
   const RULE_SHORT = { no_minimum: 'No legal minimum', pass: 'Above minimum', below_minimum: 'Below minimum', no_rule_in_pack: 'No rule in pack' };
   const CHECK = '<svg class="tick" viewBox="0 0 16 16" aria-label="passed" role="img"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   let samples = [], run = null, dir = '', selected = null, timer = null;
+  const decisions = {};  // officer decisions per run folder: { approve, note, at, saved }
 
   // ---- views ------------------------------------------------------------------------------------------------
   function show(view) {
@@ -31,6 +32,8 @@
     seg.innerHTML = samples.map((s, i) => `<button type="button" role="radio" aria-checked="${i === 0}" data-i="${i}">${esc(s.label)}</button>`).join('');
     seg.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) load(+b.dataset.i); });
     $('#run-btn').addEventListener('click', live);
+    $('#signoff').addEventListener('submit', (e) => { e.preventDefault(); decide(true); });
+    $('#sendback-btn').addEventListener('click', () => decide(false));
     show(location.hash.slice(1) || 'run');
     await load(0);
   }
@@ -126,6 +129,37 @@
     lf(done ? run.report?.lf_1cm : null);
     receipt(done ? run.receipt : null);
     cited(done ? run : null);
+    signoff(done);
+  }
+
+  function signoff(done) {
+    const box = $('#signoff'), d = decisions[dir];
+    const waiting = done && run.status === 'awaiting_signoff';
+    box.hidden = !waiting && !d;
+    $('#run-btn').className = waiting && !d ? 'secondary' : 'primary';  // once filed, signing off is the main job
+    if (box.hidden) return;
+    box.classList.toggle('done', !!d && d.approve);
+    box.classList.toggle('back', !!d && !d.approve);
+    box.querySelector('.signoff-actions').hidden = !!d;
+    const f = run.receipt.fish;
+    $('#signoff-text').innerHTML = d
+      ? `${d.approve ? '<b>Signed off</b>' : '<b>Sent back to the agent</b>'} at ${esc(d.at)}${d.note ? `: “${esc(d.note)}”` : ''}${d.saved ? '' : ' <span class="muted">(recorded run: not saved)</span>'}`
+      : `<b>Report filed.</b> ${f.accepted} fish accepted${f.flagged ? `, ${f.flagged} need your look first` : ''}. Sign off, or send it back with a note.`;
+  }
+
+  async function decide(approve) {
+    const note = $('#signoff-note').value.trim();
+    const at = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    let saved = false;
+    if (dir.startsWith('live/')) {
+      try {
+        const r = await fetch('api/signoff', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sample: dir.split('/')[1], approve, note }) });
+        saved = r.ok;
+      } catch { /* shown as not saved */ }
+    }
+    decisions[dir] = { approve, note, at, saved };
+    render(run.log.length);
   }
 
   function verdict(r, progress) {
@@ -136,9 +170,9 @@
         + fig('<span class="muted">–</span>', 'to the officer') + fig(`<span class="muted small">${esc(progress)}</span>`, 'status', 'status');
       return;
     }
-    const f = r.receipt.fish;
-    const status = { awaiting_signoff: 'Waiting for sign-off', needs_review: 'With the officer', needs_refilm: 'Clip refused',
-      signed_off: 'Signed off', running: 'Unfinished' }[r.status] || r.status;
+    const f = r.receipt.fish, d = decisions[dir];
+    const status = d ? (d.approve ? 'Signed off' : 'Sent back') : { awaiting_signoff: 'Waiting for sign-off', needs_review: 'With the officer', needs_refilm: 'Clip refused',
+      signed_off: 'Signed off', sent_back: 'Sent back', running: 'Unfinished' }[r.status] || r.status;
     el.innerHTML = fig(f.detected, 'fish found') + fig(`${f.accepted}<span class="of"> of ${f.detected}</span>`, 'accepted')
       + fig(f.flagged, 'to the officer', f.flagged ? 'warn' : '') + fig(`<span class="small">${esc(status)}</span>`, `${r.log.length} turns · $${r.cost.usd.toFixed(3)}`, 'status');
   }
