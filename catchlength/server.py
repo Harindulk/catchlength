@@ -85,6 +85,8 @@ class Handler(SimpleHTTPRequestHandler):
         return super().translate_path(path)
 
     def do_POST(self):
+        if self.path == "/api/signoff":
+            return self.signoff()
         if self.path != "/api/run":
             return self.send_error(404)
         try:
@@ -108,6 +110,35 @@ class Handler(SimpleHTTPRequestHandler):
         t0 = time.time()
         run_sample(sid, emit)
         self.log_message("run %s in %.1fs", sid, time.time() - t0)
+
+
+    def signoff(self):
+        """The officer's decision on a finished live run, written into that run's record."""
+        try:
+            body = json.loads(self.rfile.read(min(int(self.headers.get("Content-Length", 0)), 2048)) or b"{}")
+            sid, note = str(body.get("sample", "")), str(body.get("note", ""))[:300]
+            rec = record_signoff(sid, bool(body.get("approve")), note)
+        except (ValueError, KeyError):
+            return self.send_error(400, "unknown run")
+        out = json.dumps({"status": rec["status"]}).encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(out)
+
+
+def record_signoff(sid: str, approve: bool, note: str) -> dict:
+    f = (OUT / sid / "run.json").resolve()
+    if not f.is_relative_to(OUT.resolve()) or not f.exists() or "/" in sid:
+        raise KeyError(sid)
+    rec = json.loads(f.read_text())
+    if rec.get("status") != "awaiting_signoff":
+        raise KeyError(sid)
+    rec["status"] = "signed_off" if approve else "sent_back"
+    rec["log"].append({"turn": "officer", "tool": "sign_off", "args": {"approve": approve, "note": note},
+                       "result": {"status": rec["status"]}, "at": time.strftime("%Y-%m-%d %H:%M:%S")})
+    f.write_text(json.dumps(rec, indent=1, default=str))
+    return rec
 
 
 def main() -> None:

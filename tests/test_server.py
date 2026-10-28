@@ -47,3 +47,18 @@ def test_live_paths_cannot_climb_out(tmp_path, monkeypatch):
     assert "__missing__" in h.translate_path("/live/../../.env")
     assert h.translate_path("/live/s1/run.json").endswith("runs/live/s1/run.json")
     assert h.translate_path("/../.env").startswith(str(server.WEB))  # the static side keeps '..' inside web/
+
+
+def test_signoff_is_recorded_once_and_only_for_real_runs(tmp_path, monkeypatch):
+    import json
+    monkeypatch.setattr(server, "OUT", tmp_path)
+    (tmp_path / "s1").mkdir()
+    (tmp_path / "s1/run.json").write_text(json.dumps({"status": "awaiting_signoff", "log": []}))
+    rec = server.record_signoff("s1", True, "looks right")
+    assert rec["status"] == "signed_off" and rec["log"][-1]["args"]["note"] == "looks right"
+    for sid in ["s1", "../s1", "nope"]:  # already signed, path tricks, unknown
+        try:
+            server.record_signoff(sid, True, "")
+            assert False, sid
+        except KeyError:
+            pass
