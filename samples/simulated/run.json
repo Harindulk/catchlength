@@ -1,0 +1,2059 @@
+{
+ "source": "simulated: museum reference fish",
+ "status": "awaiting_signoff",
+ "plan": {
+  "usable": true,
+  "issues": [],
+  "best_frame": 0,
+  "expected_count": 5,
+  "species_candidates": [
+   "Katsuwonus pelamis"
+  ],
+  "tiles_visible": 2
+ },
+ "best_frame": 0,
+ "size": [
+  2100,
+  1267
+ ],
+ "tiles": [
+  0,
+  1
+ ],
+ "log": [
+  {
+   "turn": 0,
+   "tool": "inspect_clip",
+   "args": {},
+   "result": {
+    "usable": true,
+    "issues": [],
+    "best_frame": 0,
+    "expected_count": 5,
+    "species_candidates": [
+     "Katsuwonus pelamis"
+    ],
+    "tiles_visible": 2
+   },
+   "ms": 20,
+   "usd": 0.0017
+  },
+  {
+   "turn": 1,
+   "tool": "calibrate",
+   "args": {},
+   "result": {
+    "tiles": [
+     0,
+     1
+    ],
+    "corner_error_px": 1.33,
+    "corner_error_mm": 0.81
+   },
+   "ms": 24,
+   "usd": 0.0017
+  },
+  {
+   "turn": 2,
+   "tool": "segment",
+   "args": {},
+   "result": {
+    "found": 4,
+    "expected": 5,
+    "ids": [
+     "0",
+     "1",
+     "2",
+     "3"
+    ],
+    "note": "count differs from the plan: look for missed or merged fish"
+   },
+   "ms": 3,
+   "usd": 0.0042
+  },
+  {
+   "turn": 3,
+   "tool": "find_missed",
+   "args": {},
+   "result": {
+    "count": 5,
+    "missed_boxes": [
+     [
+      441.32812499999994,
+      1348.5937499999998,
+      1169.765625,
+      1532.3437499999998
+     ],
+     [
+      971.2499999999999,
+      1350.2343749999998,
+      2004.8437499999998,
+      1714.4531249999998
+     ]
+    ],
+    "merged_ids": [
+     "3"
+    ]
+   },
+   "ms": 18,
+   "usd": 0.0059
+  },
+  {
+   "turn": 4,
+   "tool": "rescue",
+   "args": {
+    "boxes": [
+     [
+      269.0,
+      822.0,
+      713.0,
+      934.0
+     ],
+     [
+      592.0,
+      823.0,
+      1222.0,
+      1045.0
+     ]
+    ],
+    "split_ids": [
+     "3"
+    ]
+   },
+   "result": {
+    "accepted": [
+     "2001",
+     "2002"
+    ],
+    "rejected": [],
+    "count_now": 5
+   },
+   "ms": 14,
+   "usd": 0.0083
+  },
+  {
+   "turn": 5,
+   "tool": "measure",
+   "args": {},
+   "result": {
+    "measured": 5,
+    "flagged": [],
+    "cross_frame": {
+     "frames": {
+      "1": 4,
+      "2": 4
+     },
+     "best_frame_count": 5,
+     "note": "counts differ across frames: a fish may be hidden, merged or cut off in some frames"
+    }
+   },
+   "ms": 413,
+   "usd": 0.0083
+  },
+  {
+   "turn": 6,
+   "tool": "classify",
+   "args": {},
+   "result": {
+    "species": {
+     "0": "Katsuwonus pelamis",
+     "1": "Katsuwonus pelamis",
+     "2": "Katsuwonus pelamis",
+     "2001": "Katsuwonus pelamis",
+     "2002": "Katsuwonus pelamis"
+    }
+   },
+   "ms": 49,
+   "usd": 0.0167
+  },
+  {
+   "turn": 7,
+   "tool": "apply_rules",
+   "args": {},
+   "result": {
+    "results": {
+     "0": [
+      "no_minimum",
+      "info"
+     ],
+     "1": [
+      "no_minimum",
+      "info"
+     ],
+     "2": [
+      "no_minimum",
+      "info"
+     ],
+     "2001": [
+      "no_minimum",
+      "info"
+     ],
+     "2002": [
+      "no_minimum",
+      "info"
+     ]
+    }
+   },
+   "ms": 0,
+   "usd": 0.0167
+  },
+  {
+   "turn": 8,
+   "tool": "submit_report",
+   "args": {
+    "summary": "5 fish measured. Skipjack has no gazetted minimum [rule:lk-finfish-no-min]."
+   },
+   "result": {
+    "filed": true,
+    "measured": 5,
+    "waiting_for": "officer sign-off"
+   },
+   "ms": 0,
+   "usd": 0.0167
+  }
+ ],
+ "reviews": [],
+ "report": {
+  "summary": "5 fish measured. Skipjack has no gazetted minimum [rule:lk-finfish-no-min].",
+  "fish": [
+   {
+    "id": "0",
+    "fork_cm": 39.5,
+    "axis_cm": 41.4,
+    "species": "Katsuwonus pelamis",
+    "species_conf": 0.9,
+    "tile": 0,
+    "status": "measured",
+    "why": "",
+    "sam_conf": 0.9,
+    "rules": [
+     {
+      "rule": "lk-finfish-no-min",
+      "result": "no_minimum",
+      "quote": "No gazetted minimum landing size was found for this species."
+     },
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     }
+    ],
+    "frames_mm": {
+     "1": 414.1,
+     "2": 414.1
+    }
+   },
+   {
+    "id": "1",
+    "fork_cm": 35.1,
+    "axis_cm": 37.3,
+    "species": "Katsuwonus pelamis",
+    "species_conf": 0.9,
+    "tile": 0,
+    "status": "measured",
+    "why": "",
+    "sam_conf": 0.9,
+    "rules": [
+     {
+      "rule": "lk-finfish-no-min",
+      "result": "no_minimum",
+      "quote": "No gazetted minimum landing size was found for this species."
+     },
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     }
+    ],
+    "frames_mm": {
+     "1": 373.0,
+     "2": 373.0
+    }
+   },
+   {
+    "id": "2",
+    "fork_cm": 27.5,
+    "axis_cm": 29.9,
+    "species": "Katsuwonus pelamis",
+    "species_conf": 0.9,
+    "tile": 1,
+    "status": "measured",
+    "why": "",
+    "sam_conf": 0.9,
+    "rules": [
+     {
+      "rule": "lk-finfish-no-min",
+      "result": "no_minimum",
+      "quote": "No gazetted minimum landing size was found for this species."
+     },
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     }
+    ],
+    "frames_mm": {
+     "1": 299.4,
+     "2": 299.4
+    }
+   },
+   {
+    "id": "2001",
+    "fork_cm": 23.1,
+    "axis_cm": 24.4,
+    "species": "Katsuwonus pelamis",
+    "species_conf": 0.9,
+    "tile": 0,
+    "status": "measured",
+    "why": "",
+    "sam_conf": 0.9,
+    "rules": [
+     {
+      "rule": "lk-finfish-no-min",
+      "result": "no_minimum",
+      "quote": "No gazetted minimum landing size was found for this species."
+     },
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     }
+    ],
+    "frames_mm": {}
+   },
+   {
+    "id": "2002",
+    "fork_cm": 31.9,
+    "axis_cm": 33.0,
+    "species": "Katsuwonus pelamis",
+    "species_conf": 0.9,
+    "tile": 1,
+    "status": "measured",
+    "why": "",
+    "sam_conf": 0.9,
+    "rules": [
+     {
+      "rule": "lk-finfish-no-min",
+      "result": "no_minimum",
+      "quote": "No gazetted minimum landing size was found for this species."
+     },
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     }
+    ],
+    "frames_mm": {}
+   }
+  ],
+  "lf_1cm": {
+   "23": 1,
+   "27": 1,
+   "31": 1,
+   "35": 1,
+   "39": 1
+  },
+  "measured": 5,
+  "needs_review": 0,
+  "reviews": [],
+  "tiles": [
+   0,
+   1
+  ],
+  "source": "simulated: museum reference fish"
+ },
+ "fish": [
+  {
+   "id": "0",
+   "fork_cm": 39.5,
+   "axis_cm": 41.4,
+   "species": "Katsuwonus pelamis",
+   "species_conf": 0.9,
+   "tile": 0,
+   "status": "measured",
+   "why": "",
+   "sam_conf": 0.9,
+   "rules": [
+    {
+     "rule": "lk-finfish-no-min",
+     "result": "no_minimum",
+     "quote": "No gazetted minimum landing size was found for this species."
+    },
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    }
+   ],
+   "frames_mm": {
+    "1": 414.1,
+    "2": 414.1
+   },
+   "points": {
+    "snout": [
+     401.0,
+     292.0
+    ],
+    "fork": [
+     1107.0,
+     269.0
+    ],
+    "confidence": 0.8
+   },
+   "box": [
+    401.0,
+    119.0,
+    1147.0,
+    365.0
+   ],
+   "outline": [
+    [
+     401,
+     289
+    ],
+    [
+     405,
+     296
+    ],
+    [
+     421,
+     303
+    ],
+    [
+     515,
+     332
+    ],
+    [
+     552,
+     335
+    ],
+    [
+     607,
+     333
+    ],
+    [
+     660,
+     364
+    ],
+    [
+     665,
+     364
+    ],
+    [
+     664,
+     360
+    ],
+    [
+     638,
+     341
+    ],
+    [
+     640,
+     335
+    ],
+    [
+     649,
+     335
+    ],
+    [
+     650,
+     330
+    ],
+    [
+     680,
+     328
+    ],
+    [
+     683,
+     325
+    ],
+    [
+     856,
+     296
+    ],
+    [
+     890,
+     298
+    ],
+    [
+     894,
+     290
+    ],
+    [
+     906,
+     283
+    ],
+    [
+     908,
+     278
+    ],
+    [
+     929,
+     272
+    ],
+    [
+     980,
+     244
+    ],
+    [
+     1026,
+     232
+    ],
+    [
+     1057,
+     230
+    ],
+    [
+     1071,
+     238
+    ],
+    [
+     1124,
+     282
+    ],
+    [
+     1146,
+     291
+    ],
+    [
+     1119,
+     258
+    ],
+    [
+     1125,
+     257
+    ],
+    [
+     1125,
+     252
+    ],
+    [
+     1114,
+     244
+    ],
+    [
+     1114,
+     232
+    ],
+    [
+     1108,
+     221
+    ],
+    [
+     1111,
+     218
+    ],
+    [
+     1112,
+     206
+    ],
+    [
+     1124,
+     192
+    ],
+    [
+     1126,
+     182
+    ],
+    [
+     1117,
+     177
+    ],
+    [
+     1126,
+     163
+    ],
+    [
+     1123,
+     159
+    ],
+    [
+     1105,
+     170
+    ],
+    [
+     1065,
+     212
+    ],
+    [
+     1053,
+     217
+    ],
+    [
+     998,
+     211
+    ],
+    [
+     951,
+     200
+    ],
+    [
+     944,
+     195
+    ],
+    [
+     913,
+     187
+    ],
+    [
+     859,
+     178
+    ],
+    [
+     853,
+     175
+    ],
+    [
+     863,
+     172
+    ],
+    [
+     847,
+     171
+    ],
+    [
+     836,
+     166
+    ],
+    [
+     836,
+     156
+    ],
+    [
+     802,
+     171
+    ],
+    [
+     769,
+     171
+    ],
+    [
+     771,
+     168
+    ],
+    [
+     760,
+     166
+    ],
+    [
+     744,
+     168
+    ],
+    [
+     745,
+     164
+    ],
+    [
+     715,
+     164
+    ],
+    [
+     702,
+     167
+    ],
+    [
+     697,
+     165
+    ],
+    [
+     685,
+     169
+    ],
+    [
+     681,
+     165
+    ],
+    [
+     675,
+     166
+    ],
+    [
+     677,
+     168
+    ],
+    [
+     673,
+     175
+    ],
+    [
+     664,
+     176
+    ],
+    [
+     670,
+     163
+    ],
+    [
+     660,
+     176
+    ],
+    [
+     653,
+     177
+    ],
+    [
+     661,
+     159
+    ],
+    [
+     650,
+     172
+    ],
+    [
+     650,
+     176
+    ],
+    [
+     642,
+     178
+    ],
+    [
+     656,
+     153
+    ],
+    [
+     646,
+     163
+    ],
+    [
+     639,
+     176
+    ],
+    [
+     633,
+     179
+    ],
+    [
+     638,
+     166
+    ],
+    [
+     653,
+     145
+    ],
+    [
+     639,
+     160
+    ],
+    [
+     630,
+     178
+    ],
+    [
+     625,
+     180
+    ],
+    [
+     634,
+     161
+    ],
+    [
+     656,
+     133
+    ],
+    [
+     658,
+     119
+    ],
+    [
+     634,
+     138
+    ],
+    [
+     598,
+     185
+    ],
+    [
+     518,
+     211
+    ],
+    [
+     467,
+     235
+    ],
+    [
+     404,
+     277
+    ],
+    [
+     418,
+     286
+    ]
+   ]
+  },
+  {
+   "id": "1",
+   "fork_cm": 35.1,
+   "axis_cm": 37.3,
+   "species": "Katsuwonus pelamis",
+   "species_conf": 0.9,
+   "tile": 0,
+   "status": "measured",
+   "why": "",
+   "sam_conf": 0.9,
+   "rules": [
+    {
+     "rule": "lk-finfish-no-min",
+     "result": "no_minimum",
+     "quote": "No gazetted minimum landing size was found for this species."
+    },
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    }
+   ],
+   "frames_mm": {
+    "1": 373.0,
+    "2": 373.0
+   },
+   "points": {
+    "snout": [
+     512.0,
+     541.0
+    ],
+    "fork": [
+     1155.0,
+     659.0
+    ],
+    "confidence": 0.8
+   },
+   "box": [
+    512.0,
+    450.0,
+    1211.0,
+    692.0
+   ],
+   "outline": [
+    [
+     512,
+     541
+    ],
+    [
+     515,
+     547
+    ],
+    [
+     542,
+     563
+    ],
+    [
+     603,
+     591
+    ],
+    [
+     640,
+     604
+    ],
+    [
+     704,
+     619
+    ],
+    [
+     736,
+     641
+    ],
+    [
+     728,
+     633
+    ],
+    [
+     728,
+     627
+    ],
+    [
+     745,
+     632
+    ],
+    [
+     747,
+     629
+    ],
+    [
+     826,
+     642
+    ],
+    [
+     883,
+     648
+    ],
+    [
+     956,
+     666
+    ],
+    [
+     956,
+     661
+    ],
+    [
+     962,
+     663
+    ],
+    [
+     964,
+     658
+    ],
+    [
+     976,
+     660
+    ],
+    [
+     1029,
+     657
+    ],
+    [
+     1043,
+     652
+    ],
+    [
+     1050,
+     653
+    ],
+    [
+     1056,
+     649
+    ],
+    [
+     1072,
+     649
+    ],
+    [
+     1074,
+     645
+    ],
+    [
+     1136,
+     644
+    ],
+    [
+     1158,
+     660
+    ],
+    [
+     1188,
+     691
+    ],
+    [
+     1194,
+     688
+    ],
+    [
+     1195,
+     684
+    ],
+    [
+     1188,
+     672
+    ],
+    [
+     1190,
+     656
+    ],
+    [
+     1184,
+     643
+    ],
+    [
+     1191,
+     635
+    ],
+    [
+     1192,
+     619
+    ],
+    [
+     1197,
+     616
+    ],
+    [
+     1198,
+     607
+    ],
+    [
+     1206,
+     602
+    ],
+    [
+     1210,
+     595
+    ],
+    [
+     1204,
+     594
+    ],
+    [
+     1140,
+     631
+    ],
+    [
+     1122,
+     629
+    ],
+    [
+     1089,
+     615
+    ],
+    [
+     1085,
+     610
+    ],
+    [
+     1029,
+     579
+    ],
+    [
+     1023,
+     573
+    ],
+    [
+     970,
+     550
+    ],
+    [
+     950,
+     536
+    ],
+    [
+     950,
+     529
+    ],
+    [
+     919,
+     531
+    ],
+    [
+     831,
+     506
+    ],
+    [
+     750,
+     490
+    ],
+    [
+     795,
+     450
+    ],
+    [
+     768,
+     464
+    ],
+    [
+     735,
+     489
+    ],
+    [
+     652,
+     489
+    ],
+    [
+     592,
+     498
+    ],
+    [
+     519,
+     525
+    ],
+    [
+     527,
+     531
+    ],
+    [
+     529,
+     537
+    ]
+   ]
+  },
+  {
+   "id": "2",
+   "fork_cm": 27.5,
+   "axis_cm": 29.9,
+   "species": "Katsuwonus pelamis",
+   "species_conf": 0.9,
+   "tile": 1,
+   "status": "measured",
+   "why": "",
+   "sam_conf": 0.9,
+   "rules": [
+    {
+     "rule": "lk-finfish-no-min",
+     "result": "no_minimum",
+     "quote": "No gazetted minimum landing size was found for this species."
+    },
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    }
+   ],
+   "frames_mm": {
+    "1": 299.4,
+    "2": 299.4
+   },
+   "points": {
+    "snout": [
+     1827.0,
+     265.0
+    ],
+    "fork": [
+     1299.0,
+     269.0
+    ],
+    "confidence": 0.8
+   },
+   "box": [
+    1253.0,
+    161.0,
+    1828.0,
+    328.0
+   ],
+   "outline": [
+    [
+     1827,
+     265
+    ],
+    [
+     1808,
+     251
+    ],
+    [
+     1795,
+     249
+    ],
+    [
+     1807,
+     247
+    ],
+    [
+     1756,
+     218
+    ],
+    [
+     1788,
+     184
+    ],
+    [
+     1794,
+     171
+    ],
+    [
+     1805,
+     162
+    ],
+    [
+     1792,
+     161
+    ],
+    [
+     1757,
+     179
+    ],
+    [
+     1706,
+     217
+    ],
+    [
+     1695,
+     212
+    ],
+    [
+     1682,
+     215
+    ],
+    [
+     1677,
+     209
+    ],
+    [
+     1668,
+     212
+    ],
+    [
+     1660,
+     206
+    ],
+    [
+     1648,
+     208
+    ],
+    [
+     1641,
+     202
+    ],
+    [
+     1632,
+     204
+    ],
+    [
+     1624,
+     199
+    ],
+    [
+     1610,
+     200
+    ],
+    [
+     1583,
+     192
+    ],
+    [
+     1576,
+     184
+    ],
+    [
+     1578,
+     179
+    ],
+    [
+     1573,
+     177
+    ],
+    [
+     1540,
+     192
+    ],
+    [
+     1462,
+     194
+    ],
+    [
+     1465,
+     187
+    ],
+    [
+     1460,
+     186
+    ],
+    [
+     1466,
+     182
+    ],
+    [
+     1464,
+     178
+    ],
+    [
+     1443,
+     187
+    ],
+    [
+     1418,
+     203
+    ],
+    [
+     1364,
+     216
+    ],
+    [
+     1304,
+     236
+    ],
+    [
+     1263,
+     257
+    ],
+    [
+     1253,
+     269
+    ],
+    [
+     1254,
+     275
+    ],
+    [
+     1261,
+     280
+    ],
+    [
+     1312,
+     300
+    ],
+    [
+     1379,
+     310
+    ],
+    [
+     1421,
+     311
+    ],
+    [
+     1459,
+     326
+    ],
+    [
+     1471,
+     327
+    ],
+    [
+     1471,
+     321
+    ],
+    [
+     1461,
+     309
+    ],
+    [
+     1521,
+     303
+    ],
+    [
+     1568,
+     291
+    ],
+    [
+     1599,
+     304
+    ],
+    [
+     1609,
+     305
+    ],
+    [
+     1606,
+     288
+    ],
+    [
+     1627,
+     268
+    ],
+    [
+     1635,
+     267
+    ],
+    [
+     1640,
+     261
+    ],
+    [
+     1654,
+     257
+    ],
+    [
+     1658,
+     251
+    ],
+    [
+     1666,
+     251
+    ],
+    [
+     1673,
+     243
+    ],
+    [
+     1681,
+     243
+    ],
+    [
+     1690,
+     236
+    ],
+    [
+     1698,
+     238
+    ],
+    [
+     1706,
+     231
+    ],
+    [
+     1717,
+     232
+    ],
+    [
+     1794,
+     262
+    ],
+    [
+     1818,
+     267
+    ]
+   ]
+  },
+  {
+   "id": "2001",
+   "fork_cm": 23.1,
+   "axis_cm": 24.4,
+   "species": "Katsuwonus pelamis",
+   "species_conf": 0.9,
+   "tile": 0,
+   "status": "measured",
+   "why": "",
+   "sam_conf": 0.9,
+   "rules": [
+    {
+     "rule": "lk-finfish-no-min",
+     "result": "no_minimum",
+     "quote": "No gazetted minimum landing size was found for this species."
+    },
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    }
+   ],
+   "frames_mm": {},
+   "points": {
+    "snout": [
+     269.0,
+     881.0
+    ],
+    "fork": [
+     687.0,
+     878.0
+    ],
+    "confidence": 0.8
+   },
+   "box": [
+    269.0,
+    822.0,
+    713.0,
+    934.0
+   ],
+   "outline": [
+    [
+     269,
+     881
+    ],
+    [
+     272,
+     887
+    ],
+    [
+     311,
+     909
+    ],
+    [
+     354,
+     923
+    ],
+    [
+     401,
+     927
+    ],
+    [
+     413,
+     933
+    ],
+    [
+     422,
+     930
+    ],
+    [
+     500,
+     926
+    ],
+    [
+     567,
+     929
+    ],
+    [
+     564,
+     925
+    ],
+    [
+     611,
+     915
+    ],
+    [
+     615,
+     911
+    ],
+    [
+     639,
+     904
+    ],
+    [
+     640,
+     901
+    ],
+    [
+     710,
+     887
+    ],
+    [
+     707,
+     876
+    ],
+    [
+     710,
+     874
+    ],
+    [
+     712,
+     860
+    ],
+    [
+     705,
+     861
+    ],
+    [
+     680,
+     885
+    ],
+    [
+     668,
+     886
+    ],
+    [
+     642,
+     879
+    ],
+    [
+     596,
+     858
+    ],
+    [
+     540,
+     843
+    ],
+    [
+     421,
+     834
+    ],
+    [
+     440,
+     823
+    ],
+    [
+     437,
+     822
+    ],
+    [
+     404,
+     836
+    ],
+    [
+     366,
+     840
+    ],
+    [
+     323,
+     850
+    ],
+    [
+     278,
+     870
+    ],
+    [
+     271,
+     875
+    ],
+    [
+     275,
+     880
+    ]
+   ]
+  },
+  {
+   "id": "2002",
+   "fork_cm": 31.9,
+   "axis_cm": 33.0,
+   "species": "Katsuwonus pelamis",
+   "species_conf": 0.9,
+   "tile": 1,
+   "status": "measured",
+   "why": "",
+   "sam_conf": 0.9,
+   "rules": [
+    {
+     "rule": "lk-finfish-no-min",
+     "result": "no_minimum",
+     "quote": "No gazetted minimum landing size was found for this species."
+    },
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    }
+   ],
+   "frames_mm": {},
+   "points": {
+    "snout": [
+     592.0,
+     946.0
+    ],
+    "fork": [
+     1198.0,
+     1022.0
+    ],
+    "confidence": 0.8
+   },
+   "box": [
+    592.0,
+    823.0,
+    1222.0,
+    1045.0
+   ],
+   "outline": [
+    [
+     593,
+     938
+    ],
+    [
+     601,
+     945
+    ],
+    [
+     592,
+     946
+    ],
+    [
+     620,
+     954
+    ],
+    [
+     634,
+     965
+    ],
+    [
+     629,
+     957
+    ],
+    [
+     609,
+     947
+    ],
+    [
+     607,
+     941
+    ],
+    [
+     611,
+     934
+    ],
+    [
+     618,
+     928
+    ],
+    [
+     629,
+     929
+    ],
+    [
+     637,
+     945
+    ],
+    [
+     650,
+     949
+    ],
+    [
+     658,
+     944
+    ],
+    [
+     651,
+     939
+    ],
+    [
+     650,
+     924
+    ],
+    [
+     669,
+     926
+    ],
+    [
+     682,
+     942
+    ],
+    [
+     674,
+     949
+    ],
+    [
+     675,
+     960
+    ],
+    [
+     666,
+     963
+    ],
+    [
+     663,
+     972
+    ],
+    [
+     657,
+     978
+    ],
+    [
+     657,
+     983
+    ],
+    [
+     665,
+     988
+    ],
+    [
+     665,
+     992
+    ],
+    [
+     681,
+     997
+    ],
+    [
+     689,
+     1004
+    ],
+    [
+     715,
+     1011
+    ],
+    [
+     767,
+     1018
+    ],
+    [
+     794,
+     1036
+    ],
+    [
+     814,
+     1044
+    ],
+    [
+     817,
+     1040
+    ],
+    [
+     804,
+     1033
+    ],
+    [
+     814,
+     1034
+    ],
+    [
+     806,
+     1029
+    ],
+    [
+     806,
+     1023
+    ],
+    [
+     834,
+     1026
+    ],
+    [
+     836,
+     1023
+    ],
+    [
+     977,
+     1019
+    ],
+    [
+     1004,
+     1028
+    ],
+    [
+     1011,
+     1013
+    ],
+    [
+     1026,
+     1002
+    ],
+    [
+     1032,
+     1003
+    ],
+    [
+     1035,
+     998
+    ],
+    [
+     1053,
+     994
+    ],
+    [
+     1054,
+     991
+    ],
+    [
+     1064,
+     988
+    ],
+    [
+     1069,
+     989
+    ],
+    [
+     1079,
+     983
+    ],
+    [
+     1125,
+     976
+    ],
+    [
+     1153,
+     976
+    ],
+    [
+     1165,
+     984
+    ],
+    [
+     1169,
+     983
+    ],
+    [
+     1181,
+     993
+    ],
+    [
+     1198,
+     1018
+    ],
+    [
+     1198,
+     1022
+    ],
+    [
+     1221,
+     1038
+    ],
+    [
+     1215,
+     1017
+    ],
+    [
+     1208,
+     1010
+    ],
+    [
+     1204,
+     1000
+    ],
+    [
+     1204,
+     991
+    ],
+    [
+     1201,
+     992
+    ],
+    [
+     1188,
+     984
+    ],
+    [
+     1187,
+     986
+    ],
+    [
+     1170,
+     972
+    ],
+    [
+     1174,
+     967
+    ],
+    [
+     1182,
+     967
+    ],
+    [
+     1184,
+     955
+    ],
+    [
+     1169,
+     952
+    ],
+    [
+     1159,
+     962
+    ],
+    [
+     1146,
+     964
+    ],
+    [
+     1110,
+     958
+    ],
+    [
+     1073,
+     947
+    ],
+    [
+     1040,
+     934
+    ],
+    [
+     1000,
+     913
+    ],
+    [
+     983,
+     908
+    ],
+    [
+     989,
+     907
+    ],
+    [
+     975,
+     899
+    ],
+    [
+     973,
+     889
+    ],
+    [
+     976,
+     886
+    ],
+    [
+     972,
+     883
+    ],
+    [
+     941,
+     894
+    ],
+    [
+     916,
+     889
+    ],
+    [
+     916,
+     886
+    ],
+    [
+     905,
+     886
+    ],
+    [
+     896,
+     880
+    ],
+    [
+     864,
+     878
+    ],
+    [
+     864,
+     875
+    ],
+    [
+     837,
+     876
+    ],
+    [
+     836,
+     872
+    ],
+    [
+     829,
+     872
+    ],
+    [
+     828,
+     869
+    ],
+    [
+     820,
+     867
+    ],
+    [
+     812,
+     853
+    ],
+    [
+     815,
+     849
+    ],
+    [
+     811,
+     846
+    ],
+    [
+     827,
+     823
+    ],
+    [
+     804,
+     837
+    ],
+    [
+     764,
+     877
+    ],
+    [
+     732,
+     882
+    ],
+    [
+     672,
+     898
+    ],
+    [
+     626,
+     919
+    ]
+   ]
+  }
+ ],
+ "cost": {
+  "usd": 0.0167,
+  "calls": 20,
+  "cached": 2
+ },
+ "receipt": {
+  "clip_sha256": null,
+  "finished_utc": "2026-10-28T19:49:54+00:00",
+  "models": [
+   "muse-spark-1.3",
+   "sam-3.1"
+  ],
+  "git_commit": "33f9c23",
+  "calibration": {
+   "tiles": [
+    0,
+    1
+   ],
+   "corner_error_px": 1.3323230743408203
+  },
+  "fish": {
+   "detected": 5,
+   "accepted": 5,
+   "flagged": 0
+  },
+  "rescued": [
+   "2001",
+   "2002"
+  ],
+  "frames": {
+   "best": 0,
+   "checked": [
+    1,
+    2
+   ]
+  },
+  "csv_sha256": "26c16288205def597cdf70a22269aefca478ad7037eb4f8e1129295fbc8e8b9a",
+  "cost_usd": 0.0167
+ },
+ "simulated": {
+  "note": "Simulated run: museum reference images (Smithsonian USNM, public domain) pasted at known lengths, with scripted stand-ins for Muse Spark and SAM 3.1. Not a field result.",
+  "true_total_length_cm": [
+   42.0,
+   38.0,
+   30.0,
+   25.0,
+   33.0
+  ],
+  "species": [
+   "Euthynnus affinis",
+   "Katsuwonus pelamis",
+   "Rastrelliger kanagurta",
+   "Katsuwonus pelamis",
+   "Euthynnus affinis"
+  ]
+ }
+}
