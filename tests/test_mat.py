@@ -51,3 +51,17 @@ def test_tile_ids_dont_collide():
     ids = [set(tile(MATS["A4"], k).markers()) for k in range(5)]
     assert all(not (ids[i] & ids[j]) for i in range(5) for j in range(i + 1, 5))
     assert detect(render(tile(MATS["A4"], 1), px_per_mm=PX), MATS["A4"]) is None  # tile 0 spec ignores tile 1
+
+
+def test_phone_quality_frame_still_calibrates():
+    """About 0.9 px/mm (1080p from ~1 m), mild blur, sensor noise and JPEG: both tiles found, span within 5 mm."""
+    floor = floor_with_tiles([(20, 20, 3), (560, 300, -7)])
+    img, G = phone_view(floor, seed=3)
+    s, rng = 0.45, np.random.default_rng(3)
+    img = cv2.GaussianBlur(cv2.resize(img, None, fx=s, fy=s, interpolation=cv2.INTER_AREA), (0, 0), 0.8)
+    img = np.clip(img + rng.normal(0, 3, img.shape), 0, 255).astype(np.uint8)
+    img = cv2.imdecode(cv2.imencode(".jpg", img, [cv2.IMWRITE_JPEG_QUALITY, 85])[1], 1)
+    fixes = detect_tiles(img, MATS["A4"], 2)
+    assert set(fixes) == {0, 1}
+    a, b = to_img(G, (330, 120)) * s, to_img(G, (730, 120)) * s
+    assert all(abs(length_mm(f, a, b) - 400) < 5 for f in fixes.values())
