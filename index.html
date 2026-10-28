@@ -7,7 +7,7 @@
 <meta name="description" content="A verifiable fish-sampling agent: it measures every fish on a market sheet, checks its own work, and is graded against a tape measure.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="app.css?v=6">
 </head>
 <body>
 <nav class="rail" aria-label="Main">
@@ -31,19 +31,22 @@
     <header class="title-row">
       <div>
         <h1 id="run-title">Can these lengths be trusted?</h1>
-        <p class="finding" id="finding">Pick a sample and run the agent.</p>
+        <p class="sample-line" id="sample-line"></p>
       </div>
       <div class="actions">
         <div class="segmented" role="radiogroup" aria-label="Sample" id="samples"></div>
         <button class="primary" id="run-btn" type="button">Run the agent</button>
       </div>
     </header>
-    <p class="notice" id="notice" hidden></p>
+    <dl class="verdict" id="verdict" aria-live="polite"></dl>
+    <ol class="stages" id="stages" aria-label="Agent progress"></ol>
+    <p class="notice" id="notice" role="status" hidden></p>
 
     <div class="grid run-grid">
       <article class="card frame-card" aria-labelledby="frame-h">
         <header class="card-h"><h2 id="frame-h">Best frame</h2><span class="sub" id="frame-sub"></span></header>
         <div class="frame" id="frame"><img id="frame-img" alt=""><svg id="overlay" aria-hidden="true"></svg></div>
+        <p class="frame-cap" id="frame-cap"></p>
       </article>
 
       <article class="card timeline-card" aria-labelledby="tl-h">
@@ -64,6 +67,7 @@
           <tbody></tbody>
         </table>
       </div>
+      <div class="cited" id="cited"></div>
     </article>
 
     <div class="grid two">
@@ -118,6 +122,6 @@
     </div>
   </section>
 </main>
-<script src="app.js"></script>
+<script src="app.js?v=7"></script>
 </body>
 </html>

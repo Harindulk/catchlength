@@ -50,7 +50,7 @@
     "corner_error_px": 1.33,
     "corner_error_mm": 0.81
    },
-   "ms": 24,
+   "ms": 18,
    "usd": 0.0017
   },
   {
@@ -95,7 +95,7 @@
      "3"
     ]
    },
-   "ms": 18,
+   "ms": 16,
    "usd": 0.0059
   },
   {
@@ -128,7 +128,7 @@
     "rejected": [],
     "count_now": 5
    },
-   "ms": 14,
+   "ms": 13,
    "usd": 0.0083
   },
   {
@@ -147,7 +147,7 @@
      "note": "counts differ across frames: a fish may be hidden, merged or cut off in some frames"
     }
    },
-   "ms": 413,
+   "ms": 441,
    "usd": 0.0083
   },
   {
@@ -163,7 +163,7 @@
      "2002": "Katsuwonus pelamis"
     }
    },
-   "ms": 49,
+   "ms": 53,
    "usd": 0.0167
   },
   {
@@ -2005,14 +2005,47 @@
   "calls": 20,
   "cached": 2
  },
+ "rules_cited": {
+  "iotc-length-interval": {
+   "id": "iotc-length-interval",
+   "species": [
+    "*"
+   ],
+   "measure": "fork length",
+   "threshold_cm": null,
+   "source_title": "IOTC Working Party on Data Collection and Statistics, report (IOTC-2025-WPDCS21-R)",
+   "gazette_no": null,
+   "date": "2025",
+   "url": "https://iotc.org/sites/default/files/documents/2026/03/IOTC-2025-WPDCS21_RE.pdf",
+   "quote": "size samples with class intervals greater than 5 cm",
+   "status": "reported",
+   "check": "length-frequency bins must be 5 cm or narrower; CatchLength uses 1 cm"
+  },
+  "lk-finfish-no-min": {
+   "id": "lk-finfish-no-min",
+   "species": [
+    "Katsuwonus pelamis",
+    "Euthynnus affinis",
+    "Rastrelliger kanagurta"
+   ],
+   "measure": "fork length",
+   "threshold_cm": null,
+   "source_title": "Sri Lanka fisheries regulations under the Fisheries and Aquatic Resources Act No. 2 of 1996 (gazette search: shark 2015, mud crab 2024, lobster 2000, landing of fish 1997/2011)",
+   "gazette_no": null,
+   "date": "2026-10-29",
+   "url": "https://www.documents.gov.lk/view/extra-gazettes/2015/10/1938-02_E.pdf",
+   "quote": "No gazetted minimum landing size was found for this species.",
+   "status": "opened"
+  }
+ },
  "receipt": {
   "clip_sha256": null,
-  "finished_utc": "2026-10-28T19:49:54+00:00",
+  "finished_utc": "2026-10-28T20:04:23+00:00",
   "models": [
    "muse-spark-1.3",
    "sam-3.1"
   ],
-  "git_commit": "33f9c23",
+  "git_commit": "a7f3b94",
   "calibration": {
    "tiles": [
     0,
