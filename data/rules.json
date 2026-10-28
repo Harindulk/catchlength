@@ -1,0 +1,23 @@
+{
+  "note": "Rules the agent may cite. threshold_cm null = no legal minimum exists or was found; the agent must say so, never invent one. status: 'opened' = we read the source ourselves; 'reported' = taken from a secondary source, not yet checked against the gazette text.",
+  "rules": [
+    {"id": "lk-finfish-no-min", "species": ["Katsuwonus pelamis", "Euthynnus affinis", "Rastrelliger kanagurta"], "measure": "fork length", "threshold_cm": null,
+     "source_title": "Sri Lanka fisheries regulations under the Fisheries and Aquatic Resources Act No. 2 of 1996 (gazette search: shark 2015, mud crab 2024, lobster 2000, landing of fish 1997/2011)", "gazette_no": null, "date": "2026-10-29",
+     "url": "https://www.documents.gov.lk/view/extra-gazettes/2015/10/1938-02_E.pdf", "quote": "No gazetted minimum landing size was found for this species.", "status": "opened"},
+    {"id": "lk-lobster-2000", "species": ["Panulirus homarus", "Panulirus polyphagus", "Panulirus penicillatus", "Panulirus versicolor", "Panulirus longipes"], "measure": "carapace length", "threshold_cm": 6,
+     "source_title": "Lobster Fisheries Management Regulations (as summarised by NARA, Status of the South Coast Lobster Fishery 2009)", "gazette_no": "1123/2", "date": "2000-03-13",
+     "url": "http://www.nara.ac.lk/wp-content/uploads/2017/09/Status-of-the-South-Coast-Lobster-Fishery-2009.pdf", "quote": "The minimum legal size was also revised from 5 to 6 cm for the five lobster species", "status": "reported",
+     "conflict": "The 1973 regulations (FAOLEX srl5152) say 8 cm carapace / 11.5 cm tail. Check the 2000 gazette text before relying on either."},
+    {"id": "lk-mudcrab-2024", "species": ["Scylla serrata"], "measure": "carapace width", "threshold_cm": null,
+     "source_title": "Mud Crab Fishery Management Regulations, 2024", "gazette_no": "2371/35", "date": "2024-02",
+     "url": "https://www.documents.gov.lk/view/extra-gazettes/2024/2/2371-35_E.pdf", "quote": "The catchable size is set by the Director-General for each open season on NARA's recommendation.", "status": "reported"},
+    {"id": "iotc-length-interval", "species": ["*"], "measure": "fork length", "threshold_cm": null,
+     "source_title": "IOTC Working Party on Data Collection and Statistics, report (IOTC-2025-WPDCS21-R)", "gazette_no": null, "date": "2025",
+     "url": "https://iotc.org/sites/default/files/documents/2026/03/IOTC-2025-WPDCS21_RE.pdf", "quote": "size samples with class intervals greater than 5 cm", "status": "reported",
+     "check": "length-frequency bins must be 5 cm or narrower; CatchLength uses 1 cm"},
+    {"id": "iotc-res-15-02", "species": ["*"], "measure": "sampling coverage", "threshold_cm": null,
+     "source_title": "IOTC Resolution 15/02 (mandatory statistical reporting requirements)", "gazette_no": null, "date": "2015",
+     "url": "https://iotc.org/cmm/resolution-1502-mandatory-statistical-reporting-requirements-iotc-contracting-parties-and-cooperating", "quote": "at least one length measurement ... for one ton of catch", "status": "reported",
+     "check": "a batch report states how many fish were measured so coverage per tonne can be computed"}
+  ]
+}
