@@ -27,7 +27,7 @@
     const seg = $('#samples');
     seg.innerHTML = samples.map((s, i) => `<button type="button" role="radio" aria-checked="${i === 0}" data-i="${i}">${esc(s.label)}</button>`).join('');
     seg.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) load(+b.dataset.i); });
-    $('#run-btn').addEventListener('click', replay);
+    $('#run-btn').addEventListener('click', live);
     show(location.hash.slice(1) || 'run');
     await load(0);
   }
@@ -45,6 +45,40 @@
     const [w, h] = run.size;
     $('#overlay').setAttribute('viewBox', `0 0 ${w} ${h}`);
     $('#frame-sub').textContent = `frame ${run.best_frame} · ${run.tiles.length} marker ${run.tiles.length === 1 ? 'tile' : 'tiles'}`;
+    render(run.log.length);
+  }
+
+  // ---- live run on the server, streamed turn by turn; falls back to the recording ---------------------------------
+  async function live() {
+    const btn = $('#run-btn');
+    const id = samples[+document.querySelector('#samples [aria-checked="true"]').dataset.i].id;
+    let res;
+    try { res = await fetch('api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sample: id }) }); }
+    catch { return replay(); }
+    if (!res.ok || !(res.headers.get('content-type') || '').includes('event-stream')) return replay();
+    btn.disabled = true; btn.textContent = 'Running live…';
+    const turns = [];
+    const reader = res.body.getReader(), dec = new TextDecoder();
+    let buf = '', fail = null, doneDir = null;
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let k;
+      while ((k = buf.indexOf('\n\n')) >= 0) {
+        const block = buf.slice(0, k); buf = buf.slice(k + 2);
+        const ev = /event: (\w+)/.exec(block)?.[1], data = JSON.parse(/data: (.*)/s.exec(block)?.[1] || '{}');
+        if (ev === 'turn') { turns.push(data); timeline(turns, true); $('#finding').innerHTML = `<span class="muted">Live: turn ${turns.length}…</span>`; }
+        if (ev === 'error') fail = data.message;
+        if (ev === 'done') doneDir = data.dir;
+      }
+    }
+    btn.disabled = false; btn.textContent = 'Run again';
+    if (fail || !doneDir) { $('#notice').hidden = false; $('#notice').textContent = `Live run unavailable: ${fail || 'no result'} Showing the recorded run.`; return replay(); }
+    dir = doneDir;
+    run = await (await fetch(dir + 'run.json')).json();
+    $('#frame-img').src = dir + 'frame.jpg?' + Date.now();
+    $('#notice').hidden = !run.simulated;
     render(run.log.length);
   }
 

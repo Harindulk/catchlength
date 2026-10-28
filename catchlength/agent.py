@@ -299,7 +299,7 @@ blindly. If the clip is unusable, stop. If SAM's count differs from the plan, us
 length or a species: hand anything you can't settle to the officer with request_review. Cite rules only as [rule:id]."""
 
 
-def run_agent(run: Run, model: str = spark.MODEL, max_turns: int = MAX_TURNS) -> Run:
+def run_agent(run: Run, model: str = spark.MODEL, max_turns: int = MAX_TURNS, on_turn=None) -> Run:
     """The loop: the model decides, code acts, the result goes back. Stops when the report is filed, the clip is
     refused, the job is escalated, or the turn limit is hit."""
     tools = [{"type": "function", "function": {"name": n, "description": d, "parameters": {
@@ -318,6 +318,8 @@ def run_agent(run: Run, model: str = spark.MODEL, max_turns: int = MAX_TURNS) ->
                 res = {"refused": True, "feedback": f"{type(e).__name__}: {e}"}
             run.log.append({"turn": turn, "tool": name, "args": args, "result": _brief(res), "ms": int((time.time() - t0) * 1000),
                             "usd": round(run.client.spent, 4)})
+            if on_turn:
+                on_turn(run.log[-1])  # the server streams each turn to the console as it happens
             msgs.append({"role": "tool", "tool_call_id": tc["id"], "content": json.dumps(_brief(res))})
         if run.status != "running":
             break
