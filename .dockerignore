@@ -1,0 +1,12 @@
+.venv
+.git
+.env
+.env.*
+notes
+research
+CLAUDE.md
+data/raw
+data/cache
+runs
+.taste-skill
+.claude

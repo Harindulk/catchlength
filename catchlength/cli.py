@@ -13,6 +13,7 @@ import cv2
 import numpy as np
 
 from .agent import Run, run_agent
+from .rules import RULES
 from .api import Client
 
 
@@ -79,6 +80,7 @@ def save(run: Run, out: Path, path: str = "") -> None:
                  for f in run.fish.values()],
         "cost": {"usd": round(run.client.spent, 4), "calls": len(run.client.ledger),
                  "cached": sum(c["cached"] for c in run.client.ledger)},
+        "rules_cited": {k: RULES[k] for k in sorted({x["rule"] for f in run.fish.values() for x in f.rules if x["rule"]})},
         "receipt": receipt(run, path, csv_text)}, indent=1, default=str))
 
 

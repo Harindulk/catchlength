@@ -1,0 +1,5 @@
+numpy==2.5.4
+opencv-contrib-python-headless==5.0.0.93
+openai==3.40.0
+meta-sam-parser==0.1.0
+pillow==13.0.0

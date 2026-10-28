@@ -1,14 +1,17 @@
-// CatchLength console: replays recorded agent runs (samples/<id>/run.json) and shows the benchmark.
+// CatchLength console: runs the agent live when the server is there, otherwise replays recorded runs
+// (samples/<id>/run.json), and shows the benchmark against the tape.
 (() => {
   const $ = (s, el = document) => el.querySelector(s);
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const nf1 = new Intl.NumberFormat('en', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   const cm = (v) => (v == null ? '<span class="muted">–</span>' : `${nf1.format(v)}<span class="unit">cm</span>`);
+  const cap = (t) => (t ? t.charAt(0).toUpperCase() + t.slice(1) : '');
   const NS = 'http://www.w3.org/2000/svg';
-  const STEP = { inspect_clip: 'Plan', calibrate: 'Calibrate', segment: 'Segment', find_missed: 'Check the count', rescue: 'Rescue',
-    measure: 'Measure', classify: 'Species', apply_rules: 'Rules', request_review: 'Hand to officer', submit_report: 'File report', sign_off: 'Officer sign-off' };
-  const RULE_TEXT = { no_minimum: 'No gazetted minimum size', pass: 'Above legal minimum', below_minimum: 'Below legal minimum',
-    no_rule_in_pack: 'No rule in the pack', info: '' };
+  const STAGES = [['inspect_clip', 'Plan'], ['calibrate', 'Calibrate'], ['segment', 'Segment'], ['find_missed', 'Check count'],
+    ['rescue', 'Rescue'], ['measure', 'Measure'], ['classify', 'Species'], ['apply_rules', 'Rules'], ['submit_report', 'File']];
+  const NAME = Object.fromEntries(STAGES.concat([['request_review', 'Hand to officer'], ['sign_off', 'Officer sign-off']]));
+  const RULE_SHORT = { no_minimum: 'No legal minimum', pass: 'Above minimum', below_minimum: 'Below minimum', no_rule_in_pack: 'No rule in pack' };
+  const CHECK = '<svg class="tick" viewBox="0 0 16 16" aria-label="passed" role="img"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   let samples = [], run = null, dir = '', selected = null, timer = null;
 
   // ---- views ------------------------------------------------------------------------------------------------
@@ -21,10 +24,10 @@
   }
   window.addEventListener('hashchange', () => show(location.hash.slice(1) || 'run'));
 
-  // ---- data ---------------------------------------------------------------------------------------------------
   async function init() {
     samples = await (await fetch('samples/index.json')).json();
     const seg = $('#samples');
+    seg.hidden = samples.length < 2;
     seg.innerHTML = samples.map((s, i) => `<button type="button" role="radio" aria-checked="${i === 0}" data-i="${i}">${esc(s.label)}</button>`).join('');
     seg.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) load(+b.dataset.i); });
     $('#run-btn').addEventListener('click', live);
@@ -37,26 +40,28 @@
     document.querySelectorAll('#samples button').forEach((b) => b.setAttribute('aria-checked', String(+b.dataset.i === i)));
     dir = `samples/${samples[i].id}/`;
     run = await (await fetch(dir + 'run.json')).json();
-    const sim = run.simulated;
-    $('#notice').hidden = !sim;
-    if (sim) $('#notice').textContent = sim.note;
+    selected = null;
+    $('#notice').hidden = true;
+    $('#sample-line').innerHTML = run.simulated
+      ? `<span class="pill warn">Simulated</span> Museum reference fish at known lengths, scripted model stand-ins. Not a field result.`
+      : `<span class="pill n">Field clip</span> ${esc(run.source)}`;
     $('#frame-img').src = dir + 'frame.jpg';
-    $('#frame-img').alt = `Best frame of ${run.source}: fish on a dark sheet with printed marker tiles`;
+    $('#frame-img').alt = `Best frame of ${run.source}: fish on a dark sheet next to printed marker tiles`;
     const [w, h] = run.size;
     $('#overlay').setAttribute('viewBox', `0 0 ${w} ${h}`);
     $('#frame-sub').textContent = `frame ${run.best_frame} · ${run.tiles.length} marker ${run.tiles.length === 1 ? 'tile' : 'tiles'}`;
     render(run.log.length);
   }
 
-  // ---- live run on the server, streamed turn by turn; falls back to the recording ---------------------------------
+  // ---- a live run on the server, streamed turn by turn; falls back to the recording -----------------------------
   async function live() {
     const btn = $('#run-btn');
-    const id = samples[+document.querySelector('#samples [aria-checked="true"]').dataset.i].id;
+    const id = samples[+(document.querySelector('#samples [aria-checked="true"]')?.dataset.i ?? 0)].id;
     let res;
     try { res = await fetch('api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sample: id }) }); }
     catch { return replay(); }
     if (!res.ok || !(res.headers.get('content-type') || '').includes('event-stream')) return replay();
-    btn.disabled = true; btn.textContent = 'Running live…';
+    busy(true, 'Running live…');
     const turns = [];
     const reader = res.body.getReader(), dec = new TextDecoder();
     let buf = '', fail = null, doneDir = null;
@@ -68,70 +73,110 @@
       while ((k = buf.indexOf('\n\n')) >= 0) {
         const block = buf.slice(0, k); buf = buf.slice(k + 2);
         const ev = /event: (\w+)/.exec(block)?.[1], data = JSON.parse(/data: (.*)/s.exec(block)?.[1] || '{}');
-        if (ev === 'turn') { turns.push(data); timeline(turns, true); $('#finding').innerHTML = `<span class="muted">Live: turn ${turns.length}…</span>`; }
+        if (ev === 'turn') { turns.push(data); timeline(turns, true); stages(turns, false); verdict(null, `Live · turn ${turns.length}`); }
         if (ev === 'error') fail = data.message;
         if (ev === 'done') doneDir = data.dir;
       }
     }
-    btn.disabled = false; btn.textContent = 'Run again';
-    if (fail || !doneDir) { $('#notice').hidden = false; $('#notice').textContent = `Live run unavailable: ${fail || 'no result'} Showing the recorded run.`; return replay(); }
+    busy(false);
+    if (fail || !doneDir) { note(`Live run unavailable: ${fail || 'no result came back.'} Showing the recorded run instead.`); return replay(); }
     dir = doneDir;
     run = await (await fetch(dir + 'run.json')).json();
     $('#frame-img').src = dir + 'frame.jpg?' + Date.now();
-    $('#notice').hidden = !run.simulated;
     render(run.log.length);
   }
 
   // ---- replay: the recorded log arrives turn by turn ------------------------------------------------------------
   function replay() {
     clearTimeout(timer);
-    const btn = $('#run-btn');
-    btn.disabled = true; btn.textContent = 'Running…';
+    busy(true, 'Replaying…');
     let k = 0;
     render(0);
     const tick = () => {
       k += 1;
       render(k, true);
       if (k < run.log.length) timer = setTimeout(tick, 650);
-      else { btn.disabled = false; btn.textContent = 'Run again'; }
+      else busy(false);
     };
     timer = setTimeout(tick, 300);
   }
 
+  function busy(on, label) {
+    const btn = $('#run-btn');
+    btn.disabled = on;
+    btn.textContent = on ? label : 'Run again';
+    document.body.classList.toggle('running', on);
+  }
+
+  function note(text) { const n = $('#notice'); n.hidden = !text; n.textContent = text || ''; }
+
+  // ---- render ---------------------------------------------------------------------------------------------------
   function render(upto, animate = false) {
     const log = run.log.slice(0, upto);
     const done = upto >= run.log.length;
     const seen = new Set(log.map((l) => l.tool));
-    // fish appear when SAM found them; rescued ones (ids >= 1000) when the rescue landed
     const visible = run.fish.filter((f) => (seen.has('segment') && +f.id < 1000) || (seen.has('rescue') && +f.id >= 1000));
     timeline(log, animate);
+    stages(log, done);
     overlay(visible, seen.has('measure'));
     ledger(seen.has('measure') ? visible : [], seen);
-    const r = run.receipt?.fish;
-    const status = { awaiting_signoff: 'waiting for the officer to sign off', needs_review: 'handed to the officer',
-      needs_refilm: 'clip refused, re-film needed', signed_off: 'signed off', running: 'unfinished' }[run.status] || run.status;
-    $('#finding').innerHTML = done && r
-      ? `<b>${r.accepted} of ${r.detected} fish measured</b>, ${r.flagged ? `${r.flagged} handed to the officer` : 'none flagged'} · <span class="muted">${esc(status)}</span>`
-      : upto ? `<span class="muted">Turn ${upto} of ${run.log.length}…</span>` : 'Replay the recorded run turn by turn.';
-    $('#tl-sub').textContent = `${upto} of ${run.log.length} turns · $${(run.cost?.usd ?? 0).toFixed(3)}`;
+    verdict(done ? run : null, upto ? `Turn ${upto} of ${run.log.length}` : 'Ready');
+    const usd = done ? run.cost?.usd ?? 0 : log[log.length - 1]?.usd ?? 0;  // the spend so far, as the run builds it
+    $('#tl-sub').textContent = `${upto} of ${run.log.length} turns · $${usd.toFixed(3)}`;
     lf(done ? run.report?.lf_1cm : null);
     receipt(done ? run.receipt : null);
+    cited(done ? run : null);
+  }
+
+  function verdict(r, progress) {
+    const el = $('#verdict');
+    const fig = (v, l, cls = '') => `<div class="${cls}"><dd>${v}</dd><dt>${esc(l)}</dt></div>`;
+    if (!r || !r.receipt) {
+      el.innerHTML = fig('<span class="muted">–</span>', 'fish found') + fig('<span class="muted">–</span>', 'accepted')
+        + fig('<span class="muted">–</span>', 'to the officer') + fig(`<span class="muted small">${esc(progress)}</span>`, 'status', 'status');
+      return;
+    }
+    const f = r.receipt.fish;
+    const status = { awaiting_signoff: 'Waiting for sign-off', needs_review: 'With the officer', needs_refilm: 'Clip refused',
+      signed_off: 'Signed off', running: 'Unfinished' }[r.status] || r.status;
+    el.innerHTML = fig(f.detected, 'fish found') + fig(`${f.accepted}<span class="of"> of ${f.detected}</span>`, 'accepted')
+      + fig(f.flagged, 'to the officer', f.flagged ? 'warn' : '') + fig(`<span class="small">${esc(status)}</span>`, `${r.log.length} turns · $${r.cost.usd.toFixed(3)}`, 'status');
+  }
+
+  function stageState(log, tool) {
+    const hits = log.filter((l) => l.tool === tool);
+    if (!hits.length) return 'todo';
+    const r = hits[hits.length - 1].result || {};
+    if (r.escalated) return 'esc';
+    if (r.refused) return 'no';
+    if ((tool === 'segment' && r.found !== r.expected) || (tool === 'measure' && r.flagged?.length)) return 'warn';
+    return 'ok';
+  }
+
+  function stages(log, done) {
+    const last = log[log.length - 1]?.tool;
+    $('#stages').innerHTML = STAGES.map(([t, name]) => {
+      const st = stageState(log, t);
+      const cur = !done && t === last ? ' current' : '';
+      const label = { todo: 'not reached', ok: 'passed', warn: 'needs a look', no: 'refused', esc: 'escalated' }[st];
+      return `<li class="st ${st}${cur}"><span class="mark" aria-hidden="true"></span><span class="nm">${name}</span><span class="vh">${label}</span></li>`;
+    }).join('');
   }
 
   function say(tool, r) {
     if (!r) return '';
-    if (r.refused) return `<b>Refused:</b> ${esc(r.feedback)}${r.escalated ? ` <b>${esc(r.escalated)}</b>` : ''}`;
+    if (r.refused) return `<b>Refused.</b> ${esc(r.feedback)}${r.escalated ? ` <b>${esc(r.escalated)}</b>` : ''}`;
     switch (tool) {
-      case 'inspect_clip': return `Usable. Expects <b>${r.expected_count}</b> fish; best frame ${r.best_frame}; ${r.issues?.length ? esc(r.issues.join('; ')) : 'no problems seen'}.`;
-      case 'calibrate': return `${r.tiles.length} marker tiles found; corner error <b>${r.corner_error_px} px</b> (limit 1.5).`;
-      case 'segment': return `SAM 3.1 found <b>${r.found}</b>; the plan expected ${r.expected}. ${esc(r.note.charAt(0).toUpperCase() + r.note.slice(1))}.`;
-      case 'find_missed': return `Spark counts ${r.count}: ${r.missed_boxes.length} without an outline${r.merged_ids.length ? `, outline ${esc(r.merged_ids.join(', '))} wraps two fish` : ''}.`;
-      case 'rescue': return `Boxes and negative points sent back to SAM: kept ${r.accepted.map(esc).join(', ') || 'none'}${r.rejected.length ? `, rejected ${r.rejected.length}` : ''}. Now <b>${r.count_now}</b> fish.`;
-      case 'measure': return `<b>${r.measured}</b> measured two ways, ${r.flagged.length} flagged. ${r.cross_frame ? esc(r.cross_frame.note.charAt(0).toUpperCase() + r.cross_frame.note.slice(1)) : ''}.`;
-      case 'classify': { const c = {}; Object.values(r.species).forEach((s) => (c[s] = (c[s] || 0) + 1)); return Object.entries(c).map(([s, n]) => `${n} × ${esc(s)}`).join(', ') + '.'; }
-      case 'apply_rules': return 'Every fish checked against the cited rule pack.';
+      case 'inspect_clip': return `Usable. Expects <b>${r.expected_count}</b> fish; best frame ${r.best_frame}${r.issues?.length ? `; ${esc(r.issues.join('; '))}` : ''}.`;
+      case 'calibrate': return `${r.tiles.length} marker tiles; corner error <b>${r.corner_error_px} px</b> of 1.5 allowed.`;
+      case 'segment': return `SAM 3.1 found <b>${r.found}</b>, the plan expected ${r.expected}.`;
+      case 'find_missed': return `Spark counts ${r.count}: ${r.missed_boxes.length} without an outline${r.merged_ids.length ? `; outline ${esc(r.merged_ids.join(', '))} wraps two fish` : ''}.`;
+      case 'rescue': return `Boxes and negative points back to SAM: kept ${r.accepted.map(esc).join(', ') || 'none'}${r.rejected.length ? `, rejected ${r.rejected.length}` : ''}. Now <b>${r.count_now}</b> fish.`;
+      case 'measure': return `<b>${r.measured}</b> measured two ways, ${r.flagged.length} flagged. ${r.cross_frame ? esc(cap(r.cross_frame.note)) + '.' : ''}`;
+      case 'classify': { const c = {}; Object.values(r.species).forEach((s) => (c[s] = (c[s] || 0) + 1)); return Object.entries(c).map(([s, n]) => `${n} × <i>${esc(s)}</i>`).join(', ') + '.'; }
+      case 'apply_rules': return 'Each fish checked against the cited rule pack.';
       case 'request_review': return `Queued for the officer (${r.queued}).`;
-      case 'submit_report': return `Filed: <b>${r.measured}</b> fish, waiting for ${esc(r.waiting_for)}.`;
+      case 'submit_report': return `Filed <b>${r.measured}</b> fish; waiting for ${esc(r.waiting_for)}.`;
       default: return '';
     }
   }
@@ -139,59 +184,77 @@
   function timeline(log, animate) {
     $('#timeline').innerHTML = log.map((l, i) => {
       const r = l.result || {};
-      const pill = r.escalated ? '<span class="pill warn">escalated</span>' : r.refused ? '<span class="pill no">refused</span>'
+      const tag = r.escalated ? '<span class="pill warn">escalated</span>' : r.refused ? '<span class="pill no">refused</span>'
         : l.tool === 'measure' && r.flagged?.length ? `<span class="pill warn">${r.flagged.length} flagged</span>`
-        : l.tool === 'segment' && r.found !== r.expected ? '<span class="pill warn">count off</span>' : '<span class="pill ok">passed</span>';
-      return `<li class="${animate && i === log.length - 1 ? 'arrive' : ''}"><span class="tool">${esc(STEP[l.tool] || l.tool)}</span>${pill}<span class="say">${say(l.tool, r)}</span></li>`;
-    }).join('') || '<li><span class="say">No turns yet.</span></li>';
-    const tl = $('#timeline'); tl.scrollTop = animate ? tl.scrollHeight : 0;  // follow a replay; a finished run reads from the top
+        : l.tool === 'segment' && r.found !== r.expected ? '<span class="pill warn">count off</span>' : CHECK;
+      const last = i === log.length - 1;
+      return `<li class="${animate && last ? 'arrive' : ''}${last && document.body.classList.contains('running') ? ' now' : ''}">
+        <span class="tool">${esc(NAME[l.tool] || l.tool)}</span><span class="tag">${tag}</span>
+        <span class="say">${say(l.tool, r)}</span>${l.ms != null ? `<span class="ms">${l.ms} ms</span>` : ''}</li>`;
+    }).join('') || '<li class="idle"><span class="say">Press Run to watch the agent work through the clip.</span></li>';
+    const tl = $('#timeline'); tl.scrollTop = animate ? tl.scrollHeight : 0;
   }
 
   function overlay(fish, measured) {
     const svg = $('#overlay');
     svg.innerHTML = '';
+    const fs = Math.round(run.size[0] / 42);  // label size follows the frame, so it reads at any resolution
     for (const f of fish) {
       const flagged = measured && f.status === 'needs_review';
+      const g = document.createElementNS(NS, 'g');
+      g.setAttribute('class', `fishg${selected === f.id ? ' on' : ''}${selected && selected !== f.id ? ' dim' : ''}`);
       const p = document.createElementNS(NS, 'polygon');
       p.setAttribute('points', f.outline.map((q) => q.join(',')).join(' '));
-      p.setAttribute('class', `fish${flagged ? ' flagged' : ''}${selected === f.id ? ' on' : ''}`);
-      p.addEventListener('click', () => pick(f.id));
-      svg.appendChild(p);
-      const [x0, y0] = f.box;
-      const t = document.createElementNS(NS, 'text');
-      const fs = Math.round(run.size[0] / 40);  // label size follows the frame, so it reads at any resolution
-      t.setAttribute('x', x0); t.setAttribute('y', Math.max(fs, y0 - fs / 3)); t.setAttribute('class', 'lbl'); t.setAttribute('font-size', fs); t.textContent = f.id;
-      svg.appendChild(t);
-      if (measured && selected === f.id && f.points) {
+      p.setAttribute('class', `fish${flagged ? ' flagged' : ''}`);
+      g.appendChild(p);
+      if (measured && f.points) {  // the measurement itself: snout to fork, on every fish
         const [a, b] = [f.points.snout, f.points.fork];
         const line = document.createElementNS(NS, 'line');
         Object.entries({ x1: a[0], y1: a[1], x2: b[0], y2: b[1], class: 'fl' }).forEach(([k, v]) => line.setAttribute(k, v));
-        svg.appendChild(line);
-        for (const q of [a, b]) { const c = document.createElementNS(NS, 'circle'); c.setAttribute('cx', q[0]); c.setAttribute('cy', q[1]); c.setAttribute('r', 9); c.setAttribute('class', 'pt'); svg.appendChild(c); }
+        g.appendChild(line);
+        for (const q of [a, b]) { const c = document.createElementNS(NS, 'circle'); c.setAttribute('cx', q[0]); c.setAttribute('cy', q[1]); c.setAttribute('r', fs / 4); c.setAttribute('class', 'pt'); g.appendChild(c); }
       }
+      const t = document.createElementNS(NS, 'text');
+      t.setAttribute('x', f.box[0]); t.setAttribute('y', Math.max(fs, f.box[1] - fs / 3)); t.setAttribute('class', 'lbl'); t.setAttribute('font-size', fs); t.textContent = f.id;
+      g.appendChild(t);
+      g.addEventListener('click', () => pick(f.id));
+      svg.appendChild(g);
     }
+    const s = run.fish.find((f) => f.id === selected);
+    $('#frame-cap').innerHTML = s && measured
+      ? `<b>Fish ${esc(s.id)}</b> · fork length ${cm(s.fork_cm)} · outline ${cm(s.axis_cm)} · ${esc(s.species || 'species pending')} · ${s.status === 'measured' ? 'accepted' : esc(s.why || 'with the officer')}`
+      : measured ? '<span class="muted">Dashed lines run from snout tip to tail fork. Pick a fish for its numbers.</span>' : '';
   }
 
   function ledger(fish, seen) {
     const body = $('#ledger tbody');
-    $('#fish-sub').textContent = fish.length ? `${fish.length} fish · fork length is snout tip to tail fork, on the sheet's plane` : '';
-    if (!fish.length) { body.innerHTML = `<tr><td colspan="7" class="empty">${seen.has('segment') ? 'Measuring…' : 'Run the agent to see each fish.'}</td></tr>`; return; }
+    $('#fish-sub').textContent = fish.length ? `${fish.length} fish · fork length is snout tip to tail fork, measured on the sheet's plane` : '';
+    if (!fish.length) { body.innerHTML = `<tr class="idle"><td colspan="7" class="empty">${seen.has('segment') ? 'Measuring…' : 'Each fish appears here once it has been measured.'}</td></tr>`; return; }
     body.innerHTML = fish.map((f) => {
       const fr = Object.values(f.frames_mm || {});
       const spread = fr.length && f.axis_cm != null ? (Math.max(...fr, f.axis_cm * 10) - Math.min(...fr, f.axis_cm * 10)) / 10 : null;
       const rule = (f.rules || []).find((x) => x.result !== 'info');
       const st = f.status === 'measured' ? '<span class="pill ok">accepted</span>' : f.status === 'needs_review' ? '<span class="pill warn">to officer</span>' : '<span class="pill n">found</span>';
-      return `<tr data-id="${esc(f.id)}" class="${selected === f.id ? 'on' : ''}" tabindex="0">
-        <td>${esc(f.id)}</td><td>${f.species ? esc(f.species) : '<span class="muted">–</span>'}</td>
-        <td class="num">${cm(f.fork_cm)}</td><td class="num">${cm(f.axis_cm)}</td>
+      return `<tr data-id="${esc(f.id)}" class="${selected === f.id ? 'on' : ''}" tabindex="0" aria-selected="${selected === f.id}">
+        <td>${esc(f.id)}</td><td>${f.species ? `<i>${esc(f.species)}</i>` : '<span class="muted">–</span>'}</td>
+        <td class="num strong">${cm(f.fork_cm)}</td><td class="num">${cm(f.axis_cm)}</td>
         <td class="num">${spread == null ? '<span class="muted">–</span>' : `±${nf1.format(spread / 2)}<span class="unit">cm</span>`}</td>
         <td>${st}${f.why ? `<span class="why">${esc(f.why)}</span>` : ''}</td>
-        <td class="rule">${rule ? `${esc(RULE_TEXT[rule.result] ?? rule.result)} <span class="muted">[${esc(rule.rule || '–')}]</span>` : '<span class="muted">–</span>'}</td></tr>`;
+        <td class="rule">${rule ? `${esc(RULE_SHORT[rule.result] || rule.result)}${rule.rule ? ` <sup>${esc(rule.rule)}</sup>` : ''}` : '<span class="muted">–</span>'}</td></tr>`;
     }).join('');
     body.querySelectorAll('tr[data-id]').forEach((tr) => {
       tr.addEventListener('click', () => pick(tr.dataset.id));
       tr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(tr.dataset.id); } });
     });
+  }
+
+  function cited(r) {
+    const el = $('#cited');
+    const rules = r?.rules_cited ? Object.values(r.rules_cited) : [];
+    if (!rules.length) { el.innerHTML = ''; return; }
+    el.innerHTML = `<h3>Rules cited</h3><ul>${rules.map((x) => `<li><sup>${esc(x.id)}</sup>
+      <span class="q">“${esc(x.quote)}”</span> <a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.source_title)}</a>
+      ${x.status === 'reported' ? '<span class="muted">· from a secondary source, not yet checked against the gazette text</span>' : ''}</li>`).join('')}</ul>`;
   }
 
   function pick(id) {
