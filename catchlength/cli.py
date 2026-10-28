@@ -17,14 +17,31 @@ from .rules import RULES
 from .api import Client
 
 
-def load_frames(path: str, n: int) -> list[np.ndarray]:
+def sharpness(frame: np.ndarray) -> float:
+    """Variance of the Laplacian on a 640 px copy: low means motion blur or missed focus."""
+    g = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    s = 640 / max(g.shape)
+    return float(cv2.Laplacian(cv2.resize(g, None, fx=s, fy=s, interpolation=cv2.INTER_AREA), cv2.CV_64F).var())
+
+
+def pick_frames(frames: list[np.ndarray], n: int) -> list[np.ndarray]:
+    """Keep the n sharpest frames that show at least one marker tile, in time order. A phone clip panned by hand
+    has blurred frames; Spark should choose among frames that can already be measured."""
+    from .mat import MATS, detect_tiles
+    scored = [(i, sharpness(f), len(detect_tiles(f, MATS["A4"], 4))) for i, f in enumerate(frames)]
+    usable = [x for x in scored if x[2]] or scored
+    keep = sorted(sorted(usable, key=lambda x: -x[1])[:n])
+    return [frames[i] for i, _, _ in keep]
+
+
+def load_frames(path: str, n: int, candidates: int = 24) -> list[np.ndarray]:
     img = cv2.imread(path)
     if img is not None:
         return [img]
     cap = cv2.VideoCapture(path)  # OpenCV applies the file's rotation flag, so frames come out as displayed
     total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     frames = []
-    for i in np.linspace(0, max(0, total - 1), n).astype(int):
+    for i in np.linspace(0, max(0, total - 1), max(n, candidates)).astype(int):
         cap.set(cv2.CAP_PROP_POS_FRAMES, int(i))
         ok, f = cap.read()
         if ok:
@@ -34,7 +51,7 @@ def load_frames(path: str, n: int) -> list[np.ndarray]:
     if max(frames[0].shape[:2]) > 1920:  # 4K -> 1080p: SAM and Spark don't need more, and it's cheaper
         s = 1920 / max(frames[0].shape[:2])
         frames = [cv2.resize(f, None, fx=s, fy=s, interpolation=cv2.INTER_AREA) for f in frames]
-    return frames
+    return pick_frames(frames, n)
 
 
 def catch_csv(run: Run) -> str:
