@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CatchLength · fish sampling agent</title>
+<meta name="description" content="A verifiable fish-sampling agent: it measures every fish on a market sheet, checks its own work, and is graded against a tape measure.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<nav class="rail" aria-label="Main">
+  <a class="mark" href="#run" aria-label="CatchLength home">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12c3-4 7-5 11-5 2 0 4 1 5 2l2-2v10l-2-2c-1 1-3 2-5 2-4 0-8-1-11-5z" fill="currentColor"/></svg>
+  </a>
+  <a href="#run" data-view="run" title="Run a sample">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l11 7-11 7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+    <span>Run</span></a>
+  <a href="#benchmark" data-view="benchmark" title="Benchmark against the tape">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M4 20V4M8 16l3-4 3 2 5-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Benchmark</span></a>
+  <a href="#about" data-view="about" title="About the build">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <span>About</span></a>
+</nav>
+
+<main id="canvas">
+  <!-- RUN -->
+  <section id="view-run" class="view" aria-labelledby="run-title">
+    <header class="title-row">
+      <div>
+        <h1 id="run-title">Can these lengths be trusted?</h1>
+        <p class="finding" id="finding">Pick a sample and run the agent.</p>
+      </div>
+      <div class="actions">
+        <div class="segmented" role="radiogroup" aria-label="Sample" id="samples"></div>
+        <button class="primary" id="run-btn" type="button">Run the agent</button>
+      </div>
+    </header>
+    <p class="notice" id="notice" hidden></p>
+
+    <div class="grid run-grid">
+      <article class="card frame-card" aria-labelledby="frame-h">
+        <header class="card-h"><h2 id="frame-h">Best frame</h2><span class="sub" id="frame-sub"></span></header>
+        <div class="frame" id="frame"><img id="frame-img" alt=""><svg id="overlay" aria-hidden="true"></svg></div>
+      </article>
+
+      <article class="card timeline-card" aria-labelledby="tl-h">
+        <header class="card-h"><h2 id="tl-h">What the agent did</h2><span class="sub" id="tl-sub"></span></header>
+        <ol class="timeline" id="timeline"></ol>
+      </article>
+    </div>
+
+    <article class="card" aria-labelledby="fish-h">
+      <header class="card-h"><h2 id="fish-h">Fish</h2><span class="sub" id="fish-sub"></span></header>
+      <div class="table-wrap">
+        <table class="ledger" id="ledger">
+          <thead><tr>
+            <th scope="col">Fish</th><th scope="col">Species</th><th scope="col" class="num">Fork length</th>
+            <th scope="col" class="num">Outline</th><th scope="col" class="num">Across frames</th>
+            <th scope="col">Status</th><th scope="col">Rule</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
+
+    <div class="grid two">
+      <article class="card" aria-labelledby="lf-h">
+        <header class="card-h"><h2 id="lf-h">Length frequency</h2><span class="sub">1 cm classes, accepted fish only</span></header>
+        <div id="lf"></div>
+      </article>
+      <article class="card" aria-labelledby="rc-h">
+        <header class="card-h"><h2 id="rc-h">Audit receipt</h2><span class="sub">what a reviewer needs to check this run</span></header>
+        <dl class="receipt" id="receipt"></dl>
+      </article>
+    </div>
+  </section>
+
+  <!-- BENCHMARK -->
+  <section id="view-benchmark" class="view" aria-labelledby="bm-title" hidden>
+    <header class="title-row">
+      <div>
+        <h1 id="bm-title">Agent against the tape measure</h1>
+        <p class="finding" id="bm-finding"></p>
+      </div>
+    </header>
+    <div id="bm-body"></div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="view-about" class="view" aria-labelledby="about-title" hidden>
+    <header class="title-row"><div><h1 id="about-title">About the build</h1>
+      <p class="finding">Built for the Meta Global AI Developer Hackathon, Indie track. All code written from 27 Oct 2026.</p></div></header>
+    <div class="grid two about">
+      <article class="card prose" aria-labelledby="ab-what">
+        <h2 id="ab-what">What it does</h2>
+        <p>Sri Lanka already measures coastal tuna from photographs, but a person still clicks every snout and every tail fork and names every species by hand. CatchLength does that clicking from a 20-second phone clip of fish laid next to printed marker sheets, and it can't skip checking its own work.</p>
+        <p>Theme: <em>Build for Your World.</em> "Bring Meta's models into your domain. Solve a problem you know firsthand, free up time and mental space, and make something possible that wasn't before."</p>
+        <h2>How it checks itself</h2>
+        <p>The checks live inside the agent's tools, so the model can't skip them. Calibration refuses a bent or missing sheet. A count that disagrees with the plan sends Muse Spark's boxes back to SAM 3.1 with negative points on the neighbouring fish. Every fish is measured two ways and in several frames; when they disagree it is flagged, never averaged. A tool refused three times hands the job to the officer, who signs off on the report. The tape measurements it is graded on are never shown to it.</p>
+        <h2>Rules it cites</h2>
+        <p>Sri Lanka gazettes no minimum landing size for the tunas and mackerel sampled here, so the report says so instead of inventing one. It cites the lobster and mud crab rules where they apply, and IOTC's rule that size data must be binned at 5 cm or finer.</p>
+      </article>
+      <article class="card prose" aria-labelledby="ab-models">
+        <h2 id="ab-models">Meta models and what each one does</h2>
+        <dl class="kv">
+          <dt>Muse Spark 1.3</dt><dd>Runs the agent loop (one tool per turn), plans the clip, finds missed and merged fish, places snout and fork points, names the species from a closed list.</dd>
+          <dt>SAM 3.1</dt><dd>Segments every fish from the concept "fish", then again from Spark's boxes and negative points when a fish was missed or two were merged.</dd>
+          <dt>Muse Spark Open</dt><dd>Planned: an independent auditor that re-checks a sample of accepted fish (open-weights track).</dd>
+        </dl>
+        <h2>Before the hackathon</h2>
+        <p>The idea and the application text. The museum fish photographs used for tests and the simulated sample are Smithsonian (USNM) specimens, public domain via Wikimedia Commons, and are marked wherever they appear.</p>
+        <h2>Source</h2>
+        <p>MIT licence. Repository link added at submission.</p>
+      </article>
+    </div>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
