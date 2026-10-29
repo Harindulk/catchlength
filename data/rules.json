@@ -1,7 +1,7 @@
 {
   "note": "Rules the agent may cite. threshold_cm null = no legal minimum exists or was found; the agent must say so, never invent one. status: 'opened' = we read the source ourselves; 'reported' = taken from a secondary source, not yet checked against the gazette text.",
   "rules": [
-    {"id": "lk-finfish-no-min", "species": ["Katsuwonus pelamis", "Euthynnus affinis", "Rastrelliger kanagurta"], "measure": "fork length", "threshold_cm": null,
+    {"id": "lk-finfish-no-min", "species": ["Katsuwonus pelamis", "Euthynnus affinis", "Rastrelliger kanagurta", "Auxis thazard", "Auxis rochei"], "measure": "fork length", "threshold_cm": null,
      "source_title": "Sri Lanka fisheries regulations under the Fisheries and Aquatic Resources Act No. 2 of 1996 (gazette search: shark 2015, mud crab 2024, lobster 2000, landing of fish 1997/2011)", "gazette_no": null, "date": "2026-10-29",
      "url": "https://www.documents.gov.lk/view/extra-gazettes/2015/10/1938-02_E.pdf", "quote": "No gazetted minimum landing size was found for this species.", "status": "opened"},
     {"id": "lk-lobster-2000", "species": ["Panulirus homarus", "Panulirus polyphagus", "Panulirus penicillatus", "Panulirus versicolor", "Panulirus longipes"], "measure": "carapace length", "threshold_cm": 6,

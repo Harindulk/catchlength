@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 
 NAMES = {n.lower(): s["latin"] for s in json.loads((Path(__file__).parent.parent / "config/species.json").read_text())["species"]
-         for n in (s["latin"], s["english"], s["sinhala"])}
+         for n in (s["latin"], s["english"], s["sinhala"]) if n}
 KILL = {"mae_cm": 2.0, "min_fish": 40, "count_exact": 0.9, "species": 0.9}
 
 

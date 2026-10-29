@@ -1,5 +1,7 @@
 {"species": [
   {"latin": "Katsuwonus pelamis", "english": "skipjack tuna", "sinhala": "balaya"},
   {"latin": "Euthynnus affinis", "english": "kawakawa", "sinhala": "attawalla"},
-  {"latin": "Rastrelliger kanagurta", "english": "Indian mackerel", "sinhala": "kumbalawa"}
+  {"latin": "Rastrelliger kanagurta", "english": "Indian mackerel", "sinhala": "kumbalawa"},
+  {"latin": "Auxis thazard", "english": "frigate tuna", "sinhala": "alagoduwa"},
+  {"latin": "Auxis rochei", "english": "bullet tuna", "sinhala": ""}
 ]}
