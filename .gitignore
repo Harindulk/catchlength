@@ -16,3 +16,4 @@ data/cache/
 runs/
 .taste-skill/
 .claude/
+!.env.example
