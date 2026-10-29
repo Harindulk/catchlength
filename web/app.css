@@ -245,3 +245,5 @@ button.secondary:active { transform: translateY(1px); }
 .signoff.done { border-color: transparent; background: var(--pill-positive-bg); color: var(--pill-positive-ink); }
 .signoff.back { border-color: transparent; background: var(--pill-warning-bg); color: var(--pill-warning-ink); }
 @media (max-width: 760px) { .signoff input { width: 100%; } .signoff-actions { width: 100%; } .signoff-actions button { flex: 1; } }
+.marks { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+#bm-body { display: grid; gap: var(--gap); }

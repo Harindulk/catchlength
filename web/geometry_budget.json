@@ -1,0 +1,9 @@
+{
+ "kind": "geometry",
+ "n_fish": 112,
+ "n_scenes": 30,
+ "mae_cm": 0.16,
+ "p90_cm": 0.31,
+ "bias_cm": -0.1,
+ "worst_cm": 0.53
+}
