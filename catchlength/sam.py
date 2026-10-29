@@ -48,6 +48,9 @@ def parse(output_text: str, size: tuple[int, int]) -> list[Detection]:
         m = np.frombuffer(decode_mask_to_raster(r.mask), np.uint8).reshape(r.mask.height, r.mask.width)
         full = np.zeros((h, w), bool)
         b = r.bounds
+        bw, bh = int(b.right - b.left), int(b.bottom - b.top)
+        if m.shape != (bh, bw):  # the raster is box-local and may be coarser than the box: stretch it over the box
+            m = cv2.resize(m, (bw, bh), interpolation=cv2.INTER_NEAREST)
         full[b.top:b.top + m.shape[0], b.left:b.left + m.shape[1]] = m[:h - b.top, :w - b.left] > 0
         bx = boxes.get(r.object_id)
         box = (bx.left, bx.top, bx.right, bx.bottom) if bx else (b.left, b.top, b.right, b.bottom)
