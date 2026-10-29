@@ -4,6 +4,7 @@
   const $ = (s, el = document) => el.querySelector(s);
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const nf1 = new Intl.NumberFormat('en', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const nf2 = new Intl.NumberFormat('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const cm = (v) => (v == null ? '<span class="muted">–</span>' : `${nf1.format(v)}<span class="unit">cm</span>`);
   const cap = (t) => (t ? t.charAt(0).toUpperCase() + t.slice(1) : '');
   const NS = 'http://www.w3.org/2000/svg';
@@ -353,25 +354,44 @@
   // ---- benchmark ------------------------------------------------------------------------------------------------
   async function benchmark() {
     const body = $('#bm-body');
-    let bm = null;
-    try { const r = await fetch('benchmark.json'); if (r.ok) bm = await r.json(); } catch { /* not published yet */ }
+    const get = async (f) => { try { const r = await fetch(f); return r.ok ? r.json() : null; } catch { return null; } };
+    const bm = await get('benchmark.json');
+    const plan = `<article class="card"><header class="card-h"><h2>What the tape benchmark measures</h2><span class="sub">pass marks set before the shoot</span></header>
+        <dl class="kv"><dt>Length</dt><dd>Mean error against the tape on 40 or more fish, 2.0 cm or less (FishNet's published mean error is 2.3 cm). Also the median, 90th percentile, share within 2 cm, bias and limits of agreement, with accepted fish shown apart from all fish.</dd>
+        <dt>Count</dt><dd>The agent's count equals the fish on the sheet in 90% of clean clips.</dd>
+        <dt>Species</dt><dd>Right 90% of the time, from a closed list of five coastal species, "unknown" allowed.</dd>
+        <dt>Worst fish</dt><dd>The fish with the largest errors are listed by name, with what the agent did about them.</dd></dl></article>`;
     if (!bm) {
-      $('#bm-finding').innerHTML = 'No field benchmark yet. <span class="muted">Fish are tape-measured at Peliyagoda on Sun 1 Nov; the agent never sees those numbers.</span>';
-      body.innerHTML = `<article class="card"><header class="card-h"><h2>What will be measured</h2></header>
-        <dl class="kv"><dt>Length</dt><dd>Mean and median error against the tape, 90th percentile, share within 2 cm, bias and limits of agreement. Error among accepted fish is shown apart from all fish.</dd>
-        <dt>Count</dt><dd>Clips where the agent's count equals the fish on the sheet.</dd>
-        <dt>Species</dt><dd>Accuracy over three species from a closed list, "unknown" allowed.</dd>
-        <dt>Pass marks</dt><dd>Mean error 2.0 cm or less on 40 or more fish; exact count on 90% of clean clips; species right 90% of the time.</dd></dl></article>`;
+      const g = await get('geometry_budget.json');
+      $('#bm-finding').innerHTML = 'No tape benchmark yet. <span class="muted">Fish are tape-measured at Peliyagoda on Sun 1 Nov; the agent never sees those numbers.</span>';
+      body.innerHTML = (g ? `<article class="card"><header class="card-h"><h2>What the camera and tiles add on their own</h2><span class="pill n">Simulated</span></header>
+        <div class="kpis">
+          <div class="kpi"><div class="v">${nf2.format(g.mae_cm)}<span class="unit">cm</span></div><div class="l">mean error</div></div>
+          <div class="kpi"><div class="v">${nf2.format(g.p90_cm)}<span class="unit">cm</span></div><div class="l">90th percentile</div></div>
+          <div class="kpi"><div class="v">${nf2.format(g.worst_cm)}<span class="unit">cm</span></div><div class="l">worst fish</div></div>
+          <div class="kpi"><div class="v">${g.n_fish}</div><div class="l">fish in ${g.n_scenes} scenes</div></div></div>
+        <p class="sub">Museum reference fish pasted at known lengths, blurred, noised and compressed like a 1080p phone frame from about 1 m, then measured through the marker tiles with each fish's true outline. This is the floor the geometry sets; it says nothing yet about SAM 3.1's outlines or Muse Spark's points. Bias ${nf2.format(g.bias_cm)} cm.</p></article>` : '') + plan;
       return;
     }
-    const L = bm.length_accepted_only, A = bm.length;
+    const L = bm.length_accepted_only, A = bm.length, P = bm.pass_marks;
+    const mark = (ok, label) => `<span class="pill ${ok ? 'ok' : 'no'}">${label} ${ok ? 'passed' : 'missed'}</span>`;
+    const worst = bm.pairs.filter((p) => p.agent_cm != null).sort((a, b) => Math.abs(b.agent_cm - b.tape_cm) - Math.abs(a.agent_cm - a.tape_cm)).slice(0, 3);
     $('#bm-finding').innerHTML = `<b>Mean error ${nf1.format(L.mae)} cm</b> on ${L.n} accepted fish · ${bm.flagged} handed to the officer · <span class="muted">${bm.n_measured} fish measured in all</span>`;
-    body.innerHTML = `<article class="card"><div class="kpis">
+    body.innerHTML = `<article class="card"><div class="marks">${mark(P.length, 'Length')} ${mark(P.count, 'Count')} ${mark(P.species, 'Species')}</div><div class="kpis">
       <div class="kpi"><div class="v">${nf1.format(L.mae)}<span class="unit">cm</span></div><div class="l">mean error, accepted fish</div></div>
       <div class="kpi"><div class="v">${Math.round(L.within_2cm * 100)}<span class="unit">%</span></div><div class="l">within 2 cm of the tape</div></div>
       <div class="kpi"><div class="v">${bm.count.exact_rate == null ? '–' : Math.round(bm.count.exact_rate * 100)}<span class="unit">%</span></div><div class="l">clips counted exactly</div></div>
       <div class="kpi"><div class="v">${bm.species.accuracy == null ? '–' : Math.round(bm.species.accuracy * 100)}<span class="unit">%</span></div><div class="l">species right</div></div></div>
-      <div class="chart" id="scatter"></div><p class="sub">Each dot is one fish: tape on the x axis, agent on the y axis. Dashed line = perfect agreement. Hollow dots were handed to the officer. All fish: mean error ${nf1.format(A.mae)} cm.</p></article>`;
+      <div class="chart" id="scatter"></div><p class="sub">Each dot is one fish: tape on the x axis, agent on the y axis. Dashed line = perfect agreement. Hollow dots were handed to the officer. Accepted fish: bias ${nf1.format(L.bias)} cm, 95% of errors between ${nf1.format(L.loa95[0])} and ${nf1.format(L.loa95[1])} cm. All fish: mean error ${nf1.format(A.mae)} cm.</p></article>
+      <div class="grid two">
+      <article class="card"><header class="card-h"><h2>Largest errors</h2><span class="sub">shown, never dropped</span></header>
+        <table class="ledger"><thead><tr><th scope="col">Fish</th><th scope="col" class="num">Tape</th><th scope="col" class="num">Agent</th><th scope="col" class="num">Error</th><th scope="col">Agent's call</th></tr></thead><tbody>
+        ${worst.map((p) => `<tr><td>${esc(p.key)}</td><td class="num">${cm(p.tape_cm)}</td><td class="num">${cm(p.agent_cm)}</td><td class="num">${cm(p.agent_cm - p.tape_cm)}</td><td>${p.status === 'needs_review' ? '<span class="pill warn">handed to officer</span>' : '<span class="pill n">accepted</span>'}</td></tr>`).join('')}
+        </tbody></table></article>
+      <article class="card"><header class="card-h"><h2>Counts per clip</h2><span class="sub">${bm.unmatched.length} fish without a tag</span></header>
+        <table class="ledger"><thead><tr><th scope="col">Clip</th><th scope="col" class="num">Agent</th><th scope="col" class="num">Tape sheet</th><th scope="col">Exact</th></tr></thead><tbody>
+        ${bm.count.clips.map((c) => `<tr><td>${esc(c.clip)}</td><td class="num">${c.detected}</td><td class="num">${c.on_tape ?? '–'}</td><td>${c.on_tape == null ? '<span class="muted">–</span>' : c.exact ? '<span class="pill ok">yes</span>' : '<span class="pill no">no</span>'}</td></tr>`).join('')}
+        </tbody></table></article></div>` + plan;
     scatter($('#scatter'), bm.pairs.filter((p) => p.agent_cm != null));
   }
 
