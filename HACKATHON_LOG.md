@@ -22,4 +22,12 @@ What was built each day of the hackathon, from the commit history (dates in Sri 
 - Run server: live agent runs on preloaded samples, streamed turn by turn
 - Console polish: verdict in figures, a live stage strip, fork lines on every fish
 
+## Fri 30 Oct
+
+- Agent loop sends tool_choice "auto" (the Meta API rejects "required") and nudges a reply that calls no tool
+- Printable ground-truth sheet for the market shoot; frigate and bullet tuna added to the species list
+- Audit screen: the geometry error floor before the shoot; pass marks, limits of agreement, largest errors and per-clip counts once the tape data is in
+- SAM masks placed as box-local rasters, stretched over the box when coarser
+- .env.example lists the one key live runs need
+
 Before 27 October: the idea and the application text only.
