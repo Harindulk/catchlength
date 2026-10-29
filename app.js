@@ -385,13 +385,13 @@
       <div class="chart" id="scatter"></div><p class="sub">Each dot is one fish: tape on the x axis, agent on the y axis. Dashed line = perfect agreement. Hollow dots were handed to the officer. Accepted fish: bias ${nf1.format(L.bias)} cm, 95% of errors between ${nf1.format(L.loa95[0])} and ${nf1.format(L.loa95[1])} cm. All fish: mean error ${nf1.format(A.mae)} cm.</p></article>
       <div class="grid two">
       <article class="card"><header class="card-h"><h2>Largest errors</h2><span class="sub">shown, never dropped</span></header>
-        <table class="ledger"><thead><tr><th scope="col">Fish</th><th scope="col" class="num">Tape</th><th scope="col" class="num">Agent</th><th scope="col" class="num">Error</th><th scope="col">Agent's call</th></tr></thead><tbody>
+        <div class="table-wrap"><table class="ledger"><thead><tr><th scope="col">Fish</th><th scope="col" class="num">Tape</th><th scope="col" class="num">Agent</th><th scope="col" class="num">Error</th><th scope="col">Agent's call</th></tr></thead><tbody>
         ${worst.map((p) => `<tr><td>${esc(p.key)}</td><td class="num">${cm(p.tape_cm)}</td><td class="num">${cm(p.agent_cm)}</td><td class="num">${cm(p.agent_cm - p.tape_cm)}</td><td>${p.status === 'needs_review' ? '<span class="pill warn">handed to officer</span>' : '<span class="pill n">accepted</span>'}</td></tr>`).join('')}
-        </tbody></table></article>
+        </tbody></table></div></article>
       <article class="card"><header class="card-h"><h2>Counts per clip</h2><span class="sub">${bm.unmatched.length} fish without a tag</span></header>
-        <table class="ledger"><thead><tr><th scope="col">Clip</th><th scope="col" class="num">Agent</th><th scope="col" class="num">Tape sheet</th><th scope="col">Exact</th></tr></thead><tbody>
+        <div class="table-wrap"><table class="ledger"><thead><tr><th scope="col">Clip</th><th scope="col" class="num">Agent</th><th scope="col" class="num">Tape sheet</th><th scope="col">Exact</th></tr></thead><tbody>
         ${bm.count.clips.map((c) => `<tr><td>${esc(c.clip)}</td><td class="num">${c.detected}</td><td class="num">${c.on_tape ?? '–'}</td><td>${c.on_tape == null ? '<span class="muted">–</span>' : c.exact ? '<span class="pill ok">yes</span>' : '<span class="pill no">no</span>'}</td></tr>`).join('')}
-        </tbody></table></article></div>` + plan;
+        </tbody></table></div></article></div>` + plan;
     scatter($('#scatter'), bm.pairs.filter((p) => p.agent_cm != null));
   }
 
