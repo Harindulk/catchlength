@@ -69,3 +69,20 @@ def test_saved_run_has_csv_and_receipt(scene, tmp_path, monkeypatch):
     assert rc["fish"] == {"detected": 5, "accepted": 5, "flagged": 0} and rc["rescued"] == ["2001", "2002"]
     assert rc["models"] == ["muse-spark-1.3", "sam-3.1"] and len(rc["csv_sha256"]) == 64
     assert (tmp_path / "out/catch.csv").read_text().count("\n") == 6 and (tmp_path / "out/overlay.jpg").exists()
+
+
+def test_a_reply_without_a_tool_call_is_nudged_and_tool_choice_stays_auto(tmp_path, monkeypatch):
+    monkeypatch.setattr("catchlength.api.CACHE", tmp_path)
+    bodies, replies = [], iter([
+        {"choices": [{"message": {"role": "assistant", "content": "I will start by looking at the clip."}}]},
+        {"choices": [{"message": {"role": "assistant", "content": None, "tool_calls": [
+            {"id": "t1", "type": "function", "function": {"name": "request_review", "arguments": '{"reason": "test"}'}}]}}]},
+    ])
+
+    def transport(kind, body):
+        bodies.append(json.loads(json.dumps(body)))  # the loop keeps appending to the same list
+        return next(replies)
+    run = agent.run_agent(agent.Run([np.zeros((10, 10, 3), np.uint8)], Client(transport=transport)), max_turns=2)
+    assert all(b["tool_choice"] == "auto" for b in bodies)
+    assert bodies[1]["messages"][-1]["role"] == "user" and "exactly one tool" in bodies[1]["messages"][-1]["content"]
+    assert [l["tool"] for l in run.log] == [None, "request_review"]

@@ -306,9 +306,14 @@ def run_agent(run: Run, model: str = spark.MODEL, max_turns: int = MAX_TURNS, on
         "type": "object", "properties": p, "additionalProperties": False}}} for n, (d, p) in TOOLS.items()]
     msgs = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": f"New clip: {run.source or 'upload'}. Start."}]
     for turn in range(max_turns):
-        out = run.client.call("chat", {"model": model, "messages": msgs, "tools": tools, "tool_choice": "required"}, 0.01)
+        # the Meta API accepts only tool_choice "auto" ("required" is HTTP 400), so a reply with no tool call gets a nudge
+        out = run.client.call("chat", {"model": model, "messages": msgs, "tools": tools, "tool_choice": "auto"}, 0.01)
         m = out["choices"][0]["message"]
         msgs.append({k: v for k, v in m.items() if k in ("role", "content", "tool_calls") and v is not None})
+        if not m.get("tool_calls"):
+            run.log.append({"turn": turn, "tool": None, "args": {}, "result": {"said": (m.get("content") or "")[:300]}, "ms": 0,
+                            "usd": round(run.client.spent, 4)})
+            msgs.append({"role": "user", "content": "Call exactly one tool. The report isn't filed until submit_report accepts it."})
         for tc in (m.get("tool_calls") or [])[:1]:  # one tool per turn
             name, args = tc["function"]["name"], json.loads(tc["function"]["arguments"] or "{}")
             t0 = time.time()
