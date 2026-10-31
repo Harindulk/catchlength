@@ -30,4 +30,11 @@ What was built each day of the hackathon, from the commit history (dates in Sri 
 - SAM masks placed as box-local rasters, stretched over the box when coarser
 - .env.example lists the one key live runs need
 
+## Sun 1 Nov
+
+- Tighter cross-checks: the outline must sit within 3% of the species' published TL-from-FL (frigate and bullet tuna), and a length may drift at most 1 cm across frames
+- Freeze script: code and thresholds tagged before the field shoot; receipts print the tag
+- Field-day runner works end to end on a clip: ground-truth validation, the held-out bias split, tape repeatability and the stopwatch comparison
+- Ground-truth sheet: a second fork length column for the repeat measurements
+
 Before 27 October: the idea and the application text only.
