@@ -4,6 +4,7 @@ feedback, and a tool refused 3 times hands the job to the officer instead of loo
 import json
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -17,10 +18,17 @@ TILE = MATS["A4"]
 N_TILES = 4
 MAX_TURNS = 25
 MAX_REFUSALS = 3
+CAL_PX = 1.5  # worst tile-corner reprojection error before calibration refuses
 FL_OVER_AXIS = (0.80, 1.0)  # fork length is shorter than snout-to-tail-tip; outside this band the two disagree
+TL_TOL = 0.03  # outline (about TL) may differ this much from the species' published TL-from-FL before it's flagged
 SNAP_PX = 8  # a fork point may sit this far outside the mask outline
-SPREAD_MM = 20  # a fish's outline length may vary this much across frames before it's flagged
+SPREAD_MM = 10  # a fish's length may drift this much across frames before it's flagged
 MATCH_MM = 40  # same fish in another frame = centroid within this distance on the same tile
+TL_FROM_FL = {s["latin"]: s.get("tl_from_fl") for s in
+              json.loads((Path(__file__).parent.parent / "config/species.json").read_text())["species"]}
+THRESHOLDS = {"calibration_px": CAL_PX, "fl_over_outline": FL_OVER_AXIS, "tl_tolerance": TL_TOL, "snap_px": SNAP_PX,
+              "drift_mm": SPREAD_MM, "match_mm": MATCH_MM, "rescue_area_x_median": (0.3, 3.0), "rescue_iou": 0.2,
+              "species_conf": 0.5, "max_refusals": MAX_REFUSALS}  # what freeze tags and every receipt prints
 
 
 @dataclass
@@ -116,7 +124,7 @@ class Run:
         if not self.fixes:
             return self.refuse("calibrate", "No marker tile found in the best frame. Ask for a re-film with a tile flat and in view.")
         worst = max(f.reproj_px for f in self.fixes.values())
-        if worst > 1.5:
+        if worst > CAL_PX:
             return self.refuse("calibrate", f"Tile corners don't fit a flat sheet ({worst:.1f} px error): a tile is bent or "
                                             "lifted, or the frame is blurred. Measurements would be off.")
         return {"tiles": sorted(self.fixes), "corner_error_px": round(worst, 2),
@@ -154,9 +162,10 @@ class Run:
         for d in new:
             ratio = d.area / med if med else 1.0
             overlap = max((_mask_iou(d.mask, f.det.mask) for f in keep.values()), default=0.0)
-            if not 0.3 <= ratio <= 3.0:
+            lo, hi = THRESHOLDS["rescue_area_x_median"]
+            if not lo <= ratio <= hi:
                 rejected.append({"id": d.id, "why": f"area {ratio:.1f}x the median fish"})
-            elif overlap >= 0.2:
+            elif overlap >= THRESHOLDS["rescue_iou"]:
                 rejected.append({"id": d.id, "why": f"overlaps an existing fish (IoU {overlap:.2f})"})
             else:
                 accepted.append(d)
@@ -197,6 +206,7 @@ class Run:
                                                    f"({ratio:.2f}); the two measurements disagree")
             else:
                 f.status = "measured"
+                self._check_tl(f)
             if f.status == "needs_review":
                 flagged.append({"id": f.det.id, "why": f.why})
         cross = self._cross_frame(flagged)
@@ -221,21 +231,41 @@ class Run:
                 dist, d = min(cands, key=lambda c: c[0], default=(None, None))
                 if d is not None and dist < MATCH_MM:
                     f.frames[int(i)] = axis_length_mm(d.mask, fixes[f.tile].H)[0]
-        for f in self.fish.values():
-            if f.frames and f.axis_mm:
-                spread = max(list(f.frames.values()) + [f.axis_mm]) - min(list(f.frames.values()) + [f.axis_mm])
-                if spread > SPREAD_MM and f.status == "measured":
-                    f.status, f.why = "needs_review", f"outline length moves {spread / 10:.1f} cm across frames"
-                    flagged.append({"id": f.det.id, "why": f.why})
+        self._check_drift(flagged)
         return {"frames": counts, "best_frame_count": len(self.fish),
                 "note": "counts agree across frames" if all(c == len(self.fish) for c in counts.values()) else
                         "counts differ across frames: a fish may be hidden, merged or cut off in some frames"}
 
+    def _check_drift(self, flagged: list) -> None:
+        for f in self.fish.values():
+            if f.frames and f.axis_mm:
+                spread = max(list(f.frames.values()) + [f.axis_mm]) - min(list(f.frames.values()) + [f.axis_mm])
+                if spread > SPREAD_MM and f.status == "measured":
+                    f.status, f.why = "needs_review", f"length drifts {spread / 10:.1f} cm across frames (limit {SPREAD_MM / 10:.0f} cm)"
+                    flagged.append({"id": f.det.id, "why": f.why})
+
+    def _check_tl(self, f: Fish) -> bool:
+        """Species cross-check: the outline (about total length) against the TL the species' published TL-from-FL
+        relationship predicts from this fork length. Runs after measure or classify, whichever comes second."""
+        ab = TL_FROM_FL.get(f.species or "")
+        if f.status != "measured" or not ab or not f.fork_mm or not f.axis_mm:
+            return False
+        tl = ab[0] * f.fork_mm / 10 + ab[1]
+        off = f.axis_mm / 10 / tl - 1
+        if abs(off) <= TL_TOL:
+            return False
+        f.status, f.why = "needs_review", (f"outline {f.axis_mm / 10:.1f} cm is {off:+.0%} from the {tl:.1f} cm total length "
+                                           f"a {f.species} with this fork length should have (limit {TL_TOL:.0%})")
+        return True
+
     def classify(self) -> dict:
+        flagged = []
         for f in self.fish.values():
             r = spark.species(self.client, self.crop(f.det)[0])
-            f.species, f.species_conf = (r["species"], r["confidence"]) if r["confidence"] >= 0.5 else ("unknown", r["confidence"])
-        return {"species": {k: f.species for k, f in self.fish.items()}}
+            f.species, f.species_conf = (r["species"], r["confidence"]) if r["confidence"] >= THRESHOLDS["species_conf"] else ("unknown", r["confidence"])
+            if self._check_tl(f):
+                flagged.append({"id": f.det.id, "why": f.why})
+        return {"species": {k: f.species for k, f in self.fish.items()}, "flagged": flagged}
 
     def apply_rules(self) -> dict:
         for f in self.fish.values():

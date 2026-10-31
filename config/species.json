@@ -1,7 +1,10 @@
-{"species": [
-  {"latin": "Katsuwonus pelamis", "english": "skipjack tuna", "sinhala": "balaya"},
-  {"latin": "Euthynnus affinis", "english": "kawakawa", "sinhala": "attawalla"},
-  {"latin": "Rastrelliger kanagurta", "english": "Indian mackerel", "sinhala": "kumbalawa"},
-  {"latin": "Auxis thazard", "english": "frigate tuna", "sinhala": "alagoduwa"},
-  {"latin": "Auxis rochei", "english": "bullet tuna", "sinhala": ""}
+{"note": "tl_from_fl = [a, b] means TL = a * FL + b (cm), the published length-length relationship the agent checks a fish's outline (about TL) against, within fl_tl_tolerance in catchlength/agent.py. null = no sourced relationship found yet: only the broad 0.80-1.00 band applies.",
+ "species": [
+  {"latin": "Katsuwonus pelamis", "english": "skipjack tuna", "sinhala": "balaya", "tl_from_fl": null},
+  {"latin": "Euthynnus affinis", "english": "kawakawa", "sinhala": "attawalla", "tl_from_fl": null},
+  {"latin": "Rastrelliger kanagurta", "english": "Indian mackerel", "sinhala": "kumbalawa", "tl_from_fl": null},
+  {"latin": "Auxis thazard", "english": "frigate tuna", "sinhala": "alagoduwa", "tl_from_fl": [1.0589, -0.1728],
+   "tl_source": "IOTC-2021-WPNT11-14, Figure 4 (west Sumatra, R2 0.9937)"},
+  {"latin": "Auxis rochei", "english": "bullet tuna", "sinhala": "", "tl_from_fl": [1.0586, -0.2384],
+   "tl_source": "IOTC-2021-WPNT11-14, Figure 4 (west Sumatra, R2 0.9786)"}
 ]}

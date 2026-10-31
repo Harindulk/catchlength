@@ -86,3 +86,38 @@ def test_a_reply_without_a_tool_call_is_nudged_and_tool_choice_stays_auto(tmp_pa
     assert all(b["tool_choice"] == "auto" for b in bodies)
     assert bodies[1]["messages"][-1]["role"] == "user" and "exactly one tool" in bodies[1]["messages"][-1]["content"]
     assert [l["tool"] for l in run.log] == [None, "request_review"]
+
+
+def _fish(fork_mm, axis_mm, species=None):
+    f = agent.Fish(det(0, np.ones((4, 4), bool)), fork_mm=fork_mm, axis_mm=axis_mm, species=species, status="measured")
+    return f
+
+
+def test_species_tl_check_flags_outline_off_the_published_relationship():
+    run = agent.Run([np.zeros((8, 8, 3), np.uint8)], None)
+    a, b = agent.TL_FROM_FL["Auxis thazard"]
+    tl = a * 35 + b  # cm, for a 35 cm FL frigate tuna
+    ok = _fish(350, tl * 10 * 1.02, "Auxis thazard")
+    off = _fish(350, tl * 10 * 1.04, "Auxis thazard")
+    assert not run._check_tl(ok) and ok.status == "measured"
+    assert run._check_tl(off) and off.status == "needs_review" and "+4%" in off.why
+    nosrc = _fish(350, tl * 10 * 1.10, "Katsuwonus pelamis")  # no sourced relationship: only the broad band applies
+    assert not run._check_tl(nosrc) and nosrc.status == "measured"
+
+
+def test_classify_runs_the_tl_check_when_species_arrives_after_measure(monkeypatch):
+    run = agent.Run([np.zeros((8, 8, 3), np.uint8)], None)
+    run.fish = {"0": _fish(350, 420, None)}  # 42 cm outline for 35 cm FL: ~14% long for a frigate tuna
+    monkeypatch.setattr(agent.spark, "species", lambda c, crop: {"species": "Auxis thazard", "confidence": 0.9})
+    res = run.classify()
+    assert res["flagged"][0]["id"] == "0" and run.fish["0"].status == "needs_review"
+
+
+def test_drift_over_1cm_across_frames_is_flagged():
+    run = agent.Run([np.zeros((8, 8, 3), np.uint8)], None)
+    steady, drifting = _fish(350, 380), _fish(350, 380)
+    steady.frames, drifting.frames = {2: 386.0, 5: 377.0}, {2: 392.0}  # 0.9 cm vs 1.2 cm spread
+    run.fish = {"a": steady, "b": drifting}
+    flagged = []
+    run._check_drift(flagged)
+    assert steady.status == "measured" and drifting.status == "needs_review" and len(flagged) == 1 and "1.2 cm" in flagged[0]["why"]
