@@ -1,5 +1,5 @@
 """Printable ground-truth sheet for the fish-market shoot: A4 portrait, 25 rows a page, filled in by hand with a pen.
-Typed up afterwards as ground_truth.csv (batch,tag,species,fork_cm,notes), the file catchlength.audit grades against."""
+Typed up afterwards as ground_truth.csv (batch,tag,species,fork_cm,fork_cm_2,notes), the file catchlength.audit grades against."""
 import sys
 
 from PIL import Image, ImageDraw, ImageFont
@@ -9,7 +9,8 @@ PAGES, ROWS, DPI = 2, 25, 200
 mm = lambda v: round(v * DPI / 25.4)
 F = "/System/Library/Fonts/HelveticaNeue.ttc"
 big, med, small = (ImageFont.truetype(F, mm(s)) for s in (6, 3.6, 2.8))
-COLS = [("batch", 18), ("tag", 14), ("species", 46), ("fork length cm", 30), ("notes (curled, damaged, touching)", 72)]
+COLS = [("batch", 15), ("tag", 13), ("species", 38), ("fork length cm", 27), ("2nd FL (10 fish)", 27),
+        ("notes (curled, damaged, touching)", 60)]
 
 pages = []
 for p in range(PAGES):
@@ -21,7 +22,10 @@ for p in range(PAGES):
     y += mm(10)
     d.text((x0, y), "Date ________   Market ______________   Measured by ______________", font=med, fill=0)
     y += mm(7)
-    d.text((x0, y), "Fork length = snout tip to the inside of the tail fork, straight line, fish flat. Nearest 0.5 cm.",
+    d.text((x0, y), "Fork length on the board: snout against the stop, read at the inside of the tail fork. Nearest 0.5 cm.",
+           font=small, fill=60)
+    y += mm(5)
+    d.text((x0, y), "Tags run 1, 2, 3 ... across the whole day, never restarting at 1. 2nd FL: lift, re-lay, re-measure.",
            font=small, fill=60)
     y += mm(5)
     d.text((x0, y), "Per batch, on the back: clip file names, time, number of fish, which tiles were in view.", font=small, fill=60)
@@ -42,7 +46,9 @@ for p in range(PAGES):
     d.text((x0, y), "Species: skipjack (balaya) · kawakawa (attawalla) · Indian mackerel (kumbalawa) · frigate tuna (alagoduwa) · "
            "bullet tuna", font=small, fill=60)
     y += mm(5)
-    d.text((x0, y), "Manual timing: 10 fish measured and written took ____ min ____ s", font=med, fill=0)
+    d.text((x0, y), "Stopwatch, 10 fish by hand (measure + write): ____ min ____ s", font=med, fill=0)
+    y += mm(6)
+    d.text((x0, y), "Stopwatch, the same 10 for the agent (lay out + tag + film): ____ min ____ s", font=med, fill=0)
     pages.append(im)
 pages[0].save(OUT, save_all=True, append_images=pages[1:], resolution=DPI)
 print(f"{OUT}: {PAGES} pages x {ROWS} rows")

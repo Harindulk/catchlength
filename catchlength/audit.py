@@ -12,6 +12,32 @@ import numpy as np
 NAMES = {n.lower(): s["latin"] for s in json.loads((Path(__file__).parent.parent / "config/species.json").read_text())["species"]
          for n in (s["latin"], s["english"], s["sinhala"]) if n}
 KILL = {"mae_cm": 2.0, "min_fish": 40, "count_exact": 0.9, "species": 0.9}
+# Declared before the shoot (notes/FIELD_KIT.md, frozen by scripts/freeze.py): fish tags 4, 8 ... 40 are held out.
+# Any bias correction is fitted on the other fish only and scored on these 10.
+HELD_OUT = {str(t) for t in range(4, 41, 4)}
+
+
+def read_gt(path) -> list[dict]:
+    """ground_truth.csv as typed from the paper sheet: batch,tag,species,fork_cm[,fork_cm_2],notes. Refuses duplicate
+    tags or unreadable lengths instead of grading against them (a typo would silently become a model error)."""
+    with open(path, newline="", encoding="utf-8-sig") as fh:
+        rows = [{k.strip(): (v or "").strip() for k, v in r.items() if k} for r in csv.DictReader(fh)]
+    seen, bad = set(), []
+    for line, r in enumerate(rows, 2):
+        key = f"{r.get('batch', '')}-{r.get('tag', '')}"
+        if not r.get("batch") or not r.get("tag") or key in seen:
+            bad.append(f"line {line}: batch/tag {key!r} is empty or appears twice")
+        seen.add(key)
+        for col in ("fork_cm", "fork_cm_2"):
+            r[col] = r.get(col, "").replace(",", ".")
+            try:
+                if col == "fork_cm" or r[col]:
+                    assert 2 <= float(r[col]) <= 200
+            except (ValueError, AssertionError):
+                bad.append(f"line {line}: {col} {r[col]!r} is not a length in cm")
+    if bad:
+        raise ValueError(f"{path}: " + "; ".join(bad))
+    return rows
 
 
 def grade(gt_rows: list[dict], runs: list[dict]) -> dict:
@@ -28,7 +54,7 @@ def grade(gt_rows: list[dict], runs: list[dict]) -> dict:
                 unmatched.append({"clip": run["source"], "fish": f["id"]})
                 continue
             g = gt[key]
-            pairs.append({"key": key, "tape_cm": float(g["fork_cm"]), "agent_cm": f["fork_cm"], "status": f["status"],
+            pairs.append({"key": key, "tag": g["tag"], "tape_cm": float(g["fork_cm"]), "agent_cm": f["fork_cm"], "status": f["status"],
                           "species_ok": None if not g.get("species") else _same(f["species"], g["species"])})
     measured = [p for p in pairs if p["agent_cm"] is not None]
     err = np.array([p["agent_cm"] - p["tape_cm"] for p in measured]) if measured else np.zeros(0)
@@ -39,13 +65,34 @@ def grade(gt_rows: list[dict], runs: list[dict]) -> dict:
            "accepted": int(sum(p["status"] == "measured" for p in pairs)),
            "flagged": int(sum(p["status"] == "needs_review" for p in pairs)),
            "count": {"clips": clips, "exact_rate": _rate([c["exact"] for c in clips if c["on_tape"] is not None])},
-           "species": {"n": len(sp), "accuracy": _rate(sp)}, "pairs": pairs}
+           "species": {"n": len(sp), "accuracy": _rate(sp)}, "held_out": _held_out(measured),
+           "tape_repeat": _repeat(gt_rows), "pairs": pairs}
     out["pass_marks"] = {
         "length": out["length_accepted_only"]["mae"] is not None and out["length_accepted_only"]["mae"] <= KILL["mae_cm"]
                   and out["n_measured"] >= KILL["min_fish"],
         "count": out["count"]["exact_rate"] is not None and out["count"]["exact_rate"] >= KILL["count_exact"],
         "species": out["species"]["accuracy"] is not None and out["species"]["accuracy"] >= KILL["species"]}
     return out
+
+
+def _held_out(measured: list[dict]) -> dict:
+    """Accepted fish only. The bias (mean agent - tape) is fitted on the non-held-out fish and subtracted from the
+    held-out ones, so a reported correction is never tuned on the fish it is scored on."""
+    acc = [p for p in measured if p["status"] == "measured"]
+    fit = np.array([p["agent_cm"] - p["tape_cm"] for p in acc if p["tag"] not in HELD_OUT])
+    held = np.array([p["agent_cm"] - p["tape_cm"] for p in acc if p["tag"] in HELD_OUT])
+    bias = float(fit.mean()) if len(fit) else 0.0
+    return {"tags": sorted(HELD_OUT, key=int), "fit": _stats(fit), "bias_fitted_cm": round(bias, 2),
+            "held_out_raw": _stats(held), "held_out_corrected": _stats(held - bias)}
+
+
+def _repeat(gt_rows: list[dict]) -> dict:
+    """Tape repeatability from the fish measured twice: the floor any agent error is judged against."""
+    d = np.array([float(r["fork_cm"]) - float(r["fork_cm_2"]) for r in gt_rows if r.get("fork_cm_2")])
+    if not len(d):
+        return {"n": 0}
+    return {"n": len(d), "mean_abs_diff_cm": round(float(np.abs(d).mean()), 2),
+            "tem_cm": round(float(np.sqrt((d ** 2).sum() / (2 * len(d)))), 2)}  # technical error of measurement
 
 
 def _same(agent: str | None, tape: str) -> bool:
@@ -74,7 +121,7 @@ def main() -> None:
     ap.add_argument("runs", nargs="+")
     ap.add_argument("--out", default="data/benchmark.json")
     a = ap.parse_args()
-    gt = list(csv.DictReader(open(a.ground_truth)))
+    gt = read_gt(a.ground_truth)
     runs = []
     for d in map(Path, a.runs):
         r = json.loads((d / "run.json").read_text())
