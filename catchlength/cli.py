@@ -12,7 +12,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from .agent import Run, run_agent
+from .agent import THRESHOLDS, Run, run_agent
 from .rules import RULES
 from .api import Client
 
@@ -65,16 +65,32 @@ def catch_csv(run: Run) -> str:
     return buf.getvalue()
 
 
+ROOT = Path(__file__).parent.parent
+FROZEN_PATHS = ["catchlength", "config", "data/rules.json"]  # code + thresholds; a docs commit doesn't unfreeze
+
+
+def _git(*args: str) -> str | None:
+    try:
+        r = subprocess.run(["git", *args], capture_output=True, text=True, cwd=ROOT)
+    except OSError:
+        return None
+    return r.stdout.strip() or None if r.returncode == 0 else None
+
+
+def code_version() -> dict:
+    """The last freeze tag (scripts/freeze.py) and whether the code and thresholds still match it exactly."""
+    tag = _git("describe", "--tags", "--abbrev=0", "--match", "freeze-*")
+    same = tag is not None and subprocess.run(["git", "diff", "--quiet", tag, "--", *FROZEN_PATHS], cwd=ROOT).returncode == 0
+    return {"git_commit": _git("rev-parse", "--short", "HEAD"), "freeze_tag": tag, "frozen": same,
+            "describe": _git("describe", "--tags", "--always", "--dirty", "--match", "freeze-*")}
+
+
 def receipt(run: Run, path: str, csv_text: str) -> dict:
     """What a reviewer needs to trust or reproduce the run, without trusting us."""
-    try:
-        commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
-    except OSError:
-        commit = ""
     fixes = run.fixes.values()
     return {"clip_sha256": hashlib.sha256(Path(path).read_bytes()).hexdigest() if path and Path(path).is_file() else None,
             "finished_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            "models": sorted({c["model"] for c in run.client.ledger}), "git_commit": commit or None,
+            "models": sorted({c["model"] for c in run.client.ledger}), **code_version(), "thresholds": THRESHOLDS,
             "calibration": {"tiles": sorted(run.fixes), "corner_error_px": max((f.reproj_px for f in fixes), default=None)},
             "fish": {"detected": len(run.fish), "accepted": sum(f.status == "measured" for f in run.fish.values()),
                      "flagged": sum(f.status == "needs_review" for f in run.fish.values())},
