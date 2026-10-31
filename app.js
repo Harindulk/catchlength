@@ -345,7 +345,7 @@
       ['Rescued by SAM', rc.rescued.length ? rc.rescued.join(', ') : 'none'],
       ['Frames checked', [rc.frames.best, ...rc.frames.checked].join(', ')],
       ['Cost', `$${rc.cost_usd.toFixed(3)}`],
-      ['Code', rc.git_commit || 'uncommitted'],
+      ['Code', rc.freeze_tag ? `${rc.describe}${rc.frozen ? ' (frozen)' : ' (changed since the freeze)'}` : rc.git_commit || 'uncommitted'],
       ['CSV SHA-256', rc.csv_sha256.slice(0, 16) + '…'],
     ];
     el.innerHTML = rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
