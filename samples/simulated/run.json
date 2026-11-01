@@ -35,7 +35,7 @@
     ],
     "tiles_visible": 2
    },
-   "ms": 20,
+   "ms": 239,
    "usd": 0.0017
   },
   {
@@ -47,10 +47,10 @@
      0,
      1
     ],
-    "corner_error_px": 1.33,
-    "corner_error_mm": 0.81
+    "corner_error_px": 1.21,
+    "corner_error_mm": 0.75
    },
-   "ms": 18,
+   "ms": 510,
    "usd": 0.0017
   },
   {
@@ -68,7 +68,7 @@
     ],
     "note": "count differs from the plan: look for missed or merged fish"
    },
-   "ms": 3,
+   "ms": 36,
    "usd": 0.0042
   },
   {
@@ -95,7 +95,7 @@
      "3"
     ]
    },
-   "ms": 16,
+   "ms": 192,
    "usd": 0.0059
   },
   {
@@ -128,7 +128,7 @@
     "rejected": [],
     "count_now": 5
    },
-   "ms": 13,
+   "ms": 109,
    "usd": 0.0083
   },
   {
@@ -147,7 +147,7 @@
      "note": "counts differ across frames: a fish may be hidden, merged or cut off in some frames"
     }
    },
-   "ms": 441,
+   "ms": 3306,
    "usd": 0.0083
   },
   {
@@ -161,9 +161,10 @@
      "2": "Katsuwonus pelamis",
      "2001": "Katsuwonus pelamis",
      "2002": "Katsuwonus pelamis"
-    }
+    },
+    "flagged": []
    },
-   "ms": 53,
+   "ms": 283,
    "usd": 0.0167
   },
   {
@@ -208,7 +209,7 @@
     "measured": 5,
     "waiting_for": "officer sign-off"
    },
-   "ms": 0,
+   "ms": 2,
    "usd": 0.0167
   }
  ],
@@ -218,8 +219,8 @@
   "fish": [
    {
     "id": "0",
-    "fork_cm": 39.5,
-    "axis_cm": 41.4,
+    "fork_cm": 39.9,
+    "axis_cm": 41.9,
     "species": "Katsuwonus pelamis",
     "species_conf": 0.9,
     "tile": 0,
@@ -239,14 +240,18 @@
      }
     ],
     "frames_mm": {
-     "1": 414.1,
-     "2": 414.1
+     "1": 419.1,
+     "2": 419.1
+    },
+    "snap_px": {
+     "snout": 0.0,
+     "fork": 0.0
     }
    },
    {
     "id": "1",
-    "fork_cm": 35.1,
-    "axis_cm": 37.3,
+    "fork_cm": 35.6,
+    "axis_cm": 37.9,
     "species": "Katsuwonus pelamis",
     "species_conf": 0.9,
     "tile": 0,
@@ -266,13 +271,17 @@
      }
     ],
     "frames_mm": {
-     "1": 373.0,
-     "2": 373.0
+     "1": 378.9,
+     "2": 378.9
+    },
+    "snap_px": {
+     "snout": 0.0,
+     "fork": 0.0
     }
    },
    {
     "id": "2",
-    "fork_cm": 27.5,
+    "fork_cm": 28.1,
     "axis_cm": 29.9,
     "species": "Katsuwonus pelamis",
     "species_conf": 0.9,
@@ -293,14 +302,18 @@
      }
     ],
     "frames_mm": {
-     "1": 299.4,
-     "2": 299.4
+     "1": 298.9,
+     "2": 298.9
+    },
+    "snap_px": {
+     "snout": 0.0,
+     "fork": 0.0
     }
    },
    {
     "id": "2001",
-    "fork_cm": 23.1,
-    "axis_cm": 24.4,
+    "fork_cm": 23.2,
+    "axis_cm": 24.5,
     "species": "Katsuwonus pelamis",
     "species_conf": 0.9,
     "tile": 0,
@@ -319,12 +332,16 @@
       "quote": "size samples with class intervals greater than 5 cm"
      }
     ],
-    "frames_mm": {}
+    "frames_mm": {},
+    "snap_px": {
+     "snout": 0.0,
+     "fork": 0.0
+    }
    },
    {
     "id": "2002",
-    "fork_cm": 31.9,
-    "axis_cm": 33.0,
+    "fork_cm": 32.0,
+    "axis_cm": 33.2,
     "species": "Katsuwonus pelamis",
     "species_conf": 0.9,
     "tile": 1,
@@ -343,13 +360,17 @@
       "quote": "size samples with class intervals greater than 5 cm"
      }
     ],
-    "frames_mm": {}
+    "frames_mm": {},
+    "snap_px": {
+     "snout": 0.0,
+     "fork": 0.0
+    }
    }
   ],
   "lf_1cm": {
    "23": 1,
-   "27": 1,
-   "31": 1,
+   "28": 1,
+   "32": 1,
    "35": 1,
    "39": 1
   },
@@ -365,8 +386,8 @@
  "fish": [
   {
    "id": "0",
-   "fork_cm": 39.5,
-   "axis_cm": 41.4,
+   "fork_cm": 39.9,
+   "axis_cm": 41.9,
    "species": "Katsuwonus pelamis",
    "species_conf": 0.9,
    "tile": 0,
@@ -386,8 +407,12 @@
     }
    ],
    "frames_mm": {
-    "1": 414.1,
-    "2": 414.1
+    "1": 419.1,
+    "2": 419.1
+   },
+   "snap_px": {
+    "snout": 0.0,
+    "fork": 0.0
    },
    "points": {
     "snout": [
@@ -398,7 +423,17 @@
      1107.0,
      269.0
     ],
-    "confidence": 0.8
+    "confidence": 0.8,
+    "spark": {
+     "snout": [
+      401.0,
+      292.0
+     ],
+     "fork": [
+      1107.0,
+      269.0
+     ]
+    }
    },
    "box": [
     401.0,
@@ -783,8 +818,8 @@
   },
   {
    "id": "1",
-   "fork_cm": 35.1,
-   "axis_cm": 37.3,
+   "fork_cm": 35.6,
+   "axis_cm": 37.9,
    "species": "Katsuwonus pelamis",
    "species_conf": 0.9,
    "tile": 0,
@@ -804,8 +839,12 @@
     }
    ],
    "frames_mm": {
-    "1": 373.0,
-    "2": 373.0
+    "1": 378.9,
+    "2": 378.9
+   },
+   "snap_px": {
+    "snout": 0.0,
+    "fork": 0.0
    },
    "points": {
     "snout": [
@@ -816,7 +855,17 @@
      1155.0,
      659.0
     ],
-    "confidence": 0.8
+    "confidence": 0.8,
+    "spark": {
+     "snout": [
+      512.0,
+      541.0
+     ],
+     "fork": [
+      1155.0,
+      659.0
+     ]
+    }
    },
    "box": [
     512.0,
@@ -1065,7 +1114,7 @@
   },
   {
    "id": "2",
-   "fork_cm": 27.5,
+   "fork_cm": 28.1,
    "axis_cm": 29.9,
    "species": "Katsuwonus pelamis",
    "species_conf": 0.9,
@@ -1086,8 +1135,12 @@
     }
    ],
    "frames_mm": {
-    "1": 299.4,
-    "2": 299.4
+    "1": 298.9,
+    "2": 298.9
+   },
+   "snap_px": {
+    "snout": 0.0,
+    "fork": 0.0
    },
    "points": {
     "snout": [
@@ -1095,10 +1148,20 @@
      265.0
     ],
     "fork": [
-     1299.0,
-     269.0
+     1290.0,
+     292.0
     ],
-    "confidence": 0.8
+    "confidence": 0.8,
+    "spark": {
+     "snout": [
+      1827.0,
+      265.0
+     ],
+     "fork": [
+      1290.0,
+      292.0
+     ]
+    }
    },
    "box": [
     1253.0,
@@ -1371,8 +1434,8 @@
   },
   {
    "id": "2001",
-   "fork_cm": 23.1,
-   "axis_cm": 24.4,
+   "fork_cm": 23.2,
+   "axis_cm": 24.5,
    "species": "Katsuwonus pelamis",
    "species_conf": 0.9,
    "tile": 0,
@@ -1392,6 +1455,10 @@
     }
    ],
    "frames_mm": {},
+   "snap_px": {
+    "snout": 0.0,
+    "fork": 0.0
+   },
    "points": {
     "snout": [
      269.0,
@@ -1401,7 +1468,17 @@
      687.0,
      878.0
     ],
-    "confidence": 0.8
+    "confidence": 0.8,
+    "spark": {
+     "snout": [
+      269.0,
+      881.0
+     ],
+     "fork": [
+      687.0,
+      878.0
+     ]
+    }
    },
    "box": [
     269.0,
@@ -1546,8 +1623,8 @@
   },
   {
    "id": "2002",
-   "fork_cm": 31.9,
-   "axis_cm": 33.0,
+   "fork_cm": 32.0,
+   "axis_cm": 33.2,
    "species": "Katsuwonus pelamis",
    "species_conf": 0.9,
    "tile": 1,
@@ -1567,6 +1644,10 @@
     }
    ],
    "frames_mm": {},
+   "snap_px": {
+    "snout": 0.0,
+    "fork": 0.0
+   },
    "points": {
     "snout": [
      592.0,
@@ -1576,7 +1657,17 @@
      1198.0,
      1022.0
     ],
-    "confidence": 0.8
+    "confidence": 0.8,
+    "spark": {
+     "snout": [
+      592.0,
+      946.0
+     ],
+     "fork": [
+      1198.0,
+      1022.0
+     ]
+    }
    },
    "box": [
     592.0,
@@ -2026,7 +2117,9 @@
    "species": [
     "Katsuwonus pelamis",
     "Euthynnus affinis",
-    "Rastrelliger kanagurta"
+    "Rastrelliger kanagurta",
+    "Auxis thazard",
+    "Auxis rochei"
    ],
    "measure": "fork length",
    "threshold_cm": null,
@@ -2040,18 +2133,39 @@
  },
  "receipt": {
   "clip_sha256": null,
-  "finished_utc": "2026-10-28T20:04:23+00:00",
+  "finished_utc": "2026-11-01T01:16:12+00:00",
   "models": [
    "muse-spark-1.3",
    "sam-3.1"
   ],
-  "git_commit": "a7f3b94",
+  "git_commit": "9b6c0a9",
+  "freeze_tag": "freeze-2026-11-01",
+  "frozen": false,
+  "describe": "freeze-2026-11-01-dirty",
+  "thresholds": {
+   "calibration_px": 1.5,
+   "fl_over_outline": [
+    0.8,
+    1.0
+   ],
+   "tl_tolerance": 0.03,
+   "snap_px": 8,
+   "drift_mm": 10,
+   "match_mm": 40,
+   "rescue_area_x_median": [
+    0.3,
+    3.0
+   ],
+   "rescue_iou": 0.2,
+   "species_conf": 0.5,
+   "max_refusals": 3
+  },
   "calibration": {
    "tiles": [
     0,
     1
    ],
-   "corner_error_px": 1.3323230743408203
+   "corner_error_px": 1.2122811079025269
   },
   "fish": {
    "detected": 5,
@@ -2069,7 +2183,15 @@
     2
    ]
   },
-  "csv_sha256": "26c16288205def597cdf70a22269aefca478ad7037eb4f8e1129295fbc8e8b9a",
+  "point_snap": {
+   "limit_px": 8,
+   "fish": 5,
+   "median_px": 0.0,
+   "max_px": 0.0,
+   "worst_fish": "0",
+   "over_limit": 0
+  },
+  "csv_sha256": "eb8d275029b578303b60296ad1519c5472ae34b662cdad8b5359986b65eefb47",
   "cost_usd": 0.0167
  },
  "simulated": {
