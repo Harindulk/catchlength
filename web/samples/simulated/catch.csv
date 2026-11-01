@@ -1,6 +1,6 @@
 fish_id,species,fork_cm,outline_cm,status,reason,tile,rule_results
-0,Katsuwonus pelamis,39.5,41.4,measured,,0,lk-finfish-no-min=no_minimum;iotc-length-interval=info
-1,Katsuwonus pelamis,35.1,37.3,measured,,0,lk-finfish-no-min=no_minimum;iotc-length-interval=info
-2,Katsuwonus pelamis,27.5,29.9,measured,,1,lk-finfish-no-min=no_minimum;iotc-length-interval=info
-2001,Katsuwonus pelamis,23.1,24.4,measured,,0,lk-finfish-no-min=no_minimum;iotc-length-interval=info
-2002,Katsuwonus pelamis,31.9,33.0,measured,,1,lk-finfish-no-min=no_minimum;iotc-length-interval=info
+0,Katsuwonus pelamis,39.9,41.9,measured,,0,lk-finfish-no-min=no_minimum;iotc-length-interval=info
+1,Katsuwonus pelamis,35.6,37.9,measured,,0,lk-finfish-no-min=no_minimum;iotc-length-interval=info
+2,Katsuwonus pelamis,28.1,29.9,measured,,1,lk-finfish-no-min=no_minimum;iotc-length-interval=info
+2001,Katsuwonus pelamis,23.2,24.5,measured,,0,lk-finfish-no-min=no_minimum;iotc-length-interval=info
+2002,Katsuwonus pelamis,32.0,33.2,measured,,1,lk-finfish-no-min=no_minimum;iotc-length-interval=info

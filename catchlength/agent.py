@@ -21,7 +21,7 @@ MAX_REFUSALS = 3
 CAL_PX = 1.5  # worst tile-corner reprojection error before calibration refuses
 FL_OVER_AXIS = (0.80, 1.0)  # fork length is shorter than snout-to-tail-tip; outside this band the two disagree
 TL_TOL = 0.03  # outline (about TL) may differ this much from the species' published TL-from-FL before it's flagged
-SNAP_PX = 8  # a fork point may sit this far outside the mask outline
+SNAP_PX = 8  # Spark's snout or fork point may sit this far from SAM's outline before the fish is flagged
 SPREAD_MM = 10  # a fish's length may drift this much across frames before it's flagged
 MATCH_MM = 40  # same fish in another frame = centroid within this distance on the same tile
 TL_FROM_FL = {s["latin"]: s.get("tl_from_fl") for s in
@@ -44,13 +44,14 @@ class Fish:
     status: str = "found"  # found | measured | needs_review
     why: str = ""
     frames: dict = field(default_factory=dict)  # frame index -> outline length mm, from the cross-frame check
+    snap_px: dict = field(default_factory=dict)  # how far Spark's snout and fork points sat from SAM's outline
 
     def row(self) -> dict:
         return {"id": self.det.id, "fork_cm": None if self.fork_mm is None else round(self.fork_mm / 10, 1),
                 "axis_cm": None if self.axis_mm is None else round(self.axis_mm / 10, 1), "species": self.species,
                 "species_conf": self.species_conf, "tile": self.tile, "status": self.status, "why": self.why,
                 "sam_conf": self.det.confidence, "rules": self.rules,
-                "frames_mm": {k: round(v, 1) for k, v in self.frames.items()}}
+                "frames_mm": {k: round(v, 1) for k, v in self.frames.items()}, "snap_px": self.snap_px}
 
 
 class Run:
@@ -194,13 +195,17 @@ class Run:
             crop, (x0, y0) = self.crop(f.det)
             kp = spark.keypoints(self.client, crop)
             sn, fk = np.add(kp["snout"], (x0, y0)), np.add(kp["fork"], (x0, y0))
-            f.points = {"snout": sn.tolist(), "fork": fk.tolist(), "confidence": kp["confidence"]}
-            dist = cv2.distanceTransform((~f.det.mask).astype(np.uint8), cv2.DIST_L2, 3)
-            off = [float(dist[int(min(p[1], self.size[1] - 1)), int(min(p[0], self.size[0] - 1))]) for p in (sn, fk)]
-            f.fork_mm = points_length_mm(H, sn, fk)
+            # both points belong on SAM's outline: snap each to it and keep how far it moved as a check
+            (sn2, d_sn), (fk2, d_fk) = _snap(f.det.mask, sn), _snap(f.det.mask, fk)
+            f.snap_px = {"snout": round(d_sn, 1), "fork": round(d_fk, 1)}
+            f.points = {"snout": sn2.tolist(), "fork": fk2.tolist(), "confidence": kp["confidence"],
+                        "spark": {"snout": sn.tolist(), "fork": fk.tolist()}}
+            f.fork_mm = points_length_mm(H, sn2, fk2)
             ratio = f.fork_mm / f.axis_mm if f.axis_mm else 0
-            if max(off) > SNAP_PX:
-                f.status, f.why = "needs_review", f"a fork point is {max(off):.0f} px off the fish"
+            worst = max(f.snap_px, key=f.snap_px.get)
+            if f.snap_px[worst] > SNAP_PX:
+                f.status, f.why = "needs_review", (f"Spark's {worst} point is {f.snap_px[worst]:.0f} px from the outline "
+                                                   f"SAM drew (limit {SNAP_PX} px); the two models disagree on where the fish ends")
             elif not FL_OVER_AXIS[0] <= ratio <= FL_OVER_AXIS[1]:
                 f.status, f.why = "needs_review", (f"fork length {f.fork_mm / 10:.1f} cm vs outline {f.axis_mm / 10:.1f} cm "
                                                    f"({ratio:.2f}); the two measurements disagree")
@@ -377,6 +382,14 @@ def _brief(res: dict) -> dict:
 
 def _output_text(out: dict) -> str:
     return "".join(c.get("text", "") for o in out.get("output", []) for c in (o.get("content") or []) if c.get("type") == "output_text")
+
+
+def _snap(mask: np.ndarray, pt) -> tuple[np.ndarray, float]:
+    """The nearest point on the mask's outer outline, and how far pt was from it in px (inside or outside)."""
+    cnts, _ = cv2.findContours(mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    c = max(cnts, key=cv2.contourArea).reshape(-1, 2).astype(float)
+    d = np.hypot(*(c - np.asarray(pt, float)).T)
+    return c[int(np.argmin(d))], float(d.min())
 
 
 def _plane_centroid(H: np.ndarray, mask: np.ndarray) -> np.ndarray:

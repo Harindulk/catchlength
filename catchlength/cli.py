@@ -12,7 +12,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from .agent import THRESHOLDS, Run, run_agent
+from .agent import SNAP_PX, THRESHOLDS, Run, run_agent
 from .rules import RULES
 from .api import Client
 
@@ -96,8 +96,18 @@ def receipt(run: Run, path: str, csv_text: str) -> dict:
                      "flagged": sum(f.status == "needs_review" for f in run.fish.values())},
             "rescued": [f.det.id for f in run.fish.values() if int(f.det.id) >= 1000],
             "frames": {"best": run.best, "checked": sorted({k for f in run.fish.values() for k in f.frames})},
+            "point_snap": _point_snap(run),
             "csv_sha256": hashlib.sha256(csv_text.encode()).hexdigest(),
             "cost_usd": round(run.client.spent, 4)}
+
+
+def _point_snap(run: Run) -> dict:
+    """How far Spark's snout and fork points sat from SAM's outline before snapping: two models' agreement, per run."""
+    worst = {k: max(f.snap_px.values()) for k, f in run.fish.items() if f.snap_px}
+    d = [v for f in run.fish.values() for v in f.snap_px.values()]
+    return {"limit_px": SNAP_PX, "fish": len(worst), "median_px": round(float(np.median(d)), 1) if d else None,
+            "max_px": max(d, default=None), "worst_fish": max(worst, key=worst.get, default=None),
+            "over_limit": sum(v > SNAP_PX for v in worst.values())}
 
 
 def save(run: Run, out: Path, path: str = "") -> None:

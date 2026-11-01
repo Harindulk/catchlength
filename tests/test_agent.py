@@ -121,3 +121,49 @@ def test_drift_over_1cm_across_frames_is_flagged():
     flagged = []
     run._check_drift(flagged)
     assert steady.status == "measured" and drifting.status == "needs_review" and len(flagged) == 1 and "1.2 cm" in flagged[0]["why"]
+
+
+def _notched_fish_run(monkeypatch, snout, fork):
+    """One fish (an ellipse with a forked tail cut in, notch apex at x=460) and Spark points given in frame px.
+    Identity homography, so 1 px = 1 mm."""
+    mask = np.zeros((400, 600), np.uint8)
+    cv2.ellipse(mask, (300, 200), (200, 50), 0, 0, 360, 1, -1)
+    cv2.fillPoly(mask, [np.int32([(460, 200), (520, 150), (520, 250)])], 0)
+    mask = mask.astype(bool)
+    run = agent.Run([np.zeros((400, 600, 3), np.uint8)], None)
+    run.fixes = {0: agent.MatFix(np.eye(3), 4, 0.0)}
+    run.fish = {"0": agent.Fish(det(0, mask))}
+    x0, y0 = run.crop(run.fish["0"].det)[1]
+    monkeypatch.setattr(agent.spark, "keypoints", lambda c, crop: {
+        "snout": [snout[0] - x0, snout[1] - y0], "fork": [fork[0] - x0, fork[1] - y0], "confidence": 0.8})
+    return run, mask
+
+
+def test_spark_points_snap_to_the_sam_outline_and_the_gap_is_reported(monkeypatch):
+    run, mask = _notched_fish_run(monkeypatch, snout=(95, 200), fork=(466, 200))  # 5 px off the snout, 6 px into the notch
+    run.measure()
+    f = run.fish["0"]
+    assert f.status == "measured", f.why
+    for name in ("snout", "fork"):  # snapped points sit on the outline: a mask pixel with a background neighbour
+        x, y = map(int, f.points[name])
+        assert mask[y, x] and not mask[y - 1:y + 2, x - 1:x + 2].all()
+    assert 4 <= f.snap_px["snout"] <= 6 and 3 <= f.snap_px["fork"] <= 6
+    assert f.fork_mm == pytest.approx(agent.points_length_mm(np.eye(3), f.points["snout"], f.points["fork"]))
+    assert abs(f.fork_mm - 360) < 4 and f.points["spark"] == {"snout": [95.0, 200.0], "fork": [466.0, 200.0]}
+    assert f.row()["snap_px"] == f.snap_px
+
+
+def test_a_point_far_from_the_outline_is_flagged_not_snapped_away(monkeypatch):
+    run, _ = _notched_fish_run(monkeypatch, snout=(95, 200), fork=(400, 200))  # fork placed mid-body, ~40 px from the edge
+    res = run.measure()
+    f = run.fish["0"]
+    assert f.status == "needs_review" and "fork point is" in f.why and "from the outline" in f.why
+    assert res["flagged"][0]["id"] == "0" and f.snap_px["fork"] > agent.SNAP_PX
+
+
+def test_receipt_reports_the_point_snap_check(scene, tmp_path, monkeypatch):
+    from catchlength.cli import receipt
+    run = agent.run_agent(agent.Run([scene.image], script(scene, tmp_path, monkeypatch), "synthetic"))
+    snap = receipt(run, "", "")["point_snap"]
+    assert snap["limit_px"] == agent.SNAP_PX and snap["over_limit"] == 0 and snap["fish"] == 5
+    assert 0 <= snap["median_px"] <= snap["max_px"] <= agent.SNAP_PX and snap["worst_fish"] in run.fish

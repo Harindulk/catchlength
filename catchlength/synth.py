@@ -89,7 +89,9 @@ def scripted_client(scene, patch, plan_count=5, client_kw=None):
         t = (pts - mean) @ ax
         a, b = pts[np.argmin(t)], pts[np.argmax(t)]
         f = a + 0.92 * (b - a)
-        f = pts[np.argmin(((pts - f) ** 2).sum(1))]  # a real fork point sits on the notch edge, on the fish
+        edge = cv2.findContours(m.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[0]
+        edge = max(edge, key=cv2.contourArea).reshape(-1, 2) - (x0, y0)
+        f = edge[np.argmin(((edge - f) ** 2).sum(1))].astype(float)  # a real fork point sits on the notch edge, the outline
         return {"snout": a.tolist(), "fork": f.tolist(), "confidence": 0.8, "problem": ""}
     patch(agent.spark, "keypoints", fork_points)
 
