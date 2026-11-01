@@ -11,7 +11,7 @@
   const STAGES = [['inspect_clip', 'Plan'], ['calibrate', 'Calibrate'], ['segment', 'Segment'], ['find_missed', 'Check count'],
     ['rescue', 'Rescue'], ['measure', 'Measure'], ['classify', 'Species'], ['apply_rules', 'Rules'], ['submit_report', 'File']];
   const NAME = Object.fromEntries(STAGES.concat([['request_review', 'Hand to officer'], ['sign_off', 'Officer sign-off']]));
-  const RULE_SHORT = { no_minimum: 'No legal minimum', pass: 'Above minimum', below_minimum: 'Below minimum', no_rule_in_pack: 'No rule in pack' };
+  const RULE_SHORT = { no_minimum: 'No minimum found', pass: 'Above minimum', below_minimum: 'Below minimum', no_rule_in_pack: 'No rule in pack' };
   const CHECK = '<svg class="tick" viewBox="0 0 16 16" aria-label="passed" role="img"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   let samples = [], run = null, dir = '', selected = null, timer = null;
   const decisions = {};  // officer decisions per run folder: { approve, note, at, saved }
