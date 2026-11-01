@@ -12,14 +12,15 @@ The checks sit inside the agent's tools, so the model can't skip them.
 
 - Calibration refuses a clip when the marker tiles are missing or bent (corner error over 1.5 px).
 - If SAM 3.1 finds fewer fish than Muse Spark expects, Spark returns boxes for the missed or merged fish, and they go back to SAM as box prompts with negative points on the neighbouring fish. A new mask is kept only if its size looks like one fish and it doesn't overlap one already found.
-- Each fish is measured twice: an outline length on the sheet's plane and a snout-to-fork length from Spark's points. If the two disagree, or the points fall off the fish, the fish is flagged for the officer.
+- Each fish is measured twice: an outline length on the sheet's plane and a snout-to-fork length from Spark's points. If the two disagree, the fish is flagged for the officer.
+- Spark's snout and fork points are moved onto the outline SAM drew, and the fork length is measured between the moved points. A point that sat more than 8 px from the outline, inside or outside the fish, means the two models disagree about where the fish ends, so the fish is flagged instead of snapped.
 - The fish are measured again in two other frames, and a length that moves by more than 1 cm is flagged.
 - For species with a published length-length relationship (frigate and bullet tuna, IOTC-2021-WPNT11-14), the outline must be within 3% of the total length that relationship predicts from the fork length, or the fish is flagged.
-- Sri Lanka gazettes no minimum landing size for the tunas sampled here, and the report states that for each of them. Rules come only from a pack with a source for each, and model-written text that cites any other rule is refused.
+- No minimum landing size for the tunas and mackerel sampled here was found in the sources we reviewed (Sri Lanka's gazetted fisheries regulations, `data/rules.json`), and the report says "no rule found" for each of them. Rules come only from a pack with a source for each, and model-written text that cites any other rule is refused.
 - A tool refused three times hands the job to the officer, and a filed report waits for the officer's sign-off.
-- A benchmark compares the agent's lengths with the same fish measured by hand with a tape. The agent never sees those numbers.
+- A benchmark compares the agent's lengths with the same fish measured by hand on a measuring board. The agent never sees those numbers.
 
-Every run ends with an audit receipt: the clip's hash, the models used, the calibration error, which fish were rescued, the frames checked, the cost, the code version and the hash of the CSV. The code version names the freeze tag (`scripts/freeze.py`, made before the field shoot) and says whether the code and thresholds still match it; the thresholds themselves are printed too.
+Every run ends with an audit receipt: the clip's hash, the models used, the calibration error, which fish were rescued, the frames checked, how far Spark's points sat from SAM's outlines (median, worst fish, how many over the limit), the cost, the code version and the hash of the CSV. The code version names the freeze tag (`scripts/freeze.py`, made before the field shoot) and says whether the code and thresholds still match it; the thresholds themselves are printed too.
 
 ## Meta models
 
@@ -27,6 +28,20 @@ Every run ends with an audit receipt: the clip's hash, the models used, the cali
 |---|---|
 | Muse Spark 1.3 | Runs the agent loop (one tool per turn); plans the clip; finds missed and merged fish; places snout and fork points; names the species from a closed list |
 | SAM 3.1 | Segments every fish from the concept "fish", then again from Spark's boxes and negative points |
+
+## Prior art
+
+Measuring fish from images isn't new. The closest tools we know of:
+
+| Tool | How it works | Published numbers |
+|---|---|---|
+| FishNet (Mots'oehli et al., IEEE COINS 2024, [arXiv 2403.10916](https://arxiv.org/abs/2403.10916)) | Mask R-CNN and length models trained on 300,000 hand-labelled images (1.2 million fish, 163 species) | 92% IoU on segmentation, 89% top-1 species accuracy on single-fish images, 2.3 cm mean absolute length error, all on its own held-out data |
+| MatsyaMetri (ICAR-CMFRI, Kochi, [Sep 2026](https://www.icar.org.in/en/icar-cmfri-kochi-develops-smartphone-app-measure-fish-length-and-width-without-physical-handling)) | Augmented-reality phone app: finds a flat surface and measures length and width, exports CSV; ARCore Android phones only | No accuracy figure published that we could find |
+| FishSense Lite (UC San Diego and REEF, [GCFI 77 proceedings](https://proceedings.gcfi.org/wp-content/uploads/2026/02/77-GCFI-PDF-27.pdf)) | Underwater camera (Olympus TG6) with a laser for range, carried by volunteer divers | Thousands of fish of 11 species, 37 volunteers, 230 dives (Aug 2023 to Oct 2024); lengths not statistically different from stereo-video (Kruskal-Wallis p = 0.481, n = 66) |
+
+CatchLength differs in three ways: it isn't trained on fish at all (Meta's models are used as they ship), it needs only printed paper tiles and any phone camera (no AR support, laser or second camera), and each length is checked by a second method and other frames, with the fish handed to a person when the checks disagree. FishNet's numbers come from a much larger dataset of its own, so they can't be compared directly with our field benchmark.
+
+The workflow it automates is Sri Lanka's own photo-board sampling, presented by NARA to the IOTC (IOTC-2025-WPM16-10).
 
 ## Benchmark
 

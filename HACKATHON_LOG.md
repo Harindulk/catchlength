@@ -36,5 +36,7 @@ What was built each day of the hackathon, from the commit history (dates in Sri 
 - Freeze script: code and thresholds tagged before the field shoot; receipts print the tag
 - Field-day runner works end to end on a clip: ground-truth validation, the held-out bias split, tape repeatability and the stopwatch comparison
 - Ground-truth sheet: a second fork length column for the repeat measurements
+- Muse Spark's snout and fork points snapped onto SAM 3.1's outline; how far they sat from it is a check in every receipt
+- README: prior art (FishNet, MatsyaMetri, FishSense Lite) with their published numbers; the minimum-size claim limited to the sources reviewed
 
 Before 27 October: the idea and the application text only.
