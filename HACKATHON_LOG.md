@@ -39,4 +39,13 @@ What was built each day of the hackathon, from the commit history (dates in Sri 
 - Muse Spark's snout and fork points snapped onto SAM 3.1's outline; how far they sat from it is a check in every receipt
 - README: prior art (FishNet, MatsyaMetri, FishSense Lite) with their published numbers; the minimum-size claim limited to the sources reviewed
 
+## Tue 3 Nov
+
+- First real Meta calls: smoke test passed; the three console samples recorded on Muse Spark 1.3 and SAM 3.1
+- Spark's first look no longer stops a job on its own: on real runs it called separated fish "stacked" or "cut off", so its worries go to the officer and the deterministic checks decide
+- Every parallel tool call gets an answer (a real run returned two at once, which the API then rejected)
+- Point-snap limit in millimetres on the sheet (1 cm, one length bin) instead of 8 image pixels; on the clean sample accepted fish went from 0 of 5 to 4 of 5, and the fish whose snout point sat 2 cm out in open water is still flagged
+- Re-frozen as freeze-2026-11-03 before the field shoot; the tag lists every change since the first freeze
+- Seller's size receipt, benchmark led by held-out bias against NARA's photo method, open-weights auditor path
+
 Before 27 October: the idea and the application text only.
