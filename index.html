@@ -43,10 +43,14 @@
     <form class="signoff" id="signoff" hidden>
       <p id="signoff-text"></p>
       <div class="signoff-actions">
+        <select id="signoff-lang" aria-label="Language for the officer">
+          <option value="en">English</option><option value="si" lang="si">සිංහල</option><option value="ta" lang="ta">தமிழ்</option>
+        </select>
         <input type="text" id="signoff-note" name="note" placeholder="Note for the agent (optional)" aria-label="Note for the agent" maxlength="300">
         <button type="button" class="secondary" id="sendback-btn">Send back</button>
         <button type="submit" class="primary" id="signoff-btn">Sign off report</button>
       </div>
+      <p class="muted lang-note" id="signoff-lang-note" hidden>Sinhala and Tamil: draft wording, needs a native speaker's check.</p>
     </form>
     <p class="notice" id="notice" role="status" hidden></p>
 
