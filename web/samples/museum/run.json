@@ -1,0 +1,1909 @@
+{
+ "source": "synthetic scene: five fish, two tiles",
+ "status": "awaiting_signoff",
+ "plan": {
+  "best_frame": 0,
+  "expected_count": 4,
+  "issues": [
+   "fish cut off by the frame edge"
+  ],
+  "species_candidates": [
+   "skipjack tuna (Katsuwonus pelamis)",
+   "bullet tuna (Auxis rochei)",
+   "bigeye scad (Selar crumenophthalmus)"
+  ],
+  "tiles_visible": 20,
+  "usable": false
+ },
+ "best_frame": 0,
+ "size": [
+  2100,
+  1267
+ ],
+ "tiles": [
+  0,
+  1
+ ],
+ "log": [
+  {
+   "turn": 0,
+   "tool": "inspect_clip",
+   "args": {},
+   "result": {
+    "best_frame": 0,
+    "expected_count": 4,
+    "issues": [
+     "fish cut off by the frame edge"
+    ],
+    "species_candidates": [
+     "skipjack tuna (Katsuwonus pelamis)",
+     "bullet tuna (Auxis rochei)",
+     "bigeye scad (Selar crumenophthalmus)"
+    ],
+    "tiles_visible": 20,
+    "usable": false,
+    "warning": "First look flagged problems. Carry on: calibration and the measurement checks decide, and these issues go to the officer."
+   },
+   "ms": 4,
+   "usd": 0.0
+  },
+  {
+   "turn": 1,
+   "tool": "calibrate",
+   "args": {},
+   "result": {
+    "tiles": [
+     0,
+     1
+    ],
+    "corner_error_px": 0.73,
+    "corner_error_mm": 0.45
+   },
+   "ms": 33,
+   "usd": 0.0
+  },
+  {
+   "turn": 2,
+   "tool": "segment",
+   "args": {},
+   "result": {
+    "found": 5,
+    "expected": 4,
+    "ids": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4"
+    ],
+    "note": "count differs from the plan: look for missed or merged fish"
+   },
+   "ms": 1380,
+   "usd": 0.0
+  },
+  {
+   "turn": 3,
+   "tool": "find_missed",
+   "args": {},
+   "result": {
+    "count": 5,
+    "merged_ids": [],
+    "missed_boxes": []
+   },
+   "ms": 10,
+   "usd": 0.0
+  },
+  {
+   "turn": 4,
+   "tool": "measure",
+   "args": {},
+   "result": {
+    "measured": 0,
+    "flagged": [
+     {
+      "id": "0",
+      "why": "Spark's snout point is 37 px from the outline SAM drew (limit 8 px); the two models disagree on where the fish ends"
+     },
+     {
+      "id": "1",
+      "why": "Spark's fork point is 14 px from the outline SAM drew (limit 8 px); the two models disagree on where the fish ends"
+     },
+     {
+      "id": "2",
+      "why": "Spark's fork point is 13 px from the outline SAM drew (limit 8 px); the two models disagree on where the fish ends"
+     },
+     {
+      "id": "3",
+      "why": "Spark's snout point is 9 px from the outline SAM drew (limit 8 px); the two models disagree on where the fish ends"
+     },
+     {
+      "id": "4",
+      "why": "Spark's snout point is 12 px from the outline SAM drew (limit 8 px); the two models disagree on where the fish ends"
+     }
+    ],
+    "cross_frame": {
+     "frames": {},
+     "best_frame_count": 5,
+     "note": "counts agree across frames"
+    }
+   },
+   "ms": 37,
+   "usd": 0.0
+  },
+  {
+   "turn": 5,
+   "tool": "classify",
+   "args": {},
+   "result": {
+    "species": {
+     "0": "Auxis thazard",
+     "1": "Auxis rochei",
+     "2": "Euthynnus affinis",
+     "3": "Rastrelliger kanagurta",
+     "4": "Euthynnus affinis"
+    },
+    "flagged": []
+   },
+   "ms": 5,
+   "usd": 0.0
+  },
+  {
+   "turn": 6,
+   "tool": "apply_rules",
+   "args": {},
+   "result": {
+    "results": {
+     "0": [
+      "no_minimum",
+      "info"
+     ],
+     "1": [
+      "no_minimum",
+      "info"
+     ],
+     "2": [
+      "no_minimum",
+      "info"
+     ],
+     "3": [
+      "no_minimum",
+      "info"
+     ],
+     "4": [
+      "no_minimum",
+      "info"
+     ]
+    }
+   },
+   "ms": 0,
+   "usd": 0.0
+  },
+  {
+   "turn": 7,
+   "tool": "request_review",
+   "args": {
+    "fish_id": "0",
+    "reason": "outline vs snout-to-fork disagree 37px >8px limit; length unsettled, needs officer measurement"
+   },
+   "result": {
+    "queued": 2
+   },
+   "ms": 0,
+   "usd": 0.0
+  },
+  {
+   "turn": 8,
+   "tool": "request_review",
+   "args": {
+    "fish_id": "1",
+    "reason": "outline vs snout-to-fork disagree 14px >8px limit; length unsettled, needs officer measurement"
+   },
+   "result": {
+    "queued": 3
+   },
+   "ms": 0,
+   "usd": 0.0
+  },
+  {
+   "turn": 9,
+   "tool": "request_review",
+   "args": {
+    "fish_id": "2",
+    "reason": "outline vs snout-to-fork disagree 13px >8px limit; length unsettled, needs officer measurement"
+   },
+   "result": {
+    "queued": 4
+   },
+   "ms": 0,
+   "usd": 0.0
+  },
+  {
+   "turn": 10,
+   "tool": "request_review",
+   "args": {
+    "fish_id": "3",
+    "reason": "outline vs snout-to-fork disagree 9px >8px limit; length unsettled, needs officer measurement"
+   },
+   "result": {
+    "queued": 5
+   },
+   "ms": 0,
+   "usd": 0.0
+  },
+  {
+   "turn": 11,
+   "tool": "request_review",
+   "args": {
+    "fish_id": "4",
+    "reason": "outline vs snout-to-fork disagree 12px >8px limit; length unsettled, needs officer measurement"
+   },
+   "result": {
+    "queued": 6
+   },
+   "ms": 0,
+   "usd": 0.0
+  },
+  {
+   "turn": 12,
+   "tool": "submit_report",
+   "args": {
+    "summary": "Clip best frame 0: 5 fish segmented (plan expected 4, cross-frame count agrees 5). Calibration tiles 0,1 ok (0.73px/0.45mm). Species: 0 Auxis thazard, 1 Auxis rochei, 2 Euthynnus affinis, 3 Rastrelliger kanagurta, 4 Euthynnus affinis. Measure disagreed on all 5 (snout/fork vs outline >8px), lengths unsettled and handed to officer for manual measurement. Rule check [rule:no_minimum] info for all. Initial inspect warning (fish cut off by frame edge) noted for officer."
+   },
+   "result": {
+    "refused": true,
+    "feedback": "count 5 differs from the 4 expected; rescue the difference or request_review for the run",
+    "tries_left": 2
+   },
+   "ms": 0,
+   "usd": 0.0
+  },
+  {
+   "turn": 13,
+   "tool": "request_review",
+   "args": {
+    "fish_id": "",
+    "reason": "SAM found 5 vs plan expected 4; find_missed shows 5 with no missed/merged, cross-frame agrees 5; needs officer to confirm extra fish"
+   },
+   "result": {
+    "queued": 7
+   },
+   "ms": 0,
+   "usd": 0.0
+  },
+  {
+   "turn": 14,
+   "tool": "submit_report",
+   "args": {
+    "summary": "Clip best frame 0: 5 fish segmented (plan expected 4, cross-frame count agrees 5; run handed to officer to confirm). Calibration tiles 0,1 ok (0.73px/0.45mm). Species: 0 Auxis thazard, 1 Auxis rochei, 2 Euthynnus affinis, 3 Rastrelliger kanagurta, 4 Euthynnus affinis. Lengths unsettled on all 5 (outline vs points >8px) and handed to officer. Rules [rule:no_minimum] info for all. Initial warning fish cut off by frame edge noted."
+   },
+   "result": {
+    "filed": true,
+    "measured": 0,
+    "waiting_for": "officer sign-off"
+   },
+   "ms": 0,
+   "usd": 0.0
+  }
+ ],
+ "reviews": [
+  {
+   "what": "plan",
+   "reason": "Spark's first look called the clip unusable: fish cut off by the frame edge",
+   "by": "plan"
+  },
+  {
+   "what": "0",
+   "reason": "outline vs snout-to-fork disagree 37px >8px limit; length unsettled, needs officer measurement",
+   "by": "agent"
+  },
+  {
+   "what": "1",
+   "reason": "outline vs snout-to-fork disagree 14px >8px limit; length unsettled, needs officer measurement",
+   "by": "agent"
+  },
+  {
+   "what": "2",
+   "reason": "outline vs snout-to-fork disagree 13px >8px limit; length unsettled, needs officer measurement",
+   "by": "agent"
+  },
+  {
+   "what": "3",
+   "reason": "outline vs snout-to-fork disagree 9px >8px limit; length unsettled, needs officer measurement",
+   "by": "agent"
+  },
+  {
+   "what": "4",
+   "reason": "outline vs snout-to-fork disagree 12px >8px limit; length unsettled, needs officer measurement",
+   "by": "agent"
+  },
+  {
+   "what": "run",
+   "reason": "SAM found 5 vs plan expected 4; find_missed shows 5 with no missed/merged, cross-frame agrees 5; needs officer to confirm extra fish",
+   "by": "agent"
+  }
+ ],
+ "report": {
+  "summary": "Clip best frame 0: 5 fish segmented (plan expected 4, cross-frame count agrees 5; run handed to officer to confirm). Calibration tiles 0,1 ok (0.73px/0.45mm). Species: 0 Auxis thazard, 1 Auxis rochei, 2 Euthynnus affinis, 3 Rastrelliger kanagurta, 4 Euthynnus affinis. Lengths unsettled on all 5 (outline vs points >8px) and handed to officer. Rules [rule:no_minimum] info for all. Initial warning fish cut off by frame edge noted.",
+  "fish": [
+   {
+    "id": "0",
+    "fork_cm": 37.2,
+    "axis_cm": 37.8,
+    "species": "Auxis thazard",
+    "species_conf": 0.78,
+    "tile": 1,
+    "status": "needs_review",
+    "why": "outline vs snout-to-fork disagree 37px >8px limit; length unsettled, needs officer measurement",
+    "sam_conf": 0.9569892287254333,
+    "rules": [
+     {
+      "rule": "lk-finfish-no-min",
+      "result": "no_minimum",
+      "quote": "No gazetted minimum landing size was found for this species."
+     },
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     }
+    ],
+    "frames_mm": {},
+    "snap_px": {
+     "snout": 36.8,
+     "fork": 13.8
+    }
+   },
+   {
+    "id": "1",
+    "fork_cm": 24.4,
+    "axis_cm": 24.9,
+    "species": "Auxis rochei",
+    "species_conf": 0.87,
+    "tile": 0,
+    "status": "needs_review",
+    "why": "outline vs snout-to-fork disagree 14px >8px limit; length unsettled, needs officer measurement",
+    "sam_conf": 0.9569892287254333,
+    "rules": [
+     {
+      "rule": "lk-finfish-no-min",
+      "result": "no_minimum",
+      "quote": "No gazetted minimum landing size was found for this species."
+     },
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     }
+    ],
+    "frames_mm": {},
+    "snap_px": {
+     "snout": 1.0,
+     "fork": 13.9
+    }
+   },
+   {
+    "id": "2",
+    "fork_cm": 40.3,
+    "axis_cm": 41.7,
+    "species": "Euthynnus affinis",
+    "species_conf": 0.92,
+    "tile": 1,
+    "status": "needs_review",
+    "why": "outline vs snout-to-fork disagree 13px >8px limit; length unsettled, needs officer measurement",
+    "sam_conf": 0.96875,
+    "rules": [
+     {
+      "rule": "lk-finfish-no-min",
+      "result": "no_minimum",
+      "quote": "No gazetted minimum landing size was found for this species."
+     },
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     }
+    ],
+    "frames_mm": {},
+    "snap_px": {
+     "snout": 1.9,
+     "fork": 13.4
+    }
+   },
+   {
+    "id": "3",
+    "fork_cm": 26.6,
+    "axis_cm": 29.6,
+    "species": "Rastrelliger kanagurta",
+    "species_conf": 0.93,
+    "tile": 0,
+    "status": "needs_review",
+    "why": "outline vs snout-to-fork disagree 9px >8px limit; length unsettled, needs officer measurement",
+    "sam_conf": 0.9649122953414917,
+    "rules": [
+     {
+      "rule": "lk-finfish-no-min",
+      "result": "no_minimum",
+      "quote": "No gazetted minimum landing size was found for this species."
+     },
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     }
+    ],
+    "frames_mm": {},
+    "snap_px": {
+     "snout": 8.6,
+     "fork": 1.4
+    }
+   },
+   {
+    "id": "4",
+    "fork_cm": 29.8,
+    "axis_cm": 33.1,
+    "species": "Euthynnus affinis",
+    "species_conf": 0.92,
+    "tile": 0,
+    "status": "needs_review",
+    "why": "outline vs snout-to-fork disagree 12px >8px limit; length unsettled, needs officer measurement",
+    "sam_conf": 0.9649122953414917,
+    "rules": [
+     {
+      "rule": "lk-finfish-no-min",
+      "result": "no_minimum",
+      "quote": "No gazetted minimum landing size was found for this species."
+     },
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     }
+    ],
+    "frames_mm": {},
+    "snap_px": {
+     "snout": 12.4,
+     "fork": 4.0
+    }
+   }
+  ],
+  "lf_1cm": {},
+  "measured": 0,
+  "needs_review": 5,
+  "reviews": [
+   {
+    "what": "plan",
+    "reason": "Spark's first look called the clip unusable: fish cut off by the frame edge",
+    "by": "plan"
+   },
+   {
+    "what": "0",
+    "reason": "outline vs snout-to-fork disagree 37px >8px limit; length unsettled, needs officer measurement",
+    "by": "agent"
+   },
+   {
+    "what": "1",
+    "reason": "outline vs snout-to-fork disagree 14px >8px limit; length unsettled, needs officer measurement",
+    "by": "agent"
+   },
+   {
+    "what": "2",
+    "reason": "outline vs snout-to-fork disagree 13px >8px limit; length unsettled, needs officer measurement",
+    "by": "agent"
+   },
+   {
+    "what": "3",
+    "reason": "outline vs snout-to-fork disagree 9px >8px limit; length unsettled, needs officer measurement",
+    "by": "agent"
+   },
+   {
+    "what": "4",
+    "reason": "outline vs snout-to-fork disagree 12px >8px limit; length unsettled, needs officer measurement",
+    "by": "agent"
+   },
+   {
+    "what": "run",
+    "reason": "SAM found 5 vs plan expected 4; find_missed shows 5 with no missed/merged, cross-frame agrees 5; needs officer to confirm extra fish",
+    "by": "agent"
+   }
+  ],
+  "tiles": [
+   0,
+   1
+  ],
+  "source": "synthetic scene: five fish, two tiles"
+ },
+ "fish": [
+  {
+   "id": "0",
+   "fork_cm": 37.2,
+   "axis_cm": 37.8,
+   "species": "Auxis thazard",
+   "species_conf": 0.78,
+   "tile": 1,
+   "status": "needs_review",
+   "why": "outline vs snout-to-fork disagree 37px >8px limit; length unsettled, needs officer measurement",
+   "sam_conf": 0.9569892287254333,
+   "rules": [
+    {
+     "rule": "lk-finfish-no-min",
+     "result": "no_minimum",
+     "quote": "No gazetted minimum landing size was found for this species."
+    },
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    }
+   ],
+   "frames_mm": {},
+   "snap_px": {
+    "snout": 36.8,
+    "fork": 13.8
+   },
+   "points": {
+    "snout": [
+     926.0,
+     468.0
+    ],
+    "fork": [
+     1633.0,
+     484.0
+    ],
+    "confidence": 0.93,
+    "spark": {
+     "snout": [
+      892.34375,
+      453.0625
+     ],
+     "fork": [
+      1646.75,
+      483.53125
+     ]
+    }
+   },
+   "box": [
+    926.0,
+    348.0,
+    1646.0,
+    538.0
+   ],
+   "outline": [
+    [
+     926,
+     468
+    ],
+    [
+     961,
+     486
+    ],
+    [
+     1023,
+     504
+    ],
+    [
+     1066,
+     514
+    ],
+    [
+     1123,
+     519
+    ],
+    [
+     1152,
+     528
+    ],
+    [
+     1162,
+     534
+    ],
+    [
+     1168,
+     530
+    ],
+    [
+     1188,
+     526
+    ],
+    [
+     1327,
+     530
+    ],
+    [
+     1396,
+     537
+    ],
+    [
+     1409,
+     531
+    ],
+    [
+     1468,
+     521
+    ],
+    [
+     1531,
+     501
+    ],
+    [
+     1569,
+     496
+    ],
+    [
+     1581,
+     497
+    ],
+    [
+     1597,
+     504
+    ],
+    [
+     1638,
+     534
+    ],
+    [
+     1644,
+     534
+    ],
+    [
+     1645,
+     531
+    ],
+    [
+     1638,
+     516
+    ],
+    [
+     1633,
+     494
+    ],
+    [
+     1635,
+     459
+    ],
+    [
+     1645,
+     442
+    ],
+    [
+     1645,
+     437
+    ],
+    [
+     1637,
+     440
+    ],
+    [
+     1583,
+     480
+    ],
+    [
+     1550,
+     479
+    ],
+    [
+     1458,
+     441
+    ],
+    [
+     1385,
+     417
+    ],
+    [
+     1367,
+     404
+    ],
+    [
+     1334,
+     408
+    ],
+    [
+     1238,
+     394
+    ],
+    [
+     1167,
+     388
+    ],
+    [
+     1164,
+     385
+    ],
+    [
+     1167,
+     377
+    ],
+    [
+     1193,
+     348
+    ],
+    [
+     1143,
+     389
+    ],
+    [
+     1071,
+     397
+    ],
+    [
+     1031,
+     405
+    ],
+    [
+     973,
+     426
+    ],
+    [
+     933,
+     449
+    ],
+    [
+     939,
+     459
+    ],
+    [
+     936,
+     464
+    ]
+   ]
+  },
+  {
+   "id": "1",
+   "fork_cm": 24.4,
+   "axis_cm": 24.9,
+   "species": "Auxis rochei",
+   "species_conf": 0.87,
+   "tile": 0,
+   "status": "needs_review",
+   "why": "outline vs snout-to-fork disagree 14px >8px limit; length unsettled, needs officer measurement",
+   "sam_conf": 0.9569892287254333,
+   "rules": [
+    {
+     "rule": "lk-finfish-no-min",
+     "result": "no_minimum",
+     "quote": "No gazetted minimum landing size was found for this species."
+    },
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    }
+   ],
+   "frames_mm": {},
+   "snap_px": {
+    "snout": 1.0,
+    "fork": 13.9
+   },
+   "points": {
+    "snout": [
+     169.0,
+     804.0
+    ],
+    "fork": [
+     602.0,
+     795.0
+    ],
+    "confidence": 0.9,
+    "spark": {
+     "snout": [
+      170.0,
+      804.0
+     ],
+     "fork": [
+      615.0,
+      790.0
+     ]
+    }
+   },
+   "box": [
+    167.0,
+    740.0,
+    611.0,
+    844.0
+   ],
+   "outline": [
+    [
+     167,
+     798
+    ],
+    [
+     168,
+     803
+    ],
+    [
+     177,
+     810
+    ],
+    [
+     222,
+     830
+    ],
+    [
+     250,
+     838
+    ],
+    [
+     307,
+     843
+    ],
+    [
+     400,
+     836
+    ],
+    [
+     457,
+     835
+    ],
+    [
+     465,
+     830
+    ],
+    [
+     553,
+     801
+    ],
+    [
+     572,
+     801
+    ],
+    [
+     599,
+     820
+    ],
+    [
+     607,
+     823
+    ],
+    [
+     610,
+     821
+    ],
+    [
+     608,
+     809
+    ],
+    [
+     598,
+     787
+    ],
+    [
+     601,
+     764
+    ],
+    [
+     594,
+     765
+    ],
+    [
+     574,
+     786
+    ],
+    [
+     555,
+     789
+    ],
+    [
+     492,
+     767
+    ],
+    [
+     432,
+     754
+    ],
+    [
+     330,
+     749
+    ],
+    [
+     325,
+     746
+    ],
+    [
+     328,
+     740
+    ],
+    [
+     295,
+     752
+    ],
+    [
+     232,
+     763
+    ],
+    [
+     192,
+     779
+    ]
+   ]
+  },
+  {
+   "id": "2",
+   "fork_cm": 40.3,
+   "axis_cm": 41.7,
+   "species": "Euthynnus affinis",
+   "species_conf": 0.92,
+   "tile": 1,
+   "status": "needs_review",
+   "why": "outline vs snout-to-fork disagree 13px >8px limit; length unsettled, needs officer measurement",
+   "sam_conf": 0.96875,
+   "rules": [
+    {
+     "rule": "lk-finfish-no-min",
+     "result": "no_minimum",
+     "quote": "No gazetted minimum landing size was found for this species."
+    },
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    }
+   ],
+   "frames_mm": {},
+   "snap_px": {
+    "snout": 1.9,
+    "fork": 13.4
+   },
+   "points": {
+    "snout": [
+     889.0,
+     206.0
+    ],
+    "fork": [
+     1632.0,
+     167.0
+    ],
+    "confidence": 0.92,
+    "spark": {
+     "snout": [
+      887.1875,
+      205.40625
+     ],
+     "fork": [
+      1618.640625,
+      167.1171875
+     ]
+    }
+   },
+   "box": [
+    888.0,
+    47.0,
+    1668.0,
+    293.0
+   ],
+   "outline": [
+    [
+     888,
+     208
+    ],
+    [
+     892,
+     213
+    ],
+    [
+     908,
+     221
+    ],
+    [
+     1006,
+     254
+    ],
+    [
+     1031,
+     258
+    ],
+    [
+     1105,
+     260
+    ],
+    [
+     1123,
+     275
+    ],
+    [
+     1155,
+     292
+    ],
+    [
+     1158,
+     288
+    ],
+    [
+     1137,
+     271
+    ],
+    [
+     1137,
+     267
+    ],
+    [
+     1147,
+     260
+    ],
+    [
+     1318,
+     238
+    ],
+    [
+     1373,
+     233
+    ],
+    [
+     1397,
+     235
+    ],
+    [
+     1415,
+     221
+    ],
+    [
+     1490,
+     188
+    ],
+    [
+     1543,
+     176
+    ],
+    [
+     1573,
+     175
+    ],
+    [
+     1583,
+     179
+    ],
+    [
+     1658,
+     238
+    ],
+    [
+     1667,
+     239
+    ],
+    [
+     1644,
+     209
+    ],
+    [
+     1644,
+     199
+    ],
+    [
+     1637,
+     191
+    ],
+    [
+     1633,
+     178
+    ],
+    [
+     1634,
+     155
+    ],
+    [
+     1648,
+     134
+    ],
+    [
+     1644,
+     124
+    ],
+    [
+     1648,
+     113
+    ],
+    [
+     1646,
+     107
+    ],
+    [
+     1629,
+     115
+    ],
+    [
+     1582,
+     158
+    ],
+    [
+     1571,
+     161
+    ],
+    [
+     1552,
+     160
+    ],
+    [
+     1502,
+     150
+    ],
+    [
+     1433,
+     128
+    ],
+    [
+     1379,
+     115
+    ],
+    [
+     1349,
+     101
+    ],
+    [
+     1344,
+     93
+    ],
+    [
+     1338,
+     92
+    ],
+    [
+     1321,
+     101
+    ],
+    [
+     1302,
+     104
+    ],
+    [
+     1235,
+     95
+    ],
+    [
+     1169,
+     93
+    ],
+    [
+     1152,
+     77
+    ],
+    [
+     1152,
+     66
+    ],
+    [
+     1158,
+     51
+    ],
+    [
+     1156,
+     47
+    ],
+    [
+     1130,
+     67
+    ],
+    [
+     1095,
+     108
+    ],
+    [
+     1008,
+     133
+    ],
+    [
+     958,
+     154
+    ],
+    [
+     893,
+     191
+    ],
+    [
+     891,
+     195
+    ],
+    [
+     894,
+     200
+    ]
+   ]
+  },
+  {
+   "id": "3",
+   "fork_cm": 26.6,
+   "axis_cm": 29.6,
+   "species": "Rastrelliger kanagurta",
+   "species_conf": 0.93,
+   "tile": 0,
+   "status": "needs_review",
+   "why": "outline vs snout-to-fork disagree 9px >8px limit; length unsettled, needs officer measurement",
+   "sam_conf": 0.9649122953414917,
+   "rules": [
+    {
+     "rule": "lk-finfish-no-min",
+     "result": "no_minimum",
+     "quote": "No gazetted minimum landing size was found for this species."
+    },
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    }
+   ],
+   "frames_mm": {},
+   "snap_px": {
+    "snout": 8.6,
+    "fork": 1.4
+   },
+   "points": {
+    "snout": [
+     645.0,
+     592.0
+    ],
+    "fork": [
+     1133.0,
+     602.0
+    ],
+    "confidence": 0.95,
+    "spark": {
+     "snout": [
+      640.0,
+      599.0
+     ],
+     "fork": [
+      1132.0,
+      603.0
+     ]
+    }
+   },
+   "box": [
+    640.0,
+    521.0,
+    1187.0,
+    669.0
+   ],
+   "outline": [
+    [
+     640,
+     578
+    ],
+    [
+     641,
+     587
+    ],
+    [
+     652,
+     598
+    ],
+    [
+     695,
+     622
+    ],
+    [
+     739,
+     636
+    ],
+    [
+     790,
+     646
+    ],
+    [
+     827,
+     668
+    ],
+    [
+     835,
+     667
+    ],
+    [
+     834,
+     652
+    ],
+    [
+     903,
+     651
+    ],
+    [
+     938,
+     647
+    ],
+    [
+     967,
+     666
+    ],
+    [
+     974,
+     649
+    ],
+    [
+     999,
+     632
+    ],
+    [
+     1044,
+     615
+    ],
+    [
+     1075,
+     608
+    ],
+    [
+     1090,
+     610
+    ],
+    [
+     1165,
+     654
+    ],
+    [
+     1186,
+     657
+    ],
+    [
+     1167,
+     632
+    ],
+    [
+     1133,
+     602
+    ],
+    [
+     1138,
+     594
+    ],
+    [
+     1163,
+     574
+    ],
+    [
+     1184,
+     552
+    ],
+    [
+     1178,
+     549
+    ],
+    [
+     1164,
+     551
+    ],
+    [
+     1140,
+     561
+    ],
+    [
+     1091,
+     590
+    ],
+    [
+     1079,
+     590
+    ],
+    [
+     995,
+     561
+    ],
+    [
+     969,
+     548
+    ],
+    [
+     961,
+     534
+    ],
+    [
+     929,
+     544
+    ],
+    [
+     886,
+     540
+    ],
+    [
+     860,
+     535
+    ],
+    [
+     856,
+     531
+    ],
+    [
+     857,
+     521
+    ],
+    [
+     849,
+     521
+    ],
+    [
+     809,
+     537
+    ],
+    [
+     764,
+     542
+    ],
+    [
+     691,
+     556
+    ],
+    [
+     652,
+     569
+    ]
+   ]
+  },
+  {
+   "id": "4",
+   "fork_cm": 29.8,
+   "axis_cm": 33.1,
+   "species": "Euthynnus affinis",
+   "species_conf": 0.92,
+   "tile": 0,
+   "status": "needs_review",
+   "why": "outline vs snout-to-fork disagree 12px >8px limit; length unsettled, needs officer measurement",
+   "sam_conf": 0.9649122953414917,
+   "rules": [
+    {
+     "rule": "lk-finfish-no-min",
+     "result": "no_minimum",
+     "quote": "No gazetted minimum landing size was found for this species."
+    },
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    }
+   ],
+   "frames_mm": {},
+   "snap_px": {
+    "snout": 12.4,
+    "fork": 4.0
+   },
+   "points": {
+    "snout": [
+     127.0,
+     999.0
+    ],
+    "fork": [
+     664.0,
+     1053.0
+    ],
+    "confidence": 0.32,
+    "spark": {
+     "snout": [
+      121.671875,
+      1010.203125
+     ],
+     "fork": [
+      665.890625,
+      1049.5078125
+     ]
+    }
+   },
+   "box": [
+    125.0,
+    889.0,
+    720.0,
+    1112.0
+   ],
+   "outline": [
+    [
+     125,
+     991
+    ],
+    [
+     127,
+     999
+    ],
+    [
+     146,
+     1006
+    ],
+    [
+     157,
+     1014
+    ],
+    [
+     156,
+     1010
+    ],
+    [
+     144,
+     1001
+    ],
+    [
+     147,
+     991
+    ],
+    [
+     158,
+     992
+    ],
+    [
+     166,
+     1001
+    ],
+    [
+     179,
+     1004
+    ],
+    [
+     184,
+     1000
+    ],
+    [
+     181,
+     991
+    ],
+    [
+     184,
+     984
+    ],
+    [
+     200,
+     988
+    ],
+    [
+     206,
+     996
+    ],
+    [
+     202,
+     1009
+    ],
+    [
+     189,
+     1022
+    ],
+    [
+     183,
+     1034
+    ],
+    [
+     189,
+     1045
+    ],
+    [
+     221,
+     1063
+    ],
+    [
+     236,
+     1068
+    ],
+    [
+     281,
+     1075
+    ],
+    [
+     306,
+     1093
+    ],
+    [
+     323,
+     1101
+    ],
+    [
+     329,
+     1099
+    ],
+    [
+     328,
+     1087
+    ],
+    [
+     349,
+     1085
+    ],
+    [
+     483,
+     1084
+    ],
+    [
+     507,
+     1094
+    ],
+    [
+     513,
+     1093
+    ],
+    [
+     516,
+     1085
+    ],
+    [
+     526,
+     1075
+    ],
+    [
+     555,
+     1063
+    ],
+    [
+     605,
+     1051
+    ],
+    [
+     659,
+     1050
+    ],
+    [
+     677,
+     1062
+    ],
+    [
+     700,
+     1098
+    ],
+    [
+     716,
+     1111
+    ],
+    [
+     719,
+     1110
+    ],
+    [
+     703,
+     1066
+    ],
+    [
+     677,
+     1048
+    ],
+    [
+     677,
+     1045
+    ],
+    [
+     689,
+     1036
+    ],
+    [
+     689,
+     1031
+    ],
+    [
+     685,
+     1028
+    ],
+    [
+     674,
+     1027
+    ],
+    [
+     667,
+     1034
+    ],
+    [
+     658,
+     1037
+    ],
+    [
+     592,
+     1021
+    ],
+    [
+     552,
+     1003
+    ],
+    [
+     496,
+     971
+    ],
+    [
+     491,
+     952
+    ],
+    [
+     460,
+     960
+    ],
+    [
+     404,
+     944
+    ],
+    [
+     359,
+     937
+    ],
+    [
+     346,
+     928
+    ],
+    [
+     341,
+     917
+    ],
+    [
+     344,
+     906
+    ],
+    [
+     354,
+     892
+    ],
+    [
+     353,
+     889
+    ],
+    [
+     329,
+     904
+    ],
+    [
+     288,
+     938
+    ],
+    [
+     205,
+     955
+    ],
+    [
+     156,
+     974
+    ]
+   ]
+  }
+ ],
+ "cost": {
+  "usd": 0.0,
+  "calls": 28,
+  "cached": 28
+ },
+ "rules_cited": {
+  "iotc-length-interval": {
+   "id": "iotc-length-interval",
+   "species": [
+    "*"
+   ],
+   "measure": "fork length",
+   "threshold_cm": null,
+   "source_title": "IOTC Working Party on Data Collection and Statistics, report (IOTC-2025-WPDCS21-R)",
+   "gazette_no": null,
+   "date": "2025",
+   "url": "https://iotc.org/sites/default/files/documents/2026/03/IOTC-2025-WPDCS21_RE.pdf",
+   "quote": "size samples with class intervals greater than 5 cm",
+   "status": "reported",
+   "check": "length-frequency bins must be 5 cm or narrower; CatchLength uses 1 cm"
+  },
+  "lk-finfish-no-min": {
+   "id": "lk-finfish-no-min",
+   "species": [
+    "Katsuwonus pelamis",
+    "Euthynnus affinis",
+    "Rastrelliger kanagurta",
+    "Auxis thazard",
+    "Auxis rochei"
+   ],
+   "measure": "fork length",
+   "threshold_cm": null,
+   "source_title": "Sri Lanka fisheries regulations under the Fisheries and Aquatic Resources Act No. 2 of 1996 (gazette search: shark 2015, mud crab 2024, lobster 2000, landing of fish 1997/2011)",
+   "gazette_no": null,
+   "date": "2026-10-29",
+   "url": "https://www.documents.gov.lk/view/extra-gazettes/2015/10/1938-02_E.pdf",
+   "quote": "No gazetted minimum landing size was found for this species.",
+   "status": "opened"
+  }
+ },
+ "verifier": null,
+ "auditor": null,
+ "receipt": {
+  "clip_sha256": null,
+  "finished_utc": "2026-11-03T11:10:40+00:00",
+  "models": [
+   "muse-spark-1.3",
+   "sam-3.1"
+  ],
+  "git_commit": "36cab83",
+  "freeze_tag": "freeze-2026-11-01",
+  "frozen": false,
+  "describe": "freeze-2026-11-01-6-g36cab83-dirty",
+  "thresholds": {
+   "calibration_px": 1.5,
+   "fl_over_outline": [
+    0.8,
+    1.0
+   ],
+   "tl_tolerance": 0.03,
+   "snap_px": 8,
+   "drift_mm": 10,
+   "match_mm": 40,
+   "rescue_area_x_median": [
+    0.3,
+    3.0
+   ],
+   "rescue_iou": 0.2,
+   "species_conf": 0.5,
+   "max_refusals": 3
+  },
+  "calibration": {
+   "tiles": [
+    0,
+    1
+   ],
+   "corner_error_px": 0.7289926409721375
+  },
+  "fish": {
+   "detected": 5,
+   "accepted": 0,
+   "flagged": 5
+  },
+  "rescued": [],
+  "frames": {
+   "best": 0,
+   "checked": []
+  },
+  "point_snap": {
+   "limit_px": 8,
+   "fish": 5,
+   "median_px": 10.5,
+   "max_px": 36.8,
+   "worst_fish": "0",
+   "over_limit": 5
+  },
+  "csv_sha256": "266344016ad3242af49772fc94b54f98db56a3eeb2710249004a739ecdca98a0",
+  "cost_usd": 0.0
+ },
+ "seller": {
+  "title": "Size receipt",
+  "purpose": "Evidence for the sale: what was measured and how. It doesn't set a price.",
+  "signed_off": false,
+  "status": "awaiting_signoff",
+  "fish": [
+   {
+    "id": "0",
+    "species": "Auxis thazard",
+    "name": "frigate tuna (alagoduwa)",
+    "fork_cm": null,
+    "est_weight_kg": null,
+    "note": "waiting for the fisheries officer's check"
+   },
+   {
+    "id": "1",
+    "species": "Auxis rochei",
+    "name": "bullet tuna",
+    "fork_cm": null,
+    "est_weight_kg": null,
+    "note": "waiting for the fisheries officer's check"
+   },
+   {
+    "id": "2",
+    "species": "Euthynnus affinis",
+    "name": "kawakawa (attawalla)",
+    "fork_cm": null,
+    "est_weight_kg": null,
+    "note": "waiting for the fisheries officer's check"
+   },
+   {
+    "id": "3",
+    "species": "Rastrelliger kanagurta",
+    "name": "Indian mackerel (kumbalawa)",
+    "fork_cm": null,
+    "est_weight_kg": null,
+    "note": "waiting for the fisheries officer's check"
+   },
+   {
+    "id": "4",
+    "species": "Euthynnus affinis",
+    "name": "kawakawa (attawalla)",
+    "fork_cm": null,
+    "est_weight_kg": null,
+    "note": "waiting for the fisheries officer's check"
+   }
+  ],
+  "curves": {},
+  "weights_note": "Weights are estimated from length with a published curve, not weighed. One fish can be heavier or lighter than the curve says.",
+  "measured_utc": "2026-11-03T11:10:40+00:00",
+  "clip_sha256": null,
+  "csv_sha256": "266344016ad3242af49772fc94b54f98db56a3eeb2710249004a739ecdca98a0",
+  "code": "freeze-2026-11-01-6-g36cab83-dirty"
+ },
+ "synthetic": {
+  "note": "Synthetic scene: museum reference fish (Smithsonian USNM, public domain) pasted at known lengths. Real Muse Spark 1.3 and SAM 3.1 calls.",
+  "tests": "Five fish apart, two tiles: plan, calibrate, segment, measure, species, rules.",
+  "true_total_length_cm": [
+   42.0,
+   38.0,
+   30.0,
+   25.0,
+   33.0
+  ],
+  "species": [
+   "Euthynnus affinis",
+   "Katsuwonus pelamis",
+   "Rastrelliger kanagurta",
+   "Katsuwonus pelamis",
+   "Euthynnus affinis"
+  ]
+ }
+}
