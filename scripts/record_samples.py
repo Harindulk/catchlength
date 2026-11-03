@@ -21,15 +21,16 @@ from catchlength.synth import make_scene, scripted_client
 ROOT = Path(__file__).resolve().parent.parent
 DRY = "--dry" in sys.argv
 LENGTHS = [420, 380, 300, 250, 330]
+APART = [(680, 90), (680, 260), (480, 350), (190, 470), (210, 590)]  # mm on a 1000x650 floor; tiles at (20,20), (640,400)
 SCENES = [  # id, label, scene kwargs, what the scene tests
     ("museum", "Five fish, two tiles",
-     dict(positions_mm=[(400, 130), (450, 330), (820, 140), (250, 520), (470, 545)], angles=[5, -10, 8, 0, 0], seed=1),
+     dict(positions_mm=APART, angles=[2, -3, 0, 2, -2], seed=1),  # every fish clear of the tiles and of each other
      "Five fish apart, two tiles: plan, calibrate, segment, measure, species, rules."),
     ("touching", "Fish touching",
-     dict(positions_mm=[(540, 140), (510, 232), (850, 300), (240, 520), (450, 522)], angles=[2, -2, 6, 0, 1], seed=2),
+     dict(positions_mm=[(660, 100), (660, 195), (200, 340), (190, 470), (470, 470)], angles=[0, 0, 0, 0, 0], seed=2),  # 0-1 side by side, 3-4 nose to tail
      "Fish laid touching: SAM may merge them, so the count check and box-prompt rescue have to split them."),
     ("no-tile", "No marker tile",
-     dict(positions_mm=[(400, 130), (450, 330), (820, 140), (250, 520), (470, 545)], angles=[5, -10, 8, 0, 0], seed=1, tiles=()),
+     dict(positions_mm=APART, angles=[2, -3, 0, 2, -2], seed=1, tiles=()),
      "No marker tile in view: no scale, so calibration must refuse and the job goes to the officer, no lengths."),
 ]
 

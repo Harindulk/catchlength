@@ -116,8 +116,12 @@ class Run:
         self.plan = spark.plan(self.client, self.frames)
         self.best = max(0, min(len(self.frames) - 1, int(self.plan.get("best_frame", 0))))
         if not self.plan["usable"]:
-            self.status = "needs_refilm"
-            return {"refused": True, "feedback": "Clip not usable: " + "; ".join(self.plan["issues"]), "stop": True}
+            # Spark's first look is a guess (live runs called fish "stacked" or "cut off" when they weren't), so it never
+            # stops the job: the deterministic checks decide, and the officer sees what Spark worried about.
+            self.reviews.append({"what": "plan", "reason": "Spark's first look called the clip unusable: "
+                                 + "; ".join(self.plan["issues"]), "by": "plan"})
+            return self.plan | {"warning": "First look flagged problems. Carry on: calibration and the measurement checks "
+                                           "decide, and these issues go to the officer."}
         return self.plan
 
     def calibrate(self) -> dict:
@@ -304,6 +308,9 @@ class Run:
         self.report = {"summary": summary, "fish": [f.row() for f in self.fish.values()], "lf_1cm": lf_bins(good),
                        "measured": len(good), "needs_review": len(self.fish) - len(good), "reviews": self.reviews,
                        "tiles": sorted(self.fixes), "source": self.source}
+        if not self.fish:  # nothing measured: the job is the officer's, not a report to sign
+            self.status = "needs_review"
+            return {"filed": True, "measured": 0, "waiting_for": "the officer: no fish could be measured"}
         self.status = "awaiting_signoff"
         return {"filed": True, "measured": len(good), "waiting_for": "officer sign-off"}
 
@@ -330,7 +337,7 @@ TOOLS = {
 SYSTEM = """You are a port-sampling officer's assistant at a Sri Lankan fish market. A phone clip shows fish laid on a sheet
 with printed marker tiles. Your job: get a fork length, a species and a rule check for every fish, and file a report.
 Use the tools, one per turn. Tools run their own checks: when one refuses, read the feedback and fix the cause; don't retry
-blindly. If the clip is unusable, stop. If SAM's count differs from the plan, use find_missed then rescue. Never guess a
+blindly. If calibration refuses, fix the cause or hand the run to the officer. If SAM's count differs from the plan, use find_missed then rescue. Never guess a
 length or a species: hand anything you can't settle to the officer with request_review. Cite rules only as [rule:id]."""
 
 
@@ -361,6 +368,9 @@ def run_agent(run: Run, model: str = spark.MODEL, max_turns: int = MAX_TURNS, on
             if on_turn:
                 on_turn(run.log[-1])  # the server streams each turn to the console as it happens
             msgs.append({"role": "tool", "tool_call_id": tc["id"], "content": json.dumps(_brief(res))})
+        for tc in (m.get("tool_calls") or [])[1:]:  # the API wants an answer to every call it made
+            msgs.append({"role": "tool", "tool_call_id": tc["id"], "content": json.dumps(
+                {"refused": True, "feedback": "Not run: one tool per turn. Call it again next turn if still needed."})})
         if run.status != "running":
             break
     else:

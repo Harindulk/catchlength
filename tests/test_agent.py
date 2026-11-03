@@ -195,3 +195,26 @@ def test_open_weights_auditor_goes_to_baseten_with_its_own_key(monkeypatch, tmp_
     monkeypatch.setattr(api, "_env_key", lambda name="MODEL_API_KEY": None)
     with pytest.raises(api.NoKey, match="BASETEN_API_KEY"):
         api.Client(1.0).call("chat", {"model": OPEN_MODEL, "messages": []})
+
+
+def test_unusable_first_look_goes_to_the_officer_and_never_stops_the_job(scene, tmp_path, monkeypatch):
+    client = script(scene, tmp_path, monkeypatch)
+    real = spark.plan
+    monkeypatch.setattr(spark, "plan", lambda c, f: real(c, f) | {"usable": False, "issues": ["fish stacked on each other"]})
+    run = agent.run_agent(agent.Run([scene.image], client, "synthetic"))
+    assert run.status == "awaiting_signoff" and len(run.fish) == 5
+    assert run.reviews[0] == {"what": "plan", "reason": "Spark's first look called the clip unusable: fish stacked on each other", "by": "plan"}
+
+
+def test_every_parallel_tool_call_gets_an_answer(scene, tmp_path, monkeypatch):
+    seen = []
+    replies = iter([{"choices": [{"message": {"role": "assistant", "content": None, "tool_calls": [
+        {"id": "a", "type": "function", "function": {"name": "calibrate", "arguments": "{}"}},
+        {"id": "b", "type": "function", "function": {"name": "segment", "arguments": "{}"}}]}}]}])
+
+    def transport(kind, body):
+        seen.append([m.get("tool_call_id") for m in body["messages"] if m["role"] == "tool"])
+        return next(replies, {"choices": [{"message": {"role": "assistant", "content": "done"}}]})
+    monkeypatch.setattr("catchlength.api.CACHE", tmp_path)
+    agent.run_agent(agent.Run([scene.image], Client(transport=transport)), max_turns=2)
+    assert seen[1] == ["a", "b"]
