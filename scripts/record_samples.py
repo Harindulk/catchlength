@@ -2,7 +2,8 @@
 (Smithsonian USNM, public domain) pasted at known lengths, so every length can be checked against the truth.
   python scripts/record_samples.py          live; needs MODEL_API_KEY in .env, about $0.60 a scene at most
   python scripts/record_samples.py --dry    scripted model stand-ins, free: checks the plumbing only
-  add --verify for a final Muse Wonder check that can only flag fish for the officer
+  add --verify for a final Muse Wonder check that can only flag fish for the officer, and --audit-open for the same
+  check by Muse Spark Open on Baseten (needs BASETEN_API_KEY in .env)
 Writes data/samples/<id>/frames/0.jpg (for live runs on the server) and web/samples/<id>/ (the recorded run)."""
 import json
 import sys
@@ -42,9 +43,12 @@ for sid, label, kw, tests in SCENES:
     cv2.imwrite(str(frames / "0.jpg"), scene.image, [cv2.IMWRITE_JPEG_QUALITY, 92])
     client = scripted_client(scene, setattr) if DRY else api.Client(0.60)
     run = agent.run_agent(agent.Run([scene.image], client, f"synthetic scene: {label.lower()}"))
-    if "--verify" in sys.argv and run.status == "awaiting_signoff":
-        from catchlength.verify import verify
-        run.verification = verify(run)
+    if run.status == "awaiting_signoff" and {"--verify", "--audit-open"} & set(sys.argv):
+        from catchlength.verify import OPEN_MODEL, verify
+        if "--verify" in sys.argv:
+            run.verification = verify(run)
+        if "--audit-open" in sys.argv:
+            run.audit = verify(run, model=OPEN_MODEL)
     out = ROOT / "web/samples" / (sid + "-dry" if DRY else sid)
     save(run, out)
     d = json.loads((out / "run.json").read_text())

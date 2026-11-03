@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CatchLength · size receipt for the seller</title>
+<meta name="description" content="Each fish's fork length and an estimated weight from a published curve, with the formula and its source, as evidence for the sale.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css?v=12">
+<style>
+  body { padding: 24px 16px 48px; }
+  .slip { max-width: 520px; margin: 0 auto; background: var(--surface); border-radius: var(--radius-card); padding: var(--pad); }
+  .slip h1 { font-size: var(--fs-title); line-height: 1.15; letter-spacing: -0.02em; }
+  .slip .lead { margin-top: 8px; font-size: 16px; }
+  .slip .state { margin-top: 16px; }
+  .rows { list-style: none; margin: 24px 0 0; padding: 0; }
+  .rows li { display: grid; grid-template-columns: 1fr auto; gap: 2px 16px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+  .rows .fl { font-size: var(--fs-kpi); font-weight: 500; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; text-align: right; grid-row: span 2; align-self: center; }
+  .rows .w { color: var(--muted); }
+  .how { margin-top: 24px; font-size: 13px; color: var(--muted); }
+  .how p + p { margin-top: 8px; }
+  .how a { color: var(--text); }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; }
+  .actions [hidden] { display: none; }
+  .actions a, .actions button { min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: var(--radius-control); border: 0; cursor: pointer; text-decoration: none; font-weight: 500; }
+  .actions .go { background: var(--accent); color: var(--surface); }
+  .actions .alt { background: var(--raised); }
+  .actions a:hover, .actions button:hover { opacity: .88; }
+  @media print { body { background: #fff; padding: 0; } .actions { display: none; } }
+</style>
+</head>
+<body>
+<main class="slip" aria-labelledby="t">
+  <h1 id="t">Size receipt</h1>
+  <p class="lead" id="lead">Evidence for the sale: what was measured and how. It doesn't set a price.</p>
+  <p class="state" id="state"></p>
+  <ul class="rows" id="rows"><li><span>Loading the run…</span></li></ul>
+  <div class="how" id="how"></div>
+  <div class="actions">
+    <a class="go" id="wa" href="#" target="_blank" rel="noopener" hidden>Send on WhatsApp</a>
+    <button class="alt" type="button" id="print">Save as PDF</button>
+    <a class="alt" id="back" href="./">Open the full run</a>
+  </div>
+</main>
+<script>
+(async () => {
+  const $ = (s) => document.querySelector(s);
+  const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const id = new URLSearchParams(location.search).get('s') || 'simulated';
+  if (!/^[\w-]+$/.test(id)) return;
+  $('#print').onclick = () => print();
+  let run;
+  try { run = await (await fetch(`samples/${id}/run.json`)).json(); } catch { $('#rows').innerHTML = '<li>This run could not be loaded.</li>'; return; }
+  const r = run.seller;
+  if (!r) { $('#rows').innerHTML = '<li>This run has no size receipt.</li>'; return; }
+  const kind = run.simulated ? 'Simulated sample, not a real catch. ' : run.synthetic ? 'Synthetic test scene, not a real catch. ' : '';
+  $('#state').innerHTML = `<span class="pill ${r.signed_off ? 'ok' : 'warn'}">${r.signed_off ? 'Signed off by the fisheries officer' : 'Officer has not signed off yet'}</span>`
+    + (kind ? ` <span class="muted">${kind}</span>` : '');
+  $('#rows').innerHTML = r.fish.length ? '' : '<li>No lengths: the agent could not measure this clip and handed it to the officer.</li>';
+  if (r.fish.length) $('#rows').innerHTML = r.fish.map((f) => f.fork_cm == null
+    ? `<li><span>Fish ${esc(f.id)}</span><span class="fl muted">–</span><span class="w">${esc(f.note)}</span></li>`
+    : `<li><span>Fish ${esc(f.id)} · ${esc(f.name)}</span><span class="fl">${f.fork_cm.toFixed(1)} cm</span>
+       <span class="w">${f.est_weight_kg == null ? esc(f.note) : `about ${f.est_weight_kg.toFixed(2)} kg, estimated`}</span></li>`).join('');
+  $('#how').innerHTML = `<p>Fork length: snout tip to the inside of the tail fork, measured by the CatchLength agent and checked a second way. ${esc(r.weights_note)}</p>`
+    + Object.entries(r.curves).map(([sp, c]) => `<p><i>${esc(sp)}</i>: ${esc(c.formula)}. Source: <a href="${esc(c.url)}" rel="noopener">${esc(c.source)}</a></p>`).join('')
+    + (r.clip_sha256 ? `<p>Clip fingerprint ${esc(r.clip_sha256.slice(0, 16))} · code ${esc(r.code)}</p>` : '');
+  const lines = [`CatchLength size receipt. ${r.purpose}`, r.signed_off ? 'Signed off by the fisheries officer.' : 'Not yet signed off by the fisheries officer.']
+    .concat(r.fish.map((f) => f.fork_cm == null ? `Fish ${f.id}: ${f.note}` : `Fish ${f.id}, ${f.name}: ${f.fork_cm.toFixed(1)} cm${f.est_weight_kg == null ? '' : `, about ${f.est_weight_kg.toFixed(2)} kg (estimate)`}`))
+    .concat([r.weights_note, location.href]);
+  $('#wa').href = 'https://wa.me/?text=' + encodeURIComponent(lines.join('\n'));
+  $('#wa').hidden = false;
+})();
+</script>
+</body>
+</html>

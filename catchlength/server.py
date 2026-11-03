@@ -15,6 +15,7 @@ import cv2
 from .agent import Run, run_agent
 from .api import BudgetExceeded, Client, NoKey
 from .cli import load_frames, save
+from .seller import size_receipt
 
 ROOT = Path(__file__).parent.parent
 SAMPLES = ROOT / "data/samples"
@@ -137,6 +138,7 @@ def record_signoff(sid: str, approve: bool, note: str) -> dict:
     rec["status"] = "signed_off" if approve else "sent_back"
     rec["log"].append({"turn": "officer", "tool": "sign_off", "args": {"approve": approve, "note": note},
                        "result": {"status": rec["status"]}, "at": time.strftime("%Y-%m-%d %H:%M:%S")})
+    rec["seller"] = size_receipt(rec)  # the seller's copy says whether the officer signed off
     f.write_text(json.dumps(rec, indent=1, default=str))
     return rec
 

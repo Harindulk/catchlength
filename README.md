@@ -2,7 +2,7 @@
 
 A verifiable agent for Sri Lanka's port fish sampling. It plans the job, measures every fish in a phone clip, checks each length a second way, hands what it can't settle to a fisheries officer, and leaves an audit trail for every number.
 
-Sri Lanka already measures coastal tuna from photographs. NARA, the national aquatic research agency, presented its photo-board method to the IOTC in 2025 ([IOTC-2025-WPM16-10rev1](https://iotc.org/sites/default/files/documents/2025/10/IOTC-2025-WPM16-10rev1-Sri_Lanka_photo.pdf)): field staff lay fish on a board, take a photo, then click the snout and the tail fork of each fish by hand and name its species. CatchLength does the clicking. You film about 20 seconds of fish laid next to printed marker sheets, and an agent built on Meta's models plans the job, finds every fish, measures each one twice, hands anything it can't settle to a person, and files a length-frequency report that cites the rule behind every check.
+Sri Lanka already measures coastal tuna from photographs. NARA, the national aquatic research agency, presented its photo-board method to the IOTC in 2025 ([IOTC-2025-WPM16-10rev1](https://iotc.org/sites/default/files/documents/2025/10/IOTC-2025-WPM16-10rev1-Sri_Lanka_photo.pdf)): field staff lay fish on a 60 cm board, take a photo, then draw a line on each fish from the snout to the tip of the tail (its total length) in FishMesh-2 and name its species by hand. CatchLength does that drawing and naming. It measures fork length, the measure IOTC length-frequency data uses, and checks it against the total length the species' published relationship predicts, so it gives both. You film about 20 seconds of fish laid next to printed marker sheets, and an agent built on Meta's models plans the job, finds every fish, measures each one twice, hands anything it can't settle to a person, and files a length-frequency report that cites the rule behind every check.
 
 Built for the Meta Global AI Developer Hackathon (Indie track), theme Build for Your World. All code in this repository was written from 27 October 2026.
 
@@ -20,6 +20,8 @@ The checks sit inside the agent's tools, so the model can't skip them.
 - A tool refused three times hands the job to the officer, and a filed report waits for the officer's sign-off.
 - A benchmark compares the agent's lengths with the same fish measured by hand on a measuring board. The agent never sees those numbers.
 
+Every run also gives the seller a size receipt (`web/receipt.html`, sent over WhatsApp or saved as a PDF): each accepted fish's fork length and an estimated weight from a published length-weight curve for its species, with the formula and source printed under it. It's evidence for the sale, with the same lengths the officer files, and it doesn't set a price. Flagged fish show as waiting for the officer, and Indian mackerel gets no weight because we found no sourced fork-length curve for it.
+
 Every run ends with an audit receipt: the clip's hash, the models used, the calibration error, which fish were rescued, the frames checked, how far Spark's points sat from SAM's outlines (median, worst fish, how many over the limit), the cost, the code version and the hash of the CSV. The code version names the freeze tag (`scripts/freeze.py`, made before the field shoot) and says whether the code and thresholds still match it; the thresholds themselves are printed too.
 
 ## Meta models
@@ -29,6 +31,7 @@ Every run ends with an audit receipt: the clip's hash, the models used, the cali
 | Muse Spark 1.3 | Runs the agent loop (one tool per turn); plans the clip; finds missed and merged fish; places snout and fork points; names the species from a closed list |
 | SAM 3.1 | Segments every fish from the concept "fish", then again from Spark's boxes and negative points |
 | Muse Wonder 1.0 (optional, `--verify`) | A last look at the filed report. It can only add fish to the officer's queue; it can't change a length, a species or a status |
+| Muse Spark Open on Baseten (optional, `--audit-open`) | The same bounded check by the open-weights model, hosted separately, as an independent auditor |
 
 ## Prior art
 
@@ -48,9 +51,26 @@ The workflow it automates is Sri Lanka's own photo-board sampling, presented by 
 
 Field results from fish measured at the Peliyagoda fish market on 4 November 2026 will be added here. The console's Benchmark tab reads `web/benchmark.json`.
 
+We hold it to NARA's own method. Their photo-board lengths differed from the measuring board by 0.05 cm on average, on 22 frigate tuna whose lengths had a standard deviation of only about 1.3 cm (IOTC-2025-WPM16-10rev1). Random error smears a length-frequency table; bias shifts the whole thing, so the report leads with bias: the mean agent-minus-tape difference on the 10 held-out fish, after a correction fitted only on the other fish. The target, set on 3 November before the shoot, is under 0.5 cm either way. Mean error is reported as a share of fish length (2 cm on a 27 cm tuna is 7%) and as the share of fish within 1 cm. The older pass mark, a mean error of 2.0 cm or less on 40 or more fish, is only the point where we would stop the project.
+
+One bias we expect: the tiles lie on the sheet, but a fish's outline sits a centimetre or two above it, closer to the camera, so lengths can read about 2% long from 1 m (roughly +0.5 cm on a 28 cm fish). The held-out correction is there to measure and remove it.
+
 Declared before the shoot: the ground truth is fork length on a measuring board; 10 fish are measured twice to give the tape's own error; fish tags 4, 8 … 40 are held out, so any bias correction is fitted on the other fish and scored on those 10; and the same 10 fish are timed by hand and with the agent.
 
 How much error the camera and the marker tiles add on their own, before any model is involved: on 112 synthetic fish in 30 scenes degraded like a 1080p phone frame from about 1 m (blur, sensor noise, JPEG), measured from each fish's true outline, the mean length error is 0.16 cm (90th percentile 0.31 cm, worst 0.53 cm). This is a synthetic test of the geometry only (`scripts/geometry_budget.py`); the field benchmark measures the whole agent.
+
+## When it goes wrong
+
+| What goes wrong | What the agent does |
+|---|---|
+| A tile is curled, folded or not on a flat surface | Calibration refuses the clip (corner error over 1.5 px), so no lengths are filed |
+| No tile in view, or the light is too poor to find one | Same refusal; three refusals hand the job to the officer |
+| Glare on silver skin clips the outline | Spark's points sit off SAM's outline, or the outline disagrees with the fork length: the fish is flagged |
+| A frayed or folded tail fork | The fork point lands off the outline, or (for frigate and bullet tuna) the total-length check fails: flagged |
+| A bent fish (rigor, a crate) | Outline length and fork length disagree, or the length drifts between frames: flagged |
+| Fish touching or overlapping | The count check sends boxes and negative points back to SAM to split them; a split that still looks wrong is flagged |
+| A species it doesn't know, or frigate vs bullet tuna it can't tell apart | It reports "unknown" when its confidence is under 0.5, never a guess |
+| Too many fish flagged | The receipt and benchmark show the share flagged, so the time saved is shown honestly |
 
 ## Run it
 
@@ -62,6 +82,7 @@ echo "MODEL_API_KEY=..." > .env          # a Meta Model API key; never commit it
 .venv/bin/python -m pytest -q                             # tests (no key needed)
 .venv/bin/python scripts/smoke.py                         # first real call: a Spark ping, then SAM + Spark on known lengths
 .venv/bin/python scripts/record_samples.py                # re-record the console's three samples on the real models
+.venv/bin/python scripts/record_samples.py --audit-open  # add the open-weights auditor (BASETEN_API_KEY in .env)
 ```
 
 Print `print/catchlength_A4_tiles.pdf` at 100% and check that each sheet's bar measures 100 mm. Lay at least two tiles flat on the same surface as the fish.

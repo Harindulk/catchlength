@@ -15,6 +15,10 @@ KILL = {"mae_cm": 2.0, "min_fish": 40, "count_exact": 0.9, "species": 0.9}
 # Declared before the shoot (frozen by scripts/freeze.py): fish tags 4, 8 ... 40 are held out.
 # Any bias correction is fitted on the other fish only and scored on these 10.
 HELD_OUT = {str(t) for t in range(4, 41, 4)}
+# Added 3 Nov, before the shoot, from NARA's own photo-board validation (IOTC-2025-WPM16-10rev1: photo vs board mean
+# difference 0.05 cm, sample SD about 1.3 cm on 22 frigate tuna). A fisheries reader judges bias first, so the report
+# leads with the held-out bias; the 2.0 cm MAE pass mark above stays as the kill floor, never as "accurate".
+NARA_BAR = {"held_out_abs_bias_cm": 0.5, "nara_photo_vs_board_cm": 0.05, "nara_sample_sd_cm": 1.3}
 
 
 def read_gt(path) -> list[dict]:
@@ -57,16 +61,20 @@ def grade(gt_rows: list[dict], runs: list[dict]) -> dict:
             pairs.append({"key": key, "tag": g["tag"], "tape_cm": float(g["fork_cm"]), "agent_cm": f["fork_cm"], "status": f["status"],
                           "species_ok": None if not g.get("species") else _same(f["species"], g["species"])})
     measured = [p for p in pairs if p["agent_cm"] is not None]
-    err = np.array([p["agent_cm"] - p["tape_cm"] for p in measured]) if measured else np.zeros(0)
-    acc = np.array([p["agent_cm"] - p["tape_cm"] for p in measured if p["status"] == "measured"]) if measured else np.zeros(0)
+    err = np.array([p["agent_cm"] - p["tape_cm"] for p in measured])
+    acc_p = [p for p in measured if p["status"] == "measured"]
+    acc = np.array([p["agent_cm"] - p["tape_cm"] for p in acc_p])
     sp = [p["species_ok"] for p in pairs if p["species_ok"] is not None]
     out = {"n_matched": len(pairs), "n_measured": len(measured), "unmatched": unmatched,
-           "length": _stats(err), "length_accepted_only": _stats(acc),
+           "length": _stats(err, [p["tape_cm"] for p in measured]),
+           "length_accepted_only": _stats(acc, [p["tape_cm"] for p in acc_p]),
            "accepted": int(sum(p["status"] == "measured" for p in pairs)),
            "flagged": int(sum(p["status"] == "needs_review" for p in pairs)),
            "count": {"clips": clips, "exact_rate": _rate([c["exact"] for c in clips if c["on_tape"] is not None])},
            "species": {"n": len(sp), "accuracy": _rate(sp)}, "held_out": _held_out(measured),
            "tape_repeat": _repeat(gt_rows), "pairs": pairs}
+    hb = out["held_out"]["held_out_corrected"].get("bias")
+    out["nara_bar"] = NARA_BAR | {"held_out_bias_cm": hb, "met": hb is not None and abs(hb) < NARA_BAR["held_out_abs_bias_cm"]}
     out["pass_marks"] = {
         "length": out["length_accepted_only"]["mae"] is not None and out["length_accepted_only"]["mae"] <= KILL["mae_cm"]
                   and out["n_measured"] >= KILL["min_fish"],
@@ -80,10 +88,11 @@ def _held_out(measured: list[dict]) -> dict:
     held-out ones, so a reported correction is never tuned on the fish it is scored on."""
     acc = [p for p in measured if p["status"] == "measured"]
     fit = np.array([p["agent_cm"] - p["tape_cm"] for p in acc if p["tag"] not in HELD_OUT])
-    held = np.array([p["agent_cm"] - p["tape_cm"] for p in acc if p["tag"] in HELD_OUT])
+    held_p = [p for p in acc if p["tag"] in HELD_OUT]
+    held, tape = np.array([p["agent_cm"] - p["tape_cm"] for p in held_p]), [p["tape_cm"] for p in held_p]
     bias = float(fit.mean()) if len(fit) else 0.0
     return {"tags": sorted(HELD_OUT, key=int), "fit": _stats(fit), "bias_fitted_cm": round(bias, 2),
-            "held_out_raw": _stats(held), "held_out_corrected": _stats(held - bias)}
+            "held_out_raw": _stats(held, tape), "held_out_corrected": _stats(held - bias, tape)}
 
 
 def _repeat(gt_rows: list[dict]) -> dict:
@@ -100,13 +109,16 @@ def _same(agent: str | None, tape: str) -> bool:
     return bool(agent) and agent.lower() == NAMES.get(tape.strip().lower(), tape.strip()).lower()
 
 
-def _stats(e: np.ndarray) -> dict:
+def _stats(e: np.ndarray, tape=()) -> dict:
+    """mae_pct: mean error as a share of the mean tape length, so 2 cm on a 27 cm fish reads as the 7% it is."""
     if not len(e):
-        return {"n": 0, "mae": None}
+        return {"n": 0, "mae": None, "bias": None}
     a = np.abs(e)
     sd = float(e.std(ddof=1)) if len(e) > 1 else 0.0
     return {"n": len(e), "mae": round(float(a.mean()), 2), "median_ae": round(float(np.median(a)), 2),
-            "p90_ae": round(float(np.percentile(a, 90)), 2), "within_2cm": round(float((a <= 2).mean()), 3),
+            "p90_ae": round(float(np.percentile(a, 90)), 2), "within_1cm": round(float((a <= 1).mean()), 3),
+            "within_2cm": round(float((a <= 2).mean()), 3),
+            "mae_pct": round(float(a.mean() / np.mean(tape) * 100), 1) if len(tape) else None,
             "bias": round(float(e.mean()), 2), "loa95": [round(float(e.mean() - 1.96 * sd), 2), round(float(e.mean() + 1.96 * sd), 2)]}
 
 
@@ -129,8 +141,10 @@ def main() -> None:
         runs.append({"source": r["source"], "fish": r["fish"], "tags": meta.get("tags", meta), "batch": meta.get("batch")})
     res = grade(gt, runs)
     Path(a.out).write_text(json.dumps(res, indent=1))
-    L = res["length_accepted_only"]
-    print(f"{res['n_measured']} fish measured, MAE {L['mae']} cm (accepted only), within 2 cm {L.get('within_2cm')}, "
+    L, H = res["length_accepted_only"], res["held_out"]["held_out_corrected"]
+    print(f"held-out bias {H['bias']} cm on {H['n']} fish (NARA bar |bias| < 0.5 cm: {'met' if res['nara_bar']['met'] else 'not met'}), "
+          f"MAE {L['mae']} cm = {L.get('mae_pct')}% of length, within 1 cm {L.get('within_1cm')} (accepted only), "
+          f"{res['n_measured']} fish measured, "
           f"count exact {res['count']['exact_rate']}, species {res['species']['accuracy']}, pass marks {res['pass_marks']}")
 
 

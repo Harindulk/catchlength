@@ -14,6 +14,7 @@ import numpy as np
 
 from .agent import SNAP_PX, THRESHOLDS, Run, run_agent
 from .rules import RULES
+from .seller import size_receipt
 from .api import Client
 
 
@@ -116,7 +117,7 @@ def save(run: Run, out: Path, path: str = "") -> None:
     (out / "catch.csv").write_text(csv_text)
     cv2.imwrite(str(out / "overlay.jpg"), run.outlined(), [cv2.IMWRITE_JPEG_QUALITY, 85])
     cv2.imwrite(str(out / "frame.jpg"), run.frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
-    (out / "run.json").write_text(json.dumps({
+    rec = {
         "source": run.source, "status": run.status, "plan": run.plan, "best_frame": run.best, "size": run.size,
         "tiles": sorted(run.fixes), "log": run.log, "reviews": run.reviews, "report": run.report,
         "fish": [f.row() | {"points": f.points, "box": [float(v) for v in f.det.box], "outline": _outline(f.det.mask)}
@@ -124,7 +125,9 @@ def save(run: Run, out: Path, path: str = "") -> None:
         "cost": {"usd": round(run.client.spent, 4), "calls": len(run.client.ledger),
                  "cached": sum(c["cached"] for c in run.client.ledger)},
         "rules_cited": {k: RULES[k] for k in sorted({x["rule"] for f in run.fish.values() for x in f.rules if x["rule"]})},
-        "verifier": getattr(run, "verification", None), "receipt": receipt(run, path, csv_text)}, indent=1, default=str))
+        "verifier": getattr(run, "verification", None), "auditor": getattr(run, "audit", None), "receipt": receipt(run, path, csv_text)}
+    rec["seller"] = size_receipt(rec)
+    (out / "run.json").write_text(json.dumps(rec, indent=1, default=str))
 
 
 def _outline(mask: np.ndarray) -> list:
@@ -141,11 +144,15 @@ def main() -> None:
     ap.add_argument("--budget", type=float, default=0.60)
     ap.add_argument("--out", default="runs")
     ap.add_argument("--verify", action="store_true", help="a final Muse Wonder check that can only flag fish")
+    ap.add_argument("--audit-open", action="store_true", help="the same bounded check by Muse Spark Open on Baseten (BASETEN_API_KEY)")
     a = ap.parse_args()
     run = run_agent(Run(load_frames(a.path, a.frames), Client(a.budget), Path(a.path).name))
-    if a.verify and run.status == "awaiting_signoff":
-        from .verify import verify
-        run.verification = verify(run)
+    if run.status == "awaiting_signoff" and (a.verify or a.audit_open):
+        from .verify import OPEN_MODEL, verify
+        if a.verify:
+            run.verification = verify(run)
+        if a.audit_open:
+            run.audit = verify(run, model=OPEN_MODEL)
     out = Path(a.out) / Path(a.path).stem
     save(run, out, a.path)
     print(f"{run.status}: {len(run.fish)} fish, ${run.client.spent:.3f}, {len(run.log)} turns -> {out}/run.json")

@@ -185,3 +185,13 @@ def test_wonder_verifier_can_only_flag_never_change_lengths(scene, tmp_path, mon
     assert [d["id"] for d in v["doubts"]] == ["2001"]  # ids it invented are dropped
     assert [r["what"] for r in run.reviews] == ["2001"] and run.reviews[0]["by"] == "verifier"
     assert [f.row() for f in run.fish.values()] == before  # lengths, species and statuses untouched
+
+
+def test_open_weights_auditor_goes_to_baseten_with_its_own_key(monkeypatch, tmp_path):
+    from catchlength import api
+    from catchlength.verify import OPEN_MODEL
+    monkeypatch.setattr(api, "CACHE", tmp_path)
+    monkeypatch.delenv("BASETEN_API_KEY", raising=False)
+    monkeypatch.setattr(api, "_env_key", lambda name="MODEL_API_KEY": None)
+    with pytest.raises(api.NoKey, match="BASETEN_API_KEY"):
+        api.Client(1.0).call("chat", {"model": OPEN_MODEL, "messages": []})

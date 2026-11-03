@@ -17,12 +17,12 @@ class NoKey(RuntimeError):
     pass
 
 
-def _env_key() -> str | None:
-    if os.environ.get("MODEL_API_KEY"):
-        return os.environ["MODEL_API_KEY"]
+def _env_key(name: str = "MODEL_API_KEY") -> str | None:
+    if os.environ.get(name):
+        return os.environ[name]
     env = Path(__file__).parent.parent / ".env"
     for line in env.read_text().splitlines() if env.exists() else []:
-        if line.startswith("MODEL_API_KEY="):
+        if line.startswith(name + "="):
             return line.split("=", 1)[1].strip().strip('"') or None
     return None
 
@@ -35,11 +35,14 @@ class Client:
         self._transport = transport  # tests inject a fake: (kind, body) -> dict
 
     def _live(self, kind: str, body: dict) -> dict:
-        key = _env_key()
+        # open-weights Muse models are served by Baseten's OpenAI-compatible Model APIs under the meta-models/ prefix
+        name, base = (("BASETEN_API_KEY", "https://inference.baseten.co/v1") if body["model"].startswith("meta-models/")
+                      else ("MODEL_API_KEY", "https://api.meta.ai/v1"))
+        key = _env_key(name)
         if not key:
-            raise NoKey("MODEL_API_KEY missing: add it to .env (live calls only; cached runs replay without it)")
+            raise NoKey(f"{name} missing: add it to .env (live calls only; cached runs replay without it)")
         from openai import OpenAI
-        c = OpenAI(base_url="https://api.meta.ai/v1", api_key=key)
+        c = OpenAI(base_url=base, api_key=key)
         r = c.chat.completions.create(**body) if kind == "chat" else c.responses.create(**body)
         return r.model_dump()
 

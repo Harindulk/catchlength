@@ -29,3 +29,12 @@ def test_untagged_fish_are_reported_not_dropped():
 def test_species_local_names_match_latin():
     assert grade(GT, [run([41, 42, 43, 44])])["species"]["accuracy"] == 1.0  # tape says "balaya"
     assert grade(GT, [run([41, 42, 43, 44], species="Euthynnus affinis")])["species"]["accuracy"] == 0.0
+
+
+def test_nara_bar_reads_held_out_bias_and_mae_as_share_of_length():
+    # tag 4 is held out. Fit fish (1-3) read +1 cm; the held-out fish too, so after correction its bias is 0.
+    r = grade(GT, [run([42, 43, 44, 45])])
+    assert r["held_out"]["bias_fitted_cm"] == 1.0 and r["held_out"]["held_out_corrected"]["bias"] == 0.0
+    assert r["nara_bar"]["met"] and r["length"]["mae_pct"] == round(1 / 42.5 * 100, 1) and r["length"]["within_1cm"] == 1.0
+    # a held-out fish that reads 1 cm further off than the fit misses the 0.5 cm bar
+    assert not grade(GT, [run([42, 43, 44, 46])])["nara_bar"]["met"]

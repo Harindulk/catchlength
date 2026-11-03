@@ -1,10 +1,14 @@
-{"note": "tl_from_fl = [a, b] means TL = a * FL + b (cm), the published length-length relationship the agent checks a fish's outline (about TL) against, within fl_tl_tolerance in catchlength/agent.py. null = no sourced relationship found yet: only the broad 0.80-1.00 band applies.",
+{"note": "tl_from_fl = [a, b] means TL = a * FL + b (cm), the published length-length relationship the agent checks a fish's outline (about TL) against, within fl_tl_tolerance in catchlength/agent.py. null = no sourced relationship found yet: only the broad 0.80-1.00 band applies. w_from_fl = [a, b] means round weight (kg) = a * FL(cm)^b, used only for the seller's size receipt (catchlength/seller.py), never for a check; null = no sourced fork-length curve found, so no weight is given.",
  "species": [
-  {"latin": "Katsuwonus pelamis", "english": "skipjack tuna", "sinhala": "balaya", "tl_from_fl": null},
-  {"latin": "Euthynnus affinis", "english": "kawakawa", "sinhala": "attawalla", "tl_from_fl": null},
-  {"latin": "Rastrelliger kanagurta", "english": "Indian mackerel", "sinhala": "kumbalawa", "tl_from_fl": null},
+  {"latin": "Katsuwonus pelamis", "english": "skipjack tuna", "sinhala": "balaya", "tl_from_fl": null,
+   "w_from_fl": [4.97e-06, 3.39292], "w_fl_range_cm": null, "w_source": "Chassot et al., IOTC-2016-WPDCS12-INF05, Table 2 (Indian Ocean purse-seine catch, n 1762)", "w_url": "https://iotc.org/sites/default/files/documents/2016/11/IOTC-2016-WPDCS12-INF05_-_Updating_LW_TT_PS.pdf"},
+  {"latin": "Euthynnus affinis", "english": "kawakawa", "sinhala": "attawalla", "tl_from_fl": null,
+   "w_from_fl": [2.6e-05, 2.9], "w_fl_range_cm": [20, 65], "w_source": "IOTC neritic tuna conversion equations (IOTC-2014-WPNT-DATA-Equations), data from the IPTP sampling programme in Sri Lanka, 1989", "w_url": "https://www.iotc.org/sites/default/files/documents/2014/05/IOTC-2014-WPNT-DATA-Equations.pdf"},
+  {"latin": "Rastrelliger kanagurta", "english": "Indian mackerel", "sinhala": "kumbalawa", "tl_from_fl": null, "w_from_fl": null},
   {"latin": "Auxis thazard", "english": "frigate tuna", "sinhala": "alagoduwa", "tl_from_fl": [1.0589, -0.1728],
-   "tl_source": "IOTC-2021-WPNT11-14, Figure 4 (west Sumatra, R2 0.9937)"},
+   "tl_source": "IOTC-2021-WPNT11-14, Figure 4 (west Sumatra, R2 0.9937)",
+   "w_from_fl": [1.7e-05, 3.0], "w_fl_range_cm": [20, 45], "w_source": "IOTC neritic tuna conversion equations (IOTC-2014-WPNT-DATA-Equations), data from the IPTP sampling programme in Sri Lanka, 1989", "w_url": "https://www.iotc.org/sites/default/files/documents/2014/05/IOTC-2014-WPNT-DATA-Equations.pdf"},
   {"latin": "Auxis rochei", "english": "bullet tuna", "sinhala": "", "tl_from_fl": [1.0586, -0.2384],
-   "tl_source": "IOTC-2021-WPNT11-14, Figure 4 (west Sumatra, R2 0.9786)"}
+   "tl_source": "IOTC-2021-WPNT11-14, Figure 4 (west Sumatra, R2 0.9786)",
+   "w_from_fl": [1.7e-05, 3.0], "w_fl_range_cm": [10, 40], "w_source": "IOTC neritic tuna conversion equations (IOTC-2014-WPNT-DATA-Equations), data from the IPTP sampling programme in Sri Lanka, 1989", "w_url": "https://www.iotc.org/sites/default/files/documents/2014/05/IOTC-2014-WPNT-DATA-Equations.pdf"}
 ]}
