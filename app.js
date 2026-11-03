@@ -220,7 +220,7 @@
     if (!r) return '';
     if (r.refused) return `<b>Refused.</b> ${esc(r.feedback)}${r.escalated ? ` <b>${esc(r.escalated)}</b>` : ''}`;
     switch (tool) {
-      case 'inspect_clip': return `Usable. Expects <b>${r.expected_count}</b> fish; best frame ${r.best_frame}${r.issues?.length ? `; ${esc(r.issues.join('; '))}` : ''}.`;
+      case 'inspect_clip': return `${r.usable === false ? '<b>Spark called it unusable</b>, so the officer will see why; the checks decide.' : 'Usable.'} Expects <b>${r.expected_count}</b> fish; best frame ${r.best_frame}${r.issues?.length ? `; ${esc(r.issues.join('; '))}` : ''}.`;
       case 'calibrate': return `${r.tiles.length} marker tiles; corner error <b>${r.corner_error_px} px</b> of 1.5 allowed.`;
       case 'segment': return `SAM 3.1 found <b>${r.found}</b>, the plan expected ${r.expected}.`;
       case 'find_missed': return `Spark counts ${r.count}: ${r.missed_boxes.length} without an outline${r.merged_ids.length ? `; outline ${esc(r.merged_ids.join(', '))} wraps two fish` : ''}.`;
@@ -362,7 +362,7 @@
       ['Fish', `${rc.fish.detected} found, ${rc.fish.accepted} accepted, ${rc.fish.flagged} flagged`],
       ['Rescued by SAM', rc.rescued.length ? rc.rescued.join(', ') : 'none'],
       ['Frames checked', [rc.frames.best, ...rc.frames.checked].join(', ')],
-      ['Cost', `$${rc.cost_usd.toFixed(3)}`],
+      ['Cost', run.cost && run.cost.calls && run.cost.cached === run.cost.calls ? `$${rc.cost_usd.toFixed(3)} (all ${run.cost.calls} model calls replayed from the cache of the recorded run)` : `$${rc.cost_usd.toFixed(3)}`],
       ['Code', rc.freeze_tag ? `${rc.describe}${rc.frozen ? ' (frozen)' : ' (changed since the freeze)'}` : rc.git_commit || 'uncommitted'],
       ['CSV SHA-256', rc.csv_sha256.slice(0, 16) + '…'],
     ];
