@@ -363,7 +363,7 @@
       ['Rescued by SAM', rc.rescued.length ? rc.rescued.join(', ') : 'none'],
       ['Frames checked', [rc.frames.best, ...rc.frames.checked].join(', ')],
       ['Cost', run.cost && run.cost.calls && run.cost.cached === run.cost.calls ? `$${rc.cost_usd.toFixed(3)} (all ${run.cost.calls} model calls replayed from the cache of the recorded run)` : `$${rc.cost_usd.toFixed(3)}`],
-      ['Code', rc.freeze_tag ? `${rc.describe}${rc.frozen ? ' (frozen)' : ' (changed since the freeze)'}` : rc.git_commit || 'uncommitted'],
+      ['Code', rc.freeze_tag ? (rc.frozen ? `${rc.freeze_tag}: code and thresholds match the freeze` : `${rc.describe} (code or thresholds changed since ${rc.freeze_tag})`) : rc.git_commit || 'uncommitted'],
       ['CSV SHA-256', rc.csv_sha256.slice(0, 16) + '…'],
     ];
     el.innerHTML = rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')
