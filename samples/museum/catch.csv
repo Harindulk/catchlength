@@ -1,6 +1,6 @@
 fish_id,species,fork_cm,outline_cm,status,reason,tile,rule_results
-0,Auxis thazard,37.2,37.8,needs_review,"outline vs snout-to-fork disagree 37px >8px limit; length unsettled, needs officer measurement",1,lk-finfish-no-min=no_minimum;iotc-length-interval=info
-1,Auxis rochei,24.4,24.9,needs_review,"outline vs snout-to-fork disagree 14px >8px limit; length unsettled, needs officer measurement",0,lk-finfish-no-min=no_minimum;iotc-length-interval=info
-2,Euthynnus affinis,40.3,41.7,needs_review,"outline vs snout-to-fork disagree 13px >8px limit; length unsettled, needs officer measurement",1,lk-finfish-no-min=no_minimum;iotc-length-interval=info
-3,Rastrelliger kanagurta,26.6,29.6,needs_review,"outline vs snout-to-fork disagree 9px >8px limit; length unsettled, needs officer measurement",0,lk-finfish-no-min=no_minimum;iotc-length-interval=info
-4,Euthynnus affinis,29.8,33.1,needs_review,"outline vs snout-to-fork disagree 12px >8px limit; length unsettled, needs officer measurement",0,lk-finfish-no-min=no_minimum;iotc-length-interval=info
+0,Auxis thazard,37.2,37.8,needs_review,Measurement disagreement: snout point 20 mm from outline (limit 10 mm). Possible frame-edge truncation noted at intake; cannot settle fork length without guessing. Species Auxis thazard retained for officer confirmation.,1,lk-finfish-no-min=no_minimum;iotc-length-interval=info
+1,Auxis rochei,24.4,24.9,measured,,0,lk-finfish-no-min=no_minimum;iotc-length-interval=info
+2,Euthynnus affinis,40.3,41.7,measured,,1,lk-finfish-no-min=no_minimum;iotc-length-interval=info
+3,Rastrelliger kanagurta,26.6,29.6,measured,,0,lk-finfish-no-min=no_minimum;iotc-length-interval=info
+4,Euthynnus affinis,29.8,33.1,measured,,0,lk-finfish-no-min=no_minimum;iotc-length-interval=info
