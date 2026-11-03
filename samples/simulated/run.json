@@ -2210,5 +2210,65 @@
    "Katsuwonus pelamis",
    "Euthynnus affinis"
   ]
+ },
+ "seller": {
+  "title": "Size receipt",
+  "purpose": "Evidence for the sale: what was measured and how. It doesn't set a price.",
+  "signed_off": false,
+  "status": "awaiting_signoff",
+  "fish": [
+   {
+    "id": "0",
+    "species": "Katsuwonus pelamis",
+    "name": "skipjack tuna (balaya)",
+    "fork_cm": 39.9,
+    "est_weight_kg": 1.34,
+    "note": ""
+   },
+   {
+    "id": "1",
+    "species": "Katsuwonus pelamis",
+    "name": "skipjack tuna (balaya)",
+    "fork_cm": 35.6,
+    "est_weight_kg": 0.91,
+    "note": ""
+   },
+   {
+    "id": "2",
+    "species": "Katsuwonus pelamis",
+    "name": "skipjack tuna (balaya)",
+    "fork_cm": 28.1,
+    "est_weight_kg": 0.41,
+    "note": ""
+   },
+   {
+    "id": "2001",
+    "species": "Katsuwonus pelamis",
+    "name": "skipjack tuna (balaya)",
+    "fork_cm": 23.2,
+    "est_weight_kg": 0.21,
+    "note": ""
+   },
+   {
+    "id": "2002",
+    "species": "Katsuwonus pelamis",
+    "name": "skipjack tuna (balaya)",
+    "fork_cm": 32.0,
+    "est_weight_kg": 0.64,
+    "note": ""
+   }
+  ],
+  "curves": {
+   "Katsuwonus pelamis": {
+    "formula": "W(kg) = 4.97e-06 x FL(cm)^3.39292",
+    "source": "Chassot et al., IOTC-2016-WPDCS12-INF05, Table 2 (Indian Ocean purse-seine catch, n 1762)",
+    "url": "https://iotc.org/sites/default/files/documents/2016/11/IOTC-2016-WPDCS12-INF05_-_Updating_LW_TT_PS.pdf"
+   }
+  },
+  "weights_note": "Weights are estimated from length with a published curve, not weighed. One fish can be heavier or lighter than the curve says.",
+  "measured_utc": "2026-11-01T01:16:12+00:00",
+  "clip_sha256": null,
+  "csv_sha256": "eb8d275029b578303b60296ad1519c5472ae34b662cdad8b5359986b65eefb47",
+  "code": "freeze-2026-11-01-dirty"
  }
 }

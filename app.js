@@ -366,7 +366,8 @@
       ['Code', rc.freeze_tag ? `${rc.describe}${rc.frozen ? ' (frozen)' : ' (changed since the freeze)'}` : rc.git_commit || 'uncommitted'],
       ['CSV SHA-256', rc.csv_sha256.slice(0, 16) + '…'],
     ];
-    el.innerHTML = rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+    el.innerHTML = rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')
+      + (run.seller ? `<dt>Seller's copy</dt><dd><a href="receipt.html?s=${encodeURIComponent(dir.split('/')[1])}">Size receipt to share</a> <span class="muted">(length and estimated weight)</span></dd>` : '');
   }
 
   // ---- benchmark ------------------------------------------------------------------------------------------------
@@ -375,7 +376,8 @@
     const get = async (f) => { try { const r = await fetch(f); return r.ok ? r.json() : null; } catch { return null; } };
     const bm = await get('benchmark.json');
     const plan = `<article class="card"><header class="card-h"><h2>What the tape benchmark measures</h2><span class="sub">pass marks set before the shoot</span></header>
-        <dl class="kv"><dt>Length</dt><dd>Mean error against the tape on 40 or more fish, 2.0 cm or less (FishNet's published mean error is 2.3 cm). Also the median, 90th percentile, share within 2 cm, bias and limits of agreement, with accepted fish shown apart from all fish.</dd>
+        <dl class="kv"><dt>Bias first</dt><dd>The bar is NARA's own photo-board method: 0.05 cm from the measuring board on 22 frigate tuna whose lengths spread only about 1.3 cm (IOTC-2025-WPM16-10rev1). So the headline is the bias on the 10 held-out fish (tags 4, 8 … 40), after a correction fitted only on the other fish. Target: under 0.5 cm either way.</dd>
+        <dt>Length</dt><dd>Mean error as a share of fish length, the share within 1 cm, and limits of agreement, accepted fish shown apart from all fish. 2.0 cm on 40 or more fish is the floor below which we stop, not a mark of accuracy: on a 27 cm tuna it is 7%.</dd>
         <dt>Count</dt><dd>The agent's count equals the fish on the sheet in 90% of clean clips.</dd>
         <dt>Species</dt><dd>Right 90% of the time, from a closed list of five coastal species, "unknown" allowed.</dd>
         <dt>Worst fish</dt><dd>The fish with the largest errors are listed by name, with what the agent did about them.</dd></dl></article>`;
@@ -392,15 +394,19 @@
       return;
     }
     const L = bm.length_accepted_only, A = bm.length, P = bm.pass_marks;
-    const mark = (ok, label) => `<span class="pill ${ok ? 'ok' : 'no'}">${label} ${ok ? 'passed' : 'missed'}</span>`;
+    const mark = (ok, label) => `<span class="pill ${ok ? 'ok' : 'no'}">${label} ${ok ? 'met' : 'missed'}</span>`;
+    const H = bm.held_out.held_out_corrected, NB = bm.nara_bar, sgn = (v) => (v > 0 ? '+' : '') + nf2.format(v);
     const worst = bm.pairs.filter((p) => p.agent_cm != null).sort((a, b) => Math.abs(b.agent_cm - b.tape_cm) - Math.abs(a.agent_cm - a.tape_cm)).slice(0, 3);
-    $('#bm-finding').innerHTML = `<b>Mean error ${nf1.format(L.mae)} cm</b> on ${L.n} accepted fish · ${bm.flagged} handed to the officer · <span class="muted">${bm.n_measured} fish measured in all</span>`;
-    body.innerHTML = `<article class="card"><div class="marks">${mark(P.length, 'Length')} ${mark(P.count, 'Count')} ${mark(P.species, 'Species')}</div><div class="kpis">
-      <div class="kpi"><div class="v">${nf1.format(L.mae)}<span class="unit">cm</span></div><div class="l">mean error, accepted fish</div></div>
-      <div class="kpi"><div class="v">${Math.round(L.within_2cm * 100)}<span class="unit">%</span></div><div class="l">within 2 cm of the tape</div></div>
+    $('#bm-finding').innerHTML = H.n
+      ? `<b>Held-out bias ${sgn(H.bias)} cm</b> on ${H.n} fish (target under 0.5 cm; NARA's photo method: 0.05 cm) · mean error ${nf1.format(L.mae)} cm, ${nf1.format(L.mae_pct)}% of length · ${bm.flagged} handed to the officer`
+      : `<b>No held-out fish measured yet</b> · mean error ${nf1.format(L.mae)} cm, ${nf1.format(L.mae_pct)}% of length, on ${L.n} accepted fish · ${bm.flagged} handed to the officer`;
+    body.innerHTML = `<article class="card"><div class="marks">${mark(NB.met, 'Bias under 0.5 cm')} ${mark(P.length, 'Kill floor (2 cm, 40 fish)')} ${mark(P.count, 'Count')} ${mark(P.species, 'Species')}</div><div class="kpis">
+      <div class="kpi"><div class="v">${H.n ? sgn(H.bias) : '–'}<span class="unit">cm</span></div><div class="l">bias, ${H.n} held-out fish</div></div>
+      <div class="kpi"><div class="v">${nf1.format(L.mae_pct)}<span class="unit">%</span></div><div class="l">mean error as share of length</div></div>
+      <div class="kpi"><div class="v">${Math.round(L.within_1cm * 100)}<span class="unit">%</span></div><div class="l">within 1 cm of the tape</div></div>
       <div class="kpi"><div class="v">${bm.count.exact_rate == null ? '–' : Math.round(bm.count.exact_rate * 100)}<span class="unit">%</span></div><div class="l">clips counted exactly</div></div>
       <div class="kpi"><div class="v">${bm.species.accuracy == null ? '–' : Math.round(bm.species.accuracy * 100)}<span class="unit">%</span></div><div class="l">species right</div></div></div>
-      <div class="chart" id="scatter"></div><p class="sub">Each dot is one fish: tape on the x axis, agent on the y axis. Dashed line = perfect agreement. Hollow dots were handed to the officer. Accepted fish: bias ${nf1.format(L.bias)} cm, 95% of errors between ${nf1.format(L.loa95[0])} and ${nf1.format(L.loa95[1])} cm. All fish: mean error ${nf1.format(A.mae)} cm.</p></article>
+      <div class="chart" id="scatter"></div><p class="sub">Each dot is one fish: tape on the x axis, agent on the y axis. Dashed line = perfect agreement. Hollow dots were handed to the officer. Accepted fish: mean error ${nf1.format(L.mae)} cm, bias ${nf1.format(L.bias)} cm before correction, 95% of errors between ${nf1.format(L.loa95[0])} and ${nf1.format(L.loa95[1])} cm. All fish: mean error ${nf1.format(A.mae)} cm.</p></article>
       <div class="grid two">
       <article class="card"><header class="card-h"><h2>Largest errors</h2><span class="sub">shown, never dropped</span></header>
         <div class="table-wrap"><table class="ledger"><thead><tr><th scope="col">Fish</th><th scope="col" class="num">Tape</th><th scope="col" class="num">Agent</th><th scope="col" class="num">Error</th><th scope="col">Agent's call</th></tr></thead><tbody>
