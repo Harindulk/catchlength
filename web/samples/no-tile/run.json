@@ -132,14 +132,14 @@
  "auditor": null,
  "receipt": {
   "clip_sha256": null,
-  "finished_utc": "2026-11-03T11:13:54+00:00",
+  "finished_utc": "2026-11-03T11:14:19+00:00",
   "models": [
    "muse-spark-1.3"
   ],
-  "git_commit": "ab2f2c1",
-  "freeze_tag": "freeze-2026-11-01",
-  "frozen": false,
-  "describe": "freeze-2026-11-01-8-gab2f2c1-dirty",
+  "git_commit": "2b3dc93",
+  "freeze_tag": "freeze-2026-11-03",
+  "frozen": true,
+  "describe": "freeze-2026-11-03-dirty",
   "thresholds": {
    "calibration_px": 1.5,
    "fl_over_outline": [
@@ -191,10 +191,10 @@
   "fish": [],
   "curves": {},
   "weights_note": "Weights are estimated from length with a published curve, not weighed. One fish can be heavier or lighter than the curve says.",
-  "measured_utc": "2026-11-03T11:13:54+00:00",
+  "measured_utc": "2026-11-03T11:14:19+00:00",
   "clip_sha256": null,
   "csv_sha256": "8a3a877645bfc56afc72513644e30993b2099dac9131e9f7bce25aa288f3bb95",
-  "code": "freeze-2026-11-01-8-gab2f2c1-dirty"
+  "code": "freeze-2026-11-03-dirty"
  },
  "synthetic": {
   "note": "Synthetic scene: museum reference fish (Smithsonian USNM, public domain) pasted at known lengths. Real Muse Spark 1.3 and SAM 3.1 calls.",

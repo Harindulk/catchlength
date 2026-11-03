@@ -78,7 +78,7 @@
     ],
     "note": "count differs from the plan: look for missed or merged fish"
    },
-   "ms": 1395,
+   "ms": 1428,
    "usd": 0.0
   },
   {
@@ -90,7 +90,7 @@
     "merged_ids": [],
     "missed_boxes": []
    },
-   "ms": 11,
+   "ms": 10,
    "usd": 0.0
   },
   {
@@ -111,7 +111,7 @@
      "note": "counts agree across frames"
     }
    },
-   "ms": 41,
+   "ms": 39,
    "usd": 0.0
   },
   {
@@ -128,8 +128,8 @@
     },
     "flagged": []
    },
-   "ms": 9,
-   "usd": 0.0046
+   "ms": 6,
+   "usd": 0.0
   },
   {
    "turn": 6,
@@ -160,7 +160,7 @@
     }
    },
    "ms": 0,
-   "usd": 0.011
+   "usd": 0.0
   },
   {
    "turn": 7,
@@ -173,7 +173,7 @@
     "queued": 2
    },
    "ms": 0,
-   "usd": 0.0158
+   "usd": 0.0
   },
   {
    "turn": 8,
@@ -187,7 +187,7 @@
     "tries_left": 2
    },
    "ms": 0,
-   "usd": 0.0218
+   "usd": 0.0
   },
   {
    "turn": 9,
@@ -200,7 +200,7 @@
     "queued": 3
    },
    "ms": 0,
-   "usd": 0.0282
+   "usd": 0.0
   },
   {
    "turn": 10,
@@ -214,7 +214,7 @@
     "waiting_for": "officer sign-off"
    },
    "ms": 0,
-   "usd": 0.0332
+   "usd": 0.0
   }
  ],
  "reviews": [
@@ -1673,9 +1673,9 @@
   }
  ],
  "cost": {
-  "usd": 0.0332,
+  "usd": 0.0,
   "calls": 24,
-  "cached": 18
+  "cached": 24
  },
  "rules_cited": {
   "iotc-length-interval": {
@@ -1716,15 +1716,15 @@
  "auditor": null,
  "receipt": {
   "clip_sha256": null,
-  "finished_utc": "2026-11-03T11:13:19+00:00",
+  "finished_utc": "2026-11-03T11:14:17+00:00",
   "models": [
    "muse-spark-1.3",
    "sam-3.1"
   ],
-  "git_commit": "ab2f2c1",
-  "freeze_tag": "freeze-2026-11-01",
-  "frozen": false,
-  "describe": "freeze-2026-11-01-8-gab2f2c1-dirty",
+  "git_commit": "2b3dc93",
+  "freeze_tag": "freeze-2026-11-03",
+  "frozen": true,
+  "describe": "freeze-2026-11-03",
   "thresholds": {
    "calibration_px": 1.5,
    "fl_over_outline": [
@@ -1769,7 +1769,7 @@
    "over_limit": 1
   },
   "csv_sha256": "8d37e47e4f2a1ac9a75c95e2a88c948d5899e11fa29855d8e729e3603e3e17fc",
-  "cost_usd": 0.0332
+  "cost_usd": 0.0
  },
  "seller": {
   "title": "Size receipt",
@@ -1831,10 +1831,10 @@
    }
   },
   "weights_note": "Weights are estimated from length with a published curve, not weighed. One fish can be heavier or lighter than the curve says.",
-  "measured_utc": "2026-11-03T11:13:19+00:00",
+  "measured_utc": "2026-11-03T11:14:17+00:00",
   "clip_sha256": null,
   "csv_sha256": "8d37e47e4f2a1ac9a75c95e2a88c948d5899e11fa29855d8e729e3603e3e17fc",
-  "code": "freeze-2026-11-01-8-gab2f2c1-dirty"
+  "code": "freeze-2026-11-03"
  },
  "synthetic": {
   "note": "Synthetic scene: museum reference fish (Smithsonian USNM, public domain) pasted at known lengths. Real Muse Spark 1.3 and SAM 3.1 calls.",
