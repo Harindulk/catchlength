@@ -12,7 +12,7 @@ import numpy as np
 NAMES = {n.lower(): s["latin"] for s in json.loads((Path(__file__).parent.parent / "config/species.json").read_text())["species"]
          for n in (s["latin"], s["english"], s["sinhala"]) if n}
 KILL = {"mae_cm": 2.0, "min_fish": 40, "count_exact": 0.9, "species": 0.9}
-# Declared before the shoot (notes/FIELD_KIT.md, frozen by scripts/freeze.py): fish tags 4, 8 ... 40 are held out.
+# Declared before the shoot (frozen by scripts/freeze.py): fish tags 4, 8 ... 40 are held out.
 # Any bias correction is fitted on the other fish only and scored on these 10.
 HELD_OUT = {str(t) for t in range(4, 41, 4)}
 

@@ -236,6 +236,8 @@ td.rule sup, .cited sup { font-size: 11px; color: var(--muted); vertical-align: 
 .signoff[hidden] { display: none; }
 .signoff p { font-size: 14px; }
 .signoff-actions[hidden] { display: none; }
+.signoff select { height: 36px; padding: 0 8px; border: 1px solid var(--control); border-radius: var(--radius-control); font: inherit; background: var(--surface); }
+.lang-note { flex-basis: 100%; font-size: 12px; }
 .signoff-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .signoff input { height: 36px; width: 260px; padding: 0 10px; border: 1px solid var(--control); border-radius: var(--radius-control); font: inherit; background: var(--surface); }
 .signoff input:focus-visible { outline: 2px solid var(--text); outline-offset: 0; }

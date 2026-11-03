@@ -1,8 +1,8 @@
 # CatchLength
 
-A fish-sampling agent that measures every fish in a phone clip and can't skip checking its own work.
+A verifiable agent for Sri Lanka's port fish sampling. It plans the job, measures every fish in a phone clip, checks each length a second way, hands what it can't settle to a fisheries officer, and leaves an audit trail for every number.
 
-Sri Lanka already measures coastal tuna from photographs: field staff lay fish on a board, take a photo, then click the snout and the tail fork of each fish by hand and name its species. CatchLength does the clicking. You film about 20 seconds of fish laid next to printed marker sheets, and an agent built on Meta's models plans the job, finds every fish, measures each one twice, hands anything it can't settle to a person, and files a length-frequency report that cites the rule behind every check.
+Sri Lanka already measures coastal tuna from photographs. NARA, the national aquatic research agency, presented its photo-board method to the IOTC in 2025 ([IOTC-2025-WPM16-10rev1](https://iotc.org/sites/default/files/documents/2025/10/IOTC-2025-WPM16-10rev1-Sri_Lanka_photo.pdf)): field staff lay fish on a board, take a photo, then click the snout and the tail fork of each fish by hand and name its species. CatchLength does the clicking. You film about 20 seconds of fish laid next to printed marker sheets, and an agent built on Meta's models plans the job, finds every fish, measures each one twice, hands anything it can't settle to a person, and files a length-frequency report that cites the rule behind every check.
 
 Built for the Meta Global AI Developer Hackathon (Indie track), theme Build for Your World. All code in this repository was written from 27 October 2026.
 
@@ -45,7 +45,7 @@ The workflow it automates is Sri Lanka's own photo-board sampling, presented by 
 
 ## Benchmark
 
-Field results from fish measured at the Peliyagoda fish market will be added here after 1 November 2026. The console's Benchmark tab reads `web/benchmark.json`.
+Field results from fish measured at the Peliyagoda fish market on 4 November 2026 will be added here. The console's Benchmark tab reads `web/benchmark.json`.
 
 Declared before the shoot: the ground truth is fork length on a measuring board; 10 fish are measured twice to give the tape's own error; fish tags 4, 8 … 40 are held out, so any bias correction is fitted on the other fish and scored on those 10; and the same 10 fish are timed by hand and with the agent.
 
@@ -59,6 +59,8 @@ echo "MODEL_API_KEY=..." > .env          # a Meta Model API key; never commit it
 .venv/bin/python -m catchlength.cli path/to/clip.mp4     # writes runs/<clip>/run.json, catch.csv, frame.jpg
 .venv/bin/python -m catchlength.server                    # the console at http://127.0.0.1:8000
 .venv/bin/python -m pytest -q                             # tests (no key needed)
+.venv/bin/python scripts/smoke.py                         # first real call: a Spark ping, then SAM + Spark on known lengths
+.venv/bin/python scripts/record_samples.py                # re-record the console's three samples on the real models
 ```
 
 Print `print/catchlength_A4_tiles.pdf` at 100% and check that each sheet's bar measures 100 mm. Lay at least two tiles flat on the same surface as the fish.
@@ -79,7 +81,7 @@ Or grade runs directly:
 
 Estimated at under $0.40 per clip at standard prices (SAM 3.1 is $2.50 per 1,000 images; Muse Spark 1.3 is $1.25 and $4.25 per million input and output tokens). Each run stops at $0.60. The public server runs only preloaded samples, a few per visitor per day, under a daily cap; repeat runs replay cached model responses.
 
-Limits: a closed list of five coastal species (skipjack, kawakawa, Indian mackerel, frigate and bullet tuna), anything else is "unknown"; fish laid flat on a flat surface; daylight; no Sinhala voice input (Muse Voice Transcribe doesn't support Sinhala).
+Limits: a closed list of five coastal species (skipjack, kawakawa, Indian mackerel, frigate and bullet tuna), anything else is "unknown"; fish laid flat on a flat surface; daylight; no Sinhala voice input (Muse Voice Transcribe doesn't support Sinhala). The officer's sign-off panel can switch to Sinhala or Tamil; that wording is a draft and still needs a native speaker's check.
 
 ## Before the hackathon
 

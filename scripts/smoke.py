@@ -2,7 +2,11 @@
 synthetic scene of museum fish at known lengths. python scripts/smoke.py
 Prints what came back and what it cost; responses are cached, so a rerun is free."""
 import json
+import sys
 import time
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # so `python scripts/smoke.py` finds the package
 
 import cv2
 import numpy as np
@@ -15,7 +19,13 @@ from catchlength.synth import make_scene
 
 c = Client(budget_usd=0.50)
 t = time.time()
-r = c.call("chat", {"model": spark.MODEL, "messages": [{"role": "user", "content": "Reply with the single word: ready"}]}, 0.001)
+try:
+    r = c.call("chat", {"model": spark.MODEL, "messages": [{"role": "user", "content": "Reply with the single word: ready"}]}, 0.001)
+except Exception as e:  # the one failure fixable by hand gets its fix printed
+    print(f"FAILED: {type(e).__name__}: {e}")
+    if any(k in str(e).lower() for k in ("401", "403", "billing", "payment", "credit", "quota", "restricted")):
+        print("Fix: dev.meta.ai -> Billing -> update the card (needs $20+, international online payments on), then rerun.")
+    sys.exit(1)
 print("spark ping:", r["choices"][0]["message"]["content"].strip(), f"({time.time() - t:.1f}s)")
 
 lengths = [420, 380, 300, 250, 330]

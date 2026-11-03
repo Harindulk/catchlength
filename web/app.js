@@ -14,7 +14,17 @@
   const RULE_SHORT = { no_minimum: 'No minimum found', pass: 'Above minimum', below_minimum: 'Below minimum', no_rule_in_pack: 'No rule in pack' };
   const CHECK = '<svg class="tick" viewBox="0 0 16 16" aria-label="passed" role="img"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   let samples = [], run = null, dir = '', selected = null, timer = null;
-  const decisions = {};  // officer decisions per run folder: { approve, note, at, saved }
+  const decisions = {};
+  // Officer screen in the port's languages. si/ta are draft wording: needs a native speaker's check before field use.
+  const T = {
+    en: { ok: 'Sign off report', back: 'Send back', note: 'Note for the agent (optional)',
+      filed: (a, f) => `<b>Report filed.</b> ${a} fish accepted${f ? `, ${f} need your look first` : ''}. Sign off, or send it back with a note.` },
+    si: { ok: 'වාර්තාව අනුමත කරන්න', back: 'ආපසු යවන්න', note: 'නියෝජිතයාට සටහනක් (අවශ්‍ය නම්)',
+      filed: (a, f) => `<b>වාර්තාව ගොනු කරන ලදී.</b> මාළු ${a}ක් පිළිගන්නා ලදී${f ? `, මාළු ${f}ක් ඔබ මුලින් පරීක්ෂා කළ යුතුය` : ''}. අනුමත කරන්න, නැතහොත් සටහනක් සමඟ ආපසු යවන්න.` },
+    ta: { ok: 'அறிக்கையை அங்கீகரி', back: 'திருப்பி அனுப்பு', note: 'முகவருக்குக் குறிப்பு (விருப்பத்தேர்வு)',
+      filed: (a, f) => `<b>அறிக்கை தாக்கல் செய்யப்பட்டது.</b> ${a} மீன்கள் ஏற்கப்பட்டன${f ? `, ${f} மீன்களை முதலில் நீங்கள் பார்க்க வேண்டும்` : ''}. அங்கீகரிக்கவும், அல்லது குறிப்புடன் திருப்பி அனுப்பவும்.` },
+  };
+  let lang = 'en';  // officer decisions per run folder: { approve, note, at, saved }
 
   // ---- views ------------------------------------------------------------------------------------------------
   function show(view) {
@@ -35,6 +45,7 @@
     $('#run-btn').addEventListener('click', live);
     $('#signoff').addEventListener('submit', (e) => { e.preventDefault(); decide(true); });
     $('#sendback-btn').addEventListener('click', () => decide(false));
+    $('#signoff-lang').addEventListener('change', (e) => { lang = e.target.value; signoff(true); });
     show(location.hash.slice(1) || 'run');
     await load(0);
   }
@@ -48,7 +59,9 @@
     $('#notice').hidden = true;
     $('#sample-line').innerHTML = run.simulated
       ? `<span class="pill warn">Simulated</span> Museum reference fish at known lengths, scripted model stand-ins. Not a field result.`
-      : `<span class="pill n">Field clip</span> ${esc(run.source)}`;
+      : run.synthetic
+        ? `<span class="pill warn">Synthetic scene</span> ${esc(run.synthetic.tests)} Real Muse Spark 1.3 + SAM 3.1; museum fish at known lengths.`
+        : `<span class="pill n">Field clip</span> ${esc(run.source)}`;
     $('#frame-img').src = dir + 'frame.jpg';
     $('#frame-img').alt = `Best frame of ${run.source}: fish on a dark sheet next to printed marker tiles`;
     const [w, h] = run.size;
@@ -145,7 +158,12 @@
     const f = run.receipt.fish;
     $('#signoff-text').innerHTML = d
       ? `${d.approve ? '<b>Signed off</b>' : '<b>Sent back to the agent</b>'} at ${esc(d.at)}${d.note ? `: “${esc(d.note)}”` : ''}${d.saved ? '' : ' <span class="muted">(recorded run: not saved)</span>'}`
-      : `<b>Report filed.</b> ${f.accepted} fish accepted${f.flagged ? `, ${f.flagged} need your look first` : ''}. Sign off, or send it back with a note.`;
+      : T[lang].filed(f.accepted, f.flagged);
+    $('#signoff-text').lang = d ? 'en' : lang;
+    $('#signoff-btn').textContent = T[lang].ok;
+    $('#sendback-btn').textContent = T[lang].back;
+    $('#signoff-note').placeholder = T[lang].note;
+    $('#signoff-lang-note').hidden = lang === 'en';
   }
 
   async function decide(approve) {
@@ -363,7 +381,7 @@
         <dt>Worst fish</dt><dd>The fish with the largest errors are listed by name, with what the agent did about them.</dd></dl></article>`;
     if (!bm) {
       const g = await get('geometry_budget.json');
-      $('#bm-finding').innerHTML = 'No tape benchmark yet. <span class="muted">Fish are tape-measured at Peliyagoda on Sun 1 Nov; the agent never sees those numbers.</span>';
+      $('#bm-finding').innerHTML = 'No tape benchmark yet. <span class="muted">Fish are tape-measured at Peliyagoda on Wed 4 Nov; the agent never sees those numbers.</span>';
       body.innerHTML = (g ? `<article class="card"><header class="card-h"><h2>What the camera and tiles add on their own</h2><span class="pill n">Simulated</span></header>
         <div class="kpis">
           <div class="kpi"><div class="v">${nf2.format(g.mae_cm)}<span class="unit">cm</span></div><div class="l">mean error</div></div>
