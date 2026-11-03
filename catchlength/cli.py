@@ -124,7 +124,7 @@ def save(run: Run, out: Path, path: str = "") -> None:
         "cost": {"usd": round(run.client.spent, 4), "calls": len(run.client.ledger),
                  "cached": sum(c["cached"] for c in run.client.ledger)},
         "rules_cited": {k: RULES[k] for k in sorted({x["rule"] for f in run.fish.values() for x in f.rules if x["rule"]})},
-        "receipt": receipt(run, path, csv_text)}, indent=1, default=str))
+        "verifier": getattr(run, "verification", None), "receipt": receipt(run, path, csv_text)}, indent=1, default=str))
 
 
 def _outline(mask: np.ndarray) -> list:
@@ -140,8 +140,12 @@ def main() -> None:
     ap.add_argument("--frames", type=int, default=6)
     ap.add_argument("--budget", type=float, default=0.60)
     ap.add_argument("--out", default="runs")
+    ap.add_argument("--verify", action="store_true", help="a final Muse Wonder check that can only flag fish")
     a = ap.parse_args()
     run = run_agent(Run(load_frames(a.path, a.frames), Client(a.budget), Path(a.path).name))
+    if a.verify and run.status == "awaiting_signoff":
+        from .verify import verify
+        run.verification = verify(run)
     out = Path(a.out) / Path(a.path).stem
     save(run, out, a.path)
     print(f"{run.status}: {len(run.fish)} fish, ${run.client.spent:.3f}, {len(run.log)} turns -> {out}/run.json")

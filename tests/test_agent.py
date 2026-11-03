@@ -167,3 +167,21 @@ def test_receipt_reports_the_point_snap_check(scene, tmp_path, monkeypatch):
     snap = receipt(run, "", "")["point_snap"]
     assert snap["limit_px"] == agent.SNAP_PX and snap["over_limit"] == 0 and snap["fish"] == 5
     assert 0 <= snap["median_px"] <= snap["max_px"] <= agent.SNAP_PX and snap["worst_fish"] in run.fish
+
+
+def test_wonder_verifier_can_only_flag_never_change_lengths(scene, tmp_path, monkeypatch):
+    from catchlength.verify import verify
+    run = agent.run_agent(agent.Run([scene.image], script(scene, tmp_path, monkeypatch), "synthetic"))
+    before = [f.row() for f in run.fish.values()]
+
+    def boom(kind, body):
+        raise RuntimeError("down")
+    run.client._transport = boom
+    assert "error" in verify(run) and len(run.reviews) == 0  # a failed verifier leaves the report as it was
+
+    reply = {"doubts": [{"id": "2001", "reason": "tail under fish 2002"}, {"id": "999", "reason": "made up"}]}
+    run.client._transport = lambda kind, body: {"choices": [{"message": {"content": json.dumps(reply)}}], "usage": {}}
+    v = verify(run)
+    assert [d["id"] for d in v["doubts"]] == ["2001"]  # ids it invented are dropped
+    assert [r["what"] for r in run.reviews] == ["2001"] and run.reviews[0]["by"] == "verifier"
+    assert [f.row() for f in run.fish.values()] == before  # lengths, species and statuses untouched
