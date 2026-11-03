@@ -275,7 +275,7 @@
     }
     const s = run.fish.find((f) => f.id === selected);
     $('#frame-cap').innerHTML = s && measured
-      ? `<b>Fish ${esc(s.id)}</b> · fork length ${cm(s.fork_cm)} · outline ${cm(s.axis_cm)}${s.snap_px && s.snap_px.fork != null ? ` · Spark's points ${s.snap_px.snout}/${s.snap_px.fork} px from SAM's outline` : ''} · ${esc(s.species || 'species pending')} · ${s.status === 'measured' ? 'accepted' : esc(s.why || 'with the officer')}`
+      ? `<b>Fish ${esc(s.id)}</b> · fork length ${cm(s.fork_cm)} · outline ${cm(s.axis_cm)}${s.snap_mm && s.snap_mm.fork != null ? ` · Spark's points ${s.snap_mm.snout}/${s.snap_mm.fork} mm from SAM's outline` : ''} · ${esc(s.species || 'species pending')} · ${s.status === 'measured' ? 'accepted' : esc(s.why || 'with the officer')}`
       : measured ? '<span class="muted">Dashed lines run from snout tip to tail fork. Pick a fish for its numbers.</span>' : '';
   }
 
