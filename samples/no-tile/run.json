@@ -1,0 +1,217 @@
+{
+ "source": "synthetic scene: no marker tile",
+ "status": "needs_review",
+ "plan": {
+  "best_frame": 0,
+  "expected_count": 5,
+  "issues": [
+   "tiles not visible",
+   "fish cut off by the frame edge",
+   "glare"
+  ],
+  "species_candidates": [
+   "Katsuwonus pelamis",
+   "Auxis thazard",
+   "Rastrelliger kanagurta"
+  ],
+  "tiles_visible": 0,
+  "usable": false
+ },
+ "best_frame": 0,
+ "size": [
+  2100,
+  1267
+ ],
+ "tiles": [],
+ "log": [
+  {
+   "turn": 0,
+   "tool": "inspect_clip",
+   "args": {},
+   "result": {
+    "best_frame": 0,
+    "expected_count": 5,
+    "issues": [
+     "tiles not visible",
+     "fish cut off by the frame edge",
+     "glare"
+    ],
+    "species_candidates": [
+     "Katsuwonus pelamis",
+     "Auxis thazard",
+     "Rastrelliger kanagurta"
+    ],
+    "tiles_visible": 0,
+    "usable": false,
+    "warning": "First look flagged problems. Carry on: calibration and the measurement checks decide, and these issues go to the officer."
+   },
+   "ms": 3,
+   "usd": 0.0
+  },
+  {
+   "turn": 1,
+   "tool": "calibrate",
+   "args": {},
+   "result": {
+    "refused": true,
+    "feedback": "No marker tile found in the best frame. Ask for a re-film with a tile flat and in view.",
+    "tries_left": 2
+   },
+   "ms": 49,
+   "usd": 0.0
+  },
+  {
+   "turn": 2,
+   "tool": "request_review",
+   "args": {
+    "fish_id": "",
+    "reason": "Whole run handed to officer: no marker tile visible in best frame (frame 0), calibration refused - No marker tile found, ask for re-film with tile flat and in view. Clip flagged unusable with tiles not visible, fish cut off by frame edge, and glare. Cannot establish scale so no fork length, species, or rule check can be completed. Request re-film with marker tile flat and in view."
+   },
+   "result": {
+    "queued": 2
+   },
+   "ms": 0,
+   "usd": 0.0
+  },
+  {
+   "turn": 3,
+   "tool": "submit_report",
+   "args": {
+    "summary": "Run handed to officer: calibration impossible, no marker tiles visible in best frame. Re-film requested with tile flat in view. 5 fish seen but no measurements, species, or rule checks completed."
+   },
+   "result": {
+    "filed": true,
+    "measured": 0,
+    "waiting_for": "the officer: no fish could be measured"
+   },
+   "ms": 0,
+   "usd": 0.0
+  }
+ ],
+ "reviews": [
+  {
+   "what": "plan",
+   "reason": "Spark's first look called the clip unusable: tiles not visible; fish cut off by the frame edge; glare",
+   "by": "plan"
+  },
+  {
+   "what": "run",
+   "reason": "Whole run handed to officer: no marker tile visible in best frame (frame 0), calibration refused - No marker tile found, ask for re-film with tile flat and in view. Clip flagged unusable with tiles not visible, fish cut off by frame edge, and glare. Cannot establish scale so no fork length, species, or rule check can be completed. Request re-film with marker tile flat and in view.",
+   "by": "agent"
+  }
+ ],
+ "report": {
+  "summary": "Run handed to officer: calibration impossible, no marker tiles visible in best frame. Re-film requested with tile flat in view. 5 fish seen but no measurements, species, or rule checks completed.",
+  "fish": [],
+  "lf_1cm": {},
+  "measured": 0,
+  "needs_review": 0,
+  "reviews": [
+   {
+    "what": "plan",
+    "reason": "Spark's first look called the clip unusable: tiles not visible; fish cut off by the frame edge; glare",
+    "by": "plan"
+   },
+   {
+    "what": "run",
+    "reason": "Whole run handed to officer: no marker tile visible in best frame (frame 0), calibration refused - No marker tile found, ask for re-film with tile flat and in view. Clip flagged unusable with tiles not visible, fish cut off by frame edge, and glare. Cannot establish scale so no fork length, species, or rule check can be completed. Request re-film with marker tile flat and in view.",
+    "by": "agent"
+   }
+  ],
+  "tiles": [],
+  "source": "synthetic scene: no marker tile"
+ },
+ "fish": [],
+ "cost": {
+  "usd": 0.0,
+  "calls": 5,
+  "cached": 5
+ },
+ "rules_cited": {},
+ "verifier": null,
+ "auditor": null,
+ "receipt": {
+  "clip_sha256": null,
+  "finished_utc": "2026-11-03T11:10:42+00:00",
+  "models": [
+   "muse-spark-1.3"
+  ],
+  "git_commit": "36cab83",
+  "freeze_tag": "freeze-2026-11-01",
+  "frozen": false,
+  "describe": "freeze-2026-11-01-6-g36cab83-dirty",
+  "thresholds": {
+   "calibration_px": 1.5,
+   "fl_over_outline": [
+    0.8,
+    1.0
+   ],
+   "tl_tolerance": 0.03,
+   "snap_px": 8,
+   "drift_mm": 10,
+   "match_mm": 40,
+   "rescue_area_x_median": [
+    0.3,
+    3.0
+   ],
+   "rescue_iou": 0.2,
+   "species_conf": 0.5,
+   "max_refusals": 3
+  },
+  "calibration": {
+   "tiles": [],
+   "corner_error_px": null
+  },
+  "fish": {
+   "detected": 0,
+   "accepted": 0,
+   "flagged": 0
+  },
+  "rescued": [],
+  "frames": {
+   "best": 0,
+   "checked": []
+  },
+  "point_snap": {
+   "limit_px": 8,
+   "fish": 0,
+   "median_px": null,
+   "max_px": null,
+   "worst_fish": null,
+   "over_limit": 0
+  },
+  "csv_sha256": "8a3a877645bfc56afc72513644e30993b2099dac9131e9f7bce25aa288f3bb95",
+  "cost_usd": 0.0
+ },
+ "seller": {
+  "title": "Size receipt",
+  "purpose": "Evidence for the sale: what was measured and how. It doesn't set a price.",
+  "signed_off": false,
+  "status": "needs_review",
+  "fish": [],
+  "curves": {},
+  "weights_note": "Weights are estimated from length with a published curve, not weighed. One fish can be heavier or lighter than the curve says.",
+  "measured_utc": "2026-11-03T11:10:42+00:00",
+  "clip_sha256": null,
+  "csv_sha256": "8a3a877645bfc56afc72513644e30993b2099dac9131e9f7bce25aa288f3bb95",
+  "code": "freeze-2026-11-01-6-g36cab83-dirty"
+ },
+ "synthetic": {
+  "note": "Synthetic scene: museum reference fish (Smithsonian USNM, public domain) pasted at known lengths. Real Muse Spark 1.3 and SAM 3.1 calls.",
+  "tests": "No marker tile in view: no scale, so calibration must refuse and the job goes to the officer, no lengths.",
+  "true_total_length_cm": [
+   42.0,
+   38.0,
+   30.0,
+   25.0,
+   33.0
+  ],
+  "species": [
+   "Euthynnus affinis",
+   "Katsuwonus pelamis",
+   "Rastrelliger kanagurta",
+   "Katsuwonus pelamis",
+   "Euthynnus affinis"
+  ]
+ }
+}

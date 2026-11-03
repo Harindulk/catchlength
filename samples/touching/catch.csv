@@ -1,0 +1,6 @@
+fish_id,species,fork_cm,outline_cm,status,reason,tile,rule_results
+0,Auxis thazard,23.1,25.0,needs_review,"outline 25.0 cm is +3% from expected total length for Auxis thazard, species uncertain",0,lk-finfish-no-min=no_minimum;iotc-length-interval=info
+1,Rastrelliger kanagurta,34.8,37.9,measured,,1,lk-finfish-no-min=no_minimum;iotc-length-interval=info
+2,Rastrelliger kanagurta,27.1,29.7,needs_review,"Spark's snout point is 10 px from SAM outline (limit 8 px); models disagree on where fish ends, cannot settle length",0,lk-finfish-no-min=no_minimum;iotc-length-interval=info
+3,Euthynnus affinis,29.9,32.4,needs_review,"Spark's snout point is 15 px from SAM outline (limit 8 px); models disagree on where fish ends, cannot settle length",1,lk-finfish-no-min=no_minimum;iotc-length-interval=info
+4,Euthynnus affinis,40.4,41.7,measured,,1,lk-finfish-no-min=no_minimum;iotc-length-interval=info
