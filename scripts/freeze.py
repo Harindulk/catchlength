@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from catchlength.agent import THRESHOLDS, TL_FROM_FL  # noqa: E402
-from catchlength.audit import HELD_OUT, KILL  # noqa: E402
+from catchlength.audit import HELD_OUT, KILL, NARA_BAR  # noqa: E402
 
 
 def git(*a: str, check: bool = True) -> str:
@@ -27,7 +27,17 @@ def message(name: str) -> str:
         "species TL-from-FL (TL = a*FL + b, cm): " + json.dumps({k: v for k, v in TL_FROM_FL.items() if v}),
         "kill test: " + json.dumps(KILL),
         "held-out bias split: tags " + ", ".join(sorted(HELD_OUT, key=int)) +
-        " (bias fitted on the other fish, scored on these)"])
+        " (bias fitted on the other fish, scored on these)",
+        "held-out bias target (NARA's photo method as the bar): " + json.dumps(NARA_BAR)] + _since(name))
+
+
+def _since(name: str) -> list[str]:
+    """Every commit since the previous freeze that touched the frozen code or thresholds, so a re-freeze shows what moved."""
+    prev = git("describe", "--tags", "--abbrev=0", "--match", "freeze-*", check=False)
+    if not prev or prev == name:
+        return []
+    log = git("log", "--format=%h %s", f"{prev}..HEAD", "--", "catchlength", "config", "data/rules.json")
+    return ["", f"changed since {prev}:"] + [f"  {l}" for l in log.splitlines()]
 
 
 def main() -> None:

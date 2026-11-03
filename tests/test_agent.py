@@ -148,6 +148,7 @@ def test_spark_points_snap_to_the_sam_outline_and_the_gap_is_reported(monkeypatc
         x, y = map(int, f.points[name])
         assert mask[y, x] and not mask[y - 1:y + 2, x - 1:x + 2].all()
     assert 4 <= f.snap_px["snout"] <= 6 and 3 <= f.snap_px["fork"] <= 6
+    assert f.snap_mm == pytest.approx(f.snap_px, abs=0.2)  # this test's sheet is 1 px per mm
     assert f.fork_mm == pytest.approx(agent.points_length_mm(np.eye(3), f.points["snout"], f.points["fork"]))
     assert abs(f.fork_mm - 360) < 4 and f.points["spark"] == {"snout": [95.0, 200.0], "fork": [466.0, 200.0]}
     assert f.row()["snap_px"] == f.snap_px
@@ -158,15 +159,15 @@ def test_a_point_far_from_the_outline_is_flagged_not_snapped_away(monkeypatch):
     res = run.measure()
     f = run.fish["0"]
     assert f.status == "needs_review" and "fork point is" in f.why and "from the outline" in f.why
-    assert res["flagged"][0]["id"] == "0" and f.snap_px["fork"] > agent.SNAP_PX
+    assert res["flagged"][0]["id"] == "0" and f.snap_mm["fork"] > agent.SNAP_MM
 
 
 def test_receipt_reports_the_point_snap_check(scene, tmp_path, monkeypatch):
     from catchlength.cli import receipt
     run = agent.run_agent(agent.Run([scene.image], script(scene, tmp_path, monkeypatch), "synthetic"))
     snap = receipt(run, "", "")["point_snap"]
-    assert snap["limit_px"] == agent.SNAP_PX and snap["over_limit"] == 0 and snap["fish"] == 5
-    assert 0 <= snap["median_px"] <= snap["max_px"] <= agent.SNAP_PX and snap["worst_fish"] in run.fish
+    assert snap["limit_mm"] == agent.SNAP_MM and snap["over_limit"] == 0 and snap["fish"] == 5
+    assert 0 <= snap["median_mm"] <= snap["max_mm"] <= agent.SNAP_MM and snap["worst_fish"] in run.fish
 
 
 def test_wonder_verifier_can_only_flag_never_change_lengths(scene, tmp_path, monkeypatch):

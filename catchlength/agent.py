@@ -21,12 +21,16 @@ MAX_REFUSALS = 3
 CAL_PX = 1.5  # worst tile-corner reprojection error before calibration refuses
 FL_OVER_AXIS = (0.80, 1.0)  # fork length is shorter than snout-to-tail-tip; outside this band the two disagree
 TL_TOL = 0.03  # outline (about TL) may differ this much from the species' published TL-from-FL before it's flagged
-SNAP_PX = 8  # Spark's snout or fork point may sit this far from SAM's outline before the fish is flagged
+# Spark's snout or fork point may sit this far from SAM's outline, measured on the sheet, before the fish is flagged.
+# One IOTC length bin (1 cm): a bigger gap means the two models disagree by more than the report's resolution. It was
+# 8 image px until 3 Nov, set on scripted points; on the first real run Spark's points sat 9-14 px (5-8 mm) off clean
+# forks and snapped onto the right notch, and a pixel limit also changes meaning with resolution and camera height.
+SNAP_MM = 10
 SPREAD_MM = 10  # a fish's length may drift this much across frames before it's flagged
 MATCH_MM = 40  # same fish in another frame = centroid within this distance on the same tile
 TL_FROM_FL = {s["latin"]: s.get("tl_from_fl") for s in
               json.loads((Path(__file__).parent.parent / "config/species.json").read_text())["species"]}
-THRESHOLDS = {"calibration_px": CAL_PX, "fl_over_outline": FL_OVER_AXIS, "tl_tolerance": TL_TOL, "snap_px": SNAP_PX,
+THRESHOLDS = {"calibration_px": CAL_PX, "fl_over_outline": FL_OVER_AXIS, "tl_tolerance": TL_TOL, "snap_mm": SNAP_MM,
               "drift_mm": SPREAD_MM, "match_mm": MATCH_MM, "rescue_area_x_median": (0.3, 3.0), "rescue_iou": 0.2,
               "species_conf": 0.5, "max_refusals": MAX_REFUSALS}  # what freeze tags and every receipt prints
 
@@ -45,13 +49,14 @@ class Fish:
     why: str = ""
     frames: dict = field(default_factory=dict)  # frame index -> outline length mm, from the cross-frame check
     snap_px: dict = field(default_factory=dict)  # how far Spark's snout and fork points sat from SAM's outline
+    snap_mm: dict = field(default_factory=dict)  # the same gaps on the sheet's plane, which the check uses
 
     def row(self) -> dict:
         return {"id": self.det.id, "fork_cm": None if self.fork_mm is None else round(self.fork_mm / 10, 1),
                 "axis_cm": None if self.axis_mm is None else round(self.axis_mm / 10, 1), "species": self.species,
                 "species_conf": self.species_conf, "tile": self.tile, "status": self.status, "why": self.why,
                 "sam_conf": self.det.confidence, "rules": self.rules,
-                "frames_mm": {k: round(v, 1) for k, v in self.frames.items()}, "snap_px": self.snap_px}
+                "frames_mm": {k: round(v, 1) for k, v in self.frames.items()}, "snap_px": self.snap_px, "snap_mm": self.snap_mm}
 
 
 class Run:
@@ -202,14 +207,15 @@ class Run:
             # both points belong on SAM's outline: snap each to it and keep how far it moved as a check
             (sn2, d_sn), (fk2, d_fk) = _snap(f.det.mask, sn), _snap(f.det.mask, fk)
             f.snap_px = {"snout": round(d_sn, 1), "fork": round(d_fk, 1)}
+            f.snap_mm = {"snout": round(points_length_mm(H, sn, sn2), 1), "fork": round(points_length_mm(H, fk, fk2), 1)}
             f.points = {"snout": sn2.tolist(), "fork": fk2.tolist(), "confidence": kp["confidence"],
                         "spark": {"snout": sn.tolist(), "fork": fk.tolist()}}
             f.fork_mm = points_length_mm(H, sn2, fk2)
             ratio = f.fork_mm / f.axis_mm if f.axis_mm else 0
-            worst = max(f.snap_px, key=f.snap_px.get)
-            if f.snap_px[worst] > SNAP_PX:
-                f.status, f.why = "needs_review", (f"Spark's {worst} point is {f.snap_px[worst]:.0f} px from the outline "
-                                                   f"SAM drew (limit {SNAP_PX} px); the two models disagree on where the fish ends")
+            worst = max(f.snap_mm, key=f.snap_mm.get)
+            if f.snap_mm[worst] > SNAP_MM:
+                f.status, f.why = "needs_review", (f"Spark's {worst} point is {f.snap_mm[worst]:.0f} mm from the outline "
+                                                   f"SAM drew (limit {SNAP_MM} mm); the two models disagree on where the fish ends")
             elif not FL_OVER_AXIS[0] <= ratio <= FL_OVER_AXIS[1]:
                 f.status, f.why = "needs_review", (f"fork length {f.fork_mm / 10:.1f} cm vs outline {f.axis_mm / 10:.1f} cm "
                                                    f"({ratio:.2f}); the two measurements disagree")

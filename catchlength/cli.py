@@ -12,7 +12,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from .agent import SNAP_PX, THRESHOLDS, Run, run_agent
+from .agent import SNAP_MM, THRESHOLDS, Run, run_agent
 from .rules import RULES
 from .seller import size_receipt
 from .api import Client
@@ -104,11 +104,11 @@ def receipt(run: Run, path: str, csv_text: str) -> dict:
 
 def _point_snap(run: Run) -> dict:
     """How far Spark's snout and fork points sat from SAM's outline before snapping: two models' agreement, per run."""
-    worst = {k: max(f.snap_px.values()) for k, f in run.fish.items() if f.snap_px}
-    d = [v for f in run.fish.values() for v in f.snap_px.values()]
-    return {"limit_px": SNAP_PX, "fish": len(worst), "median_px": round(float(np.median(d)), 1) if d else None,
-            "max_px": max(d, default=None), "worst_fish": max(worst, key=worst.get, default=None),
-            "over_limit": sum(v > SNAP_PX for v in worst.values())}
+    worst = {k: max(f.snap_mm.values()) for k, f in run.fish.items() if f.snap_mm}
+    d = [v for f in run.fish.values() for v in f.snap_mm.values()]
+    return {"limit_mm": SNAP_MM, "fish": len(worst), "median_mm": round(float(np.median(d)), 1) if d else None,
+            "max_mm": max(d, default=None), "worst_fish": max(worst, key=worst.get, default=None),
+            "over_limit": sum(v > SNAP_MM for v in worst.values())}
 
 
 def save(run: Run, out: Path, path: str = "") -> None:
