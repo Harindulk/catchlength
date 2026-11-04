@@ -1,3 +1,3 @@
-batch,tag,species,fork_cm,fork_cm_2,notes
-B1,1,balaya,42.5,42.0,taped twice
-B1,2,balaya,40.0,,
+batch,tag,species,fork_cm,fork_cm_2,total_cm,total_cm_2,notes
+B1,1,balaya,42.5,42.0,46.0,46.5,taped twice
+B1,2,balaya,40.0,,43.5,,
