@@ -1,0 +1,198 @@
+{
+ "source": "IMG_3133.MOV",
+ "status": "needs_review",
+ "plan": {
+  "best_frame": 3,
+  "expected_count": 4,
+  "issues": [
+   "fish stacked on each other",
+   "tiles not visible"
+  ],
+  "species_candidates": [
+   "queenfish",
+   "threadfin bream",
+   "scad",
+   "sardine"
+  ],
+  "tiles_visible": 19,
+  "usable": true
+ },
+ "best_frame": 3,
+ "size": [
+  1080,
+  1920
+ ],
+ "tiles": [
+  0,
+  1
+ ],
+ "log": [
+  {
+   "turn": 0,
+   "tool": "inspect_clip",
+   "args": {},
+   "result": {
+    "best_frame": 3,
+    "expected_count": 4,
+    "issues": [
+     "fish stacked on each other",
+     "tiles not visible"
+    ],
+    "species_candidates": [
+     "queenfish",
+     "threadfin bream",
+     "scad",
+     "sardine"
+    ],
+    "tiles_visible": 19,
+    "usable": true
+   },
+   "ms": 63064,
+   "usd": 0.036
+  },
+  {
+   "turn": 1,
+   "tool": "calibrate",
+   "args": {},
+   "result": {
+    "refused": true,
+    "feedback": "Tile corners don't fit a flat sheet (2.4 px error): a tile is bent or lifted, or the frame is blurred. Measurements would be off.",
+    "tries_left": 2
+   },
+   "ms": 62,
+   "usd": 0.0383
+  },
+  {
+   "turn": 2,
+   "tool": "request_review",
+   "args": {
+    "fish_id": "",
+    "reason": "calibration refused: tile corners don't fit flat sheet (2.4 px error) - bent/lifted tile or blurred frame at best_frame 3; cannot obtain reliable scale, handing whole run to officer"
+   },
+   "result": {
+    "queued": 1
+   },
+   "ms": 0,
+   "usd": 0.0428
+  },
+  {
+   "turn": 3,
+   "tool": "submit_report",
+   "args": {
+    "summary": "Clip IMG_3133.MOV (best_frame 3, 4 fish expected) could not be measured: calibration refused - tiles do not fit flat sheet (2.4 px error, bent/lifted tile or blur). Whole run handed to officer for manual scale check, no lengths/species/rules determined."
+   },
+   "result": {
+    "filed": true,
+    "measured": 0,
+    "waiting_for": "the officer: no fish could be measured"
+   },
+   "ms": 0,
+   "usd": 0.0485
+  }
+ ],
+ "reviews": [
+  {
+   "what": "run",
+   "reason": "calibration refused: tile corners don't fit flat sheet (2.4 px error) - bent/lifted tile or blurred frame at best_frame 3; cannot obtain reliable scale, handing whole run to officer",
+   "by": "agent"
+  }
+ ],
+ "report": {
+  "summary": "Clip IMG_3133.MOV (best_frame 3, 4 fish expected) could not be measured: calibration refused - tiles do not fit flat sheet (2.4 px error, bent/lifted tile or blur). Whole run handed to officer for manual scale check, no lengths/species/rules determined.",
+  "fish": [],
+  "lf_1cm": {},
+  "measured": 0,
+  "needs_review": 0,
+  "reviews": [
+   {
+    "what": "run",
+    "reason": "calibration refused: tile corners don't fit flat sheet (2.4 px error) - bent/lifted tile or blurred frame at best_frame 3; cannot obtain reliable scale, handing whole run to officer",
+    "by": "agent"
+   }
+  ],
+  "tiles": [
+   0,
+   1
+  ],
+  "source": "IMG_3133.MOV"
+ },
+ "fish": [],
+ "cost": {
+  "usd": 0.0485,
+  "calls": 5,
+  "cached": 0
+ },
+ "rules_cited": {},
+ "verifier": null,
+ "auditor": null,
+ "receipt": {
+  "clip_sha256": "69c667dc07bf20513636891e7b91916fd886425de8633156b878f13171cea16a",
+  "finished_utc": "2026-11-04T12:11:14+00:00",
+  "models": [
+   "muse-spark-1.3"
+  ],
+  "git_commit": "26b9a1a",
+  "freeze_tag": "freeze-2026-11-03",
+  "frozen": true,
+  "describe": "freeze-2026-11-03-19-g26b9a1a",
+  "thresholds": {
+   "calibration_px": 1.5,
+   "fl_over_outline": [
+    0.8,
+    1.0
+   ],
+   "tl_tolerance": 0.03,
+   "snap_mm": 10,
+   "drift_mm": 10,
+   "match_mm": 40,
+   "rescue_area_x_median": [
+    0.3,
+    3.0
+   ],
+   "rescue_iou": 0.2,
+   "species_conf": 0.5,
+   "max_refusals": 3
+  },
+  "calibration": {
+   "tiles": [
+    0,
+    1
+   ],
+   "corner_error_px": 2.350221872329712
+  },
+  "fish": {
+   "detected": 0,
+   "accepted": 0,
+   "flagged": 0
+  },
+  "rescued": [],
+  "frames": {
+   "best": 3,
+   "checked": []
+  },
+  "point_snap": {
+   "limit_mm": 10,
+   "fish": 0,
+   "median_mm": null,
+   "max_mm": null,
+   "worst_fish": null,
+   "over_limit": 0
+  },
+  "csv_sha256": "8a3a877645bfc56afc72513644e30993b2099dac9131e9f7bce25aa288f3bb95",
+  "cost_usd": 0.0485
+ },
+ "seller": {
+  "title": "Size receipt",
+  "purpose": "Evidence for the sale: what was measured and how. It doesn't set a price.",
+  "signed_off": false,
+  "status": "needs_review",
+  "fish": [],
+  "curves": {},
+  "weights_note": "Weights are estimated from length with a published curve, not weighed. One fish can be heavier or lighter than the curve says.",
+  "measured_utc": "2026-11-04T12:11:14+00:00",
+  "clip_sha256": "69c667dc07bf20513636891e7b91916fd886425de8633156b878f13171cea16a",
+  "csv_sha256": "8a3a877645bfc56afc72513644e30993b2099dac9131e9f7bce25aa288f3bb95",
+  "code": "freeze-2026-11-03-19-g26b9a1a"
+ },
+ "wall_s": 86.4
+}
