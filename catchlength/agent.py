@@ -18,7 +18,11 @@ TILE = MATS["A4"]
 N_TILES = 4
 MAX_TURNS = 25
 MAX_REFUSALS = 3
-CAL_PX = 1.5  # worst tile-corner reprojection error before calibration refuses
+# Worst tile-corner fit error, measured on the sheet, before calibration refuses: half a 1 cm length class.
+# It was 1.5 image px until 4 Nov, set on synthetic renders. On the first real phone clips every tile fitted the
+# sheet to 0.9-1.7 mm but 1.5-4.6 px, so the pixel limit refused all four clips, and a pixel limit changes meaning
+# with resolution and camera height anyway. Changed after freeze-2026-11-03: receipts from those runs say so.
+CAL_MM = 5
 FL_OVER_AXIS = (0.80, 1.0)  # fork length is shorter than snout-to-tail-tip; outside this band the two disagree
 TL_TOL = 0.03  # outline (about TL) may differ this much from the species' published TL-from-FL before it's flagged
 # Spark's snout or fork point may sit this far from SAM's outline, measured on the sheet, before the fish is flagged.
@@ -30,7 +34,7 @@ SPREAD_MM = 10  # a fish's length may drift this much across frames before it's 
 MATCH_MM = 40  # same fish in another frame = centroid within this distance on the same tile
 TL_FROM_FL = {s["latin"]: s.get("tl_from_fl") for s in
               json.loads((Path(__file__).parent.parent / "config/species.json").read_text())["species"]}
-THRESHOLDS = {"calibration_px": CAL_PX, "fl_over_outline": FL_OVER_AXIS, "tl_tolerance": TL_TOL, "snap_mm": SNAP_MM,
+THRESHOLDS = {"calibration_mm": CAL_MM, "fl_over_outline": FL_OVER_AXIS, "tl_tolerance": TL_TOL, "snap_mm": SNAP_MM,
               "drift_mm": SPREAD_MM, "match_mm": MATCH_MM, "rescue_area_x_median": (0.3, 3.0), "rescue_iou": 0.2,
               "species_conf": 0.5, "max_refusals": MAX_REFUSALS}  # what freeze tags and every receipt prints
 
@@ -133,12 +137,12 @@ class Run:
         self.fixes = detect_tiles(self.frame, TILE, N_TILES)
         if not self.fixes:
             return self.refuse("calibrate", "No marker tile found in the best frame. Ask for a re-film with a tile flat and in view.")
-        worst = max(f.reproj_px for f in self.fixes.values())
-        if worst > CAL_PX:
-            return self.refuse("calibrate", f"Tile corners don't fit a flat sheet ({worst:.1f} px error): a tile is bent or "
-                                            "lifted, or the frame is blurred. Measurements would be off.")
-        return {"tiles": sorted(self.fixes), "corner_error_px": round(worst, 2),
-                "corner_error_mm": round(max(f.reproj_mm for f in self.fixes.values()), 2)}
+        worst = max(f.reproj_mm for f in self.fixes.values())
+        if worst > CAL_MM:
+            return self.refuse("calibrate", f"Tile corners don't fit a flat sheet ({worst:.1f} mm error on the sheet, limit "
+                                            f"{CAL_MM} mm): a tile is bent or lifted, or the frame is blurred. Measurements would be off.")
+        return {"tiles": sorted(self.fixes), "corner_error_mm": round(worst, 2),
+                "corner_error_px": round(max(f.reproj_px for f in self.fixes.values()), 2)}
 
     def segment(self) -> dict:
         out = self.client.call("responses", sam.request(self.frame, "fish"), sam.USD_PER_IMAGE)

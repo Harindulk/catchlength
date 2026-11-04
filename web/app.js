@@ -253,8 +253,8 @@
     const R = (t) => [...log].reverse().find((l) => l.tool === t)?.result;
     const rows = [];
     const cal = R('calibrate');
-    if (cal) rows.push(cal.refused ? ['no', 'Marker tiles', 'flat, corners within 1.5 px', 'none found: refused to measure']
-      : ['ok', 'Marker tiles', 'corners within 1.5 px', `${cal.tiles.length} tiles, ${nf2.format(cal.corner_error_px)} px`]);
+    if (cal) rows.push(cal.refused ? ['no', 'Marker tiles', 'flat: corners fit the sheet within 5 mm', /no marker tile/i.test(cal.feedback || '') ? 'none found: refused to measure' : `${esc((cal.feedback || '').split(':')[0])}: refused`]
+      : ['ok', 'Marker tiles', 'corners fit the sheet within 5 mm', `${cal.tiles.length} tiles, ${cal.corner_error_mm != null ? nf2.format(cal.corner_error_mm) + ' mm' : nf2.format(cal.corner_error_px) + ' px'}`]);
     const seg = R('segment');
     if (seg) rows.push(seg.found === seg.expected ? ['ok', 'Fish count', 'SAM matches the plan', `${seg.found} of ${seg.expected}`]
       : ['warn', 'Fish count', 'SAM matches the plan', `SAM ${seg.found}, plan ${seg.expected}${R('find_missed') ? `; Spark recounted ${R('find_missed').count}` : ''}`]);
@@ -307,7 +307,7 @@
     if (r.refused) return `<b>Refused.</b> ${esc(r.feedback)}${r.escalated ? ` <b>${esc(r.escalated)}</b>` : ''}`;
     switch (tool) {
       case 'inspect_clip': return `${r.usable === false ? '<b>Spark called it unusable</b>, so the officer will see why; the checks decide.' : 'Usable.'} Expects <b>${r.expected_count}</b> fish; best frame ${r.best_frame}${r.issues?.length ? `; ${esc(r.issues.join('; '))}` : ''}.`;
-      case 'calibrate': return `${r.tiles.length} marker tiles; corner error <b>${r.corner_error_px} px</b> of 1.5 allowed.`;
+      case 'calibrate': return `${r.tiles.length} marker tiles; corners fit the sheet to <b>${r.corner_error_mm != null ? `${r.corner_error_mm} mm` : `${r.corner_error_px} px`}</b> (limit 5 mm).`;
       case 'segment': return `SAM 3.1 found <b>${r.found}</b>, the plan expected ${r.expected}.`;
       case 'find_missed': return `Spark counts ${r.count}: ${r.missed_boxes.length} without an outline${r.merged_ids.length ? `; outline ${esc(r.merged_ids.join(', '))} wraps two fish` : ''}.`;
       case 'rescue': return `Boxes and negative points back to SAM: kept ${r.accepted.map(esc).join(', ') || 'none'}${r.rejected.length ? `, rejected ${r.rejected.length}` : ''}. Now <b>${r.count_now}</b> fish.`;
@@ -476,7 +476,7 @@
       ['Clip SHA-256', rc.clip_sha256 ? rc.clip_sha256.slice(0, 16) + '…' : (run.synthetic ? '– (synthetic scene, a still image, no clip file)' : '– (simulated, no clip file)')],
       ['Finished', rc.finished_utc.replace('T', ' ').replace('+00:00', ' UTC')],
       ['Models', rc.models.join(', ')],
-      ['Calibration', rc.calibration.tiles.length ? `${rc.calibration.tiles.length} tiles, corner error ${nf2.format(rc.calibration.corner_error_px)} px` : 'refused: no marker tile found, no lengths filed'],
+      ['Calibration', rc.calibration.tiles.length ? `${rc.calibration.tiles.length} tiles, corner error ${rc.calibration.corner_error_mm != null ? nf2.format(rc.calibration.corner_error_mm) + ' mm on the sheet' : nf2.format(rc.calibration.corner_error_px) + ' px'}` : 'refused: no marker tile found, no lengths filed'],
       ['Fish', `${rc.fish.detected} found, ${rc.fish.accepted} accepted, ${rc.fish.flagged} flagged`],
       ['Rescued by SAM', rc.rescued.length ? rc.rescued.join(', ') : 'none'],
       ['Final look', run.verifier ? `${run.verifier.model}: ${run.verifier.checked} accepted fish checked, ${run.verifier.doubts.length ? `doubts on fish ${run.verifier.doubts.map((d) => d.id).join(', ')} (queued for the officer, lengths unchanged)` : 'no doubts'}` : 'not run'],

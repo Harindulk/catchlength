@@ -31,7 +31,7 @@ flowchart LR
   R -- three refusals --> O
 ```
 
-- Calibration refuses a clip when the marker tiles are missing or bent (corner error over 1.5 px).
+- Calibration refuses a clip when the marker tiles are missing or bent: the tile corners must fit a flat sheet to within 5 mm. (Until the field clips on 4 November the limit was 1.5 image pixels, set on synthetic renders; it refused all four real clips whose tiles fitted to 0.9 to 1.7 mm. The Benchmark section reports both runs.)
 - If SAM 3.1 finds fewer fish than Muse Spark expects, Spark returns boxes for the missed or merged fish, and they go back to SAM as box prompts with negative points on the neighbouring fish. A new mask is kept only if its size looks like one fish and it doesn't overlap one already found. (This loop is tested on scripted runs. In our real-model scenes SAM 3.1 separated touching and even overlapping fish on its own, so the rescue never had to fire.)
 - Each fish is measured twice: an outline length on the sheet's plane and a snout-to-fork length from Spark's points. If the two disagree, the fish is flagged for the officer.
 - Spark's snout and fork points are moved onto the outline SAM drew, and the fork length is measured between the moved points. A point that sat more than 1 cm from the outline on the sheet, inside or outside the fish, means the two models disagree about where the fish ends by more than the 1 cm length classes its report uses (the class IOTC's reporting guidelines recommend for fork length), so the fish is flagged instead of snapped. (Until 3 November the limit was 8 image pixels. On the first real run Spark's points sat 5-8 mm from clean tail forks and snapped onto the right notch, yet every fish was flagged, and a pixel limit means a different distance at every resolution and camera height. The change is in the `freeze-2026-11-03` record.)
@@ -92,7 +92,7 @@ Before field use we ran it on four frames of real fish from the Florida Fish and
 
 | What goes wrong | What the agent does |
 |---|---|
-| A tile is curled, folded or not on a flat surface | Calibration refuses the clip (corner error over 1.5 px), so no lengths are filed |
+| A tile is curled, folded or not on a flat surface | Calibration refuses the clip (corners fit the sheet worse than 5 mm), so no lengths are filed |
 | No tile in view, or the light is too poor to find one | Same refusal; three refusals hand the job to the officer |
 | Glare on silver skin clips the outline | Spark's points sit off SAM's outline, or the outline disagrees with the fork length: the fish is flagged |
 | A frayed or folded tail fork | The fork point lands off the outline, or (for frigate and bullet tuna) the total-length check fails: flagged |
