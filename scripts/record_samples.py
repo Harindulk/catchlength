@@ -21,6 +21,7 @@ from catchlength.synth import make_scene, scripted_client
 ROOT = Path(__file__).resolve().parent.parent
 DRY = "--dry" in sys.argv
 LENGTHS = [420, 380, 300, 250, 330]
+TAB = {"museum": "Flags a fish", "no-tile": "Refuses: no tile"}  # console tab names; the scene label stays as recorded
 APART = [(680, 90), (680, 260), (480, 350), (190, 470), (210, 590)]  # mm on a 1000x650 floor; tiles at (20,20), (640,400)
 SCENES = [  # id, label, scene kwargs, what the scene tests
     ("museum", "Five fish, two tiles",
@@ -57,8 +58,8 @@ for sid, label, kw, tests in SCENES:
                               "lengths." + (" Scripted model stand-ins (dry run)." if DRY else " Real Muse Spark 1.3 and SAM 3.1 calls."),
                       "tests": tests, "true_total_length_cm": [x / 10 for x in LENGTHS], "species": scene.species}
     (out / "run.json").write_text(json.dumps(d, indent=1))
-    index.append({"id": out.name, "label": label})
+    index.append({"id": out.name, "label": TAB.get(sid, label)})
     print(f"{sid}: {run.status}, {len(run.fish)} fish, ${client.spent:.3f} -> {out}")
 
 if not DRY:  # recorded real runs first; the scripted sample stays last, labelled
-    (ROOT / "web/samples/index.json").write_text(json.dumps(index + [{"id": "simulated", "label": "Scripted stand-in"}]))
+    (ROOT / "web/samples/index.json").write_text(json.dumps(index))

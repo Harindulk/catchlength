@@ -7,7 +7,7 @@
 <meta name="description" content="A verifiable fish-sampling agent: it measures every fish on a market sheet, checks its own work, and is graded against a tape measure.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=17">
+<link rel="stylesheet" href="app.css?v=18">
 </head>
 <body>
 <header class="topbar">
@@ -18,13 +18,13 @@
   <span class="meta">Muse Spark 1.3 · SAM 3.1</span>
 </header>
 <nav class="rail" aria-label="Main">
-  <a href="#run" data-view="run" title="Run a sample">
+  <a href="#run" data-view="run" title="Run a sample" aria-label="Run a sample">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l11 7-11 7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
     <span>Run</span></a>
-  <a href="#benchmark" data-view="benchmark" title="Benchmark against the tape">
+  <a href="#benchmark" data-view="benchmark" title="Benchmark against the tape" aria-label="Benchmark against the tape">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M4 20V4M8 16l3-4 3 2 5-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span>Benchmark</span></a>
-  <a href="#about" data-view="about" title="About the build">
+  <a href="#about" data-view="about" title="About the build" aria-label="About the build">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     <span>About</span></a>
 </nav>
@@ -34,16 +34,19 @@
   <section id="view-run" class="view" aria-labelledby="run-title">
     <header class="title-row">
       <div>
-        <h1 id="run-title">Can these lengths be trusted?</h1>
+        <h1 id="run-title">Every fish measured twice, or handed to the officer</h1>
+        <p class="lede">An agent on Muse Spark 1.3 and SAM 3.1 for Sri Lanka's port fish sampling. It plans the job, measures each fish two ways, checks itself, and passes what it can't prove to a fisheries officer.</p>
         <p class="sample-line" id="sample-line"></p>
       </div>
       <div class="actions">
         <div class="segmented" role="radiogroup" aria-label="Sample" id="samples"></div>
         <button class="primary" id="run-btn" type="button">Run the agent</button>
+        <a class="tape-link" href="#benchmark">Against the tape →</a>
       </div>
     </header>
     <dl class="verdict" id="verdict" aria-live="polite"></dl>
     <ol class="stages" id="stages" aria-label="Agent progress"></ol>
+    <p class="legend" aria-hidden="true"><span class="k ok"></span>passed <span class="k warn"></span>a check fired <span class="k no"></span>refused <span class="k todo"></span>not needed</p>
     <form class="signoff" id="signoff" hidden>
       <p id="signoff-text"></p>
       <div class="signoff-actions">
@@ -66,7 +69,9 @@
       </article>
 
       <article class="card timeline-card" aria-labelledby="tl-h">
-        <header class="card-h"><h2 id="tl-h">What the agent did</h2><span class="sub" id="tl-sub"></span></header>
+        <header class="card-h"><h2 id="ck-h">Checks it ran</h2><span class="sub">limit · result</span></header>
+        <ul class="checks" id="checks" aria-labelledby="ck-h"></ul>
+        <header class="card-h tl-head"><h2 id="tl-h">What the agent did</h2><span class="sub" id="tl-sub"></span></header>
         <ol class="timeline" id="timeline"></ol>
       </article>
     </div>
@@ -138,6 +143,6 @@
     </div>
   </section>
 </main>
-<script src="app.js?v=21"></script>
+<script src="app.js?v=24"></script>
 </body>
 </html>
