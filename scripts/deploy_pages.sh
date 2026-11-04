@@ -8,4 +8,4 @@ git subtree split --prefix web -b gh-pages
 git push -f origin gh-pages
 gh api -X POST repos/Harindulk/catchlength/pages -f 'source[branch]=gh-pages' -f 'source[path]=/' >/dev/null 2>&1 \
   || gh api -X PUT repos/Harindulk/catchlength/pages -f 'source[branch]=gh-pages' -f 'source[path]=/' >/dev/null
-echo "Pages builds in about a minute: https://harindulk.github.io/catchlength/"
+echo "Pages builds in about a minute: https://links.harindu.dev/catchlength/"

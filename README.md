@@ -8,6 +8,8 @@ Fork length in 1 cm classes is the format this data already travels in. Sri Lank
 
 Built for the Meta Global AI Developer Hackathon (Indie track), theme Build for Your World. All code in this repository was written from 27 October 2026.
 
+**Live console:** https://links.harindu.dev/catchlength/ (static, replays recorded runs on the real models). Run it yourself with `python3 -m http.server -d web`.
+
 ![CatchLength console: a recorded run on Muse Spark 1.3 and SAM 3.1. Teal outlines are accepted fish; the amber one went to the officer.](docs/console.jpg)
 
 ## How it checks itself
