@@ -273,6 +273,8 @@
     if (sp) { const u = Object.values(sp.species).filter((s) => s === 'unknown').length; rows.push([u ? 'warn' : 'ok', 'Species', 'closed list, else unknown', u ? `${u} unknown` : 'all named; officer confirms']); }
     const bad = log.filter((l) => l.tool === 'submit_report' && l.result?.refused);
     if (bad.length) rows.push(['warn', 'Report check', 'counts explained, citations real', `refused ${bad.length}×, then fixed${/rules that don't exist/.test(bad[0].result.feedback) ? ' (a made-up citation)' : ''}`]);
+    const v = run.verifier;  // the bounded last look: it can queue a fish for the officer, never change a number
+    if (v && log.some((l) => l.tool === 'submit_report' && l.result?.filed)) rows.push([v.error ? 'todo' : v.doubts.length ? 'warn' : 'ok', 'Final look, Muse Wonder', 'can only queue, never change', v.error ? 'did not answer' : v.doubts.length ? `doubts on fish ${v.doubts.map((d) => d.id).join(', ')}: queued for the officer` : `${v.checked} accepted fish, no doubts`]);
     const q = run.reviews?.length ?? 0;
     if (log.some((l) => l.tool === 'submit_report' && l.result?.filed)) rows.push([q ? 'warn' : 'ok', 'Officer queue', 'anything unproven', q ? `${q} item${q > 1 ? 's' : ''} for the officer` : 'nothing queued']);
     const icon = { ok: CHECK, warn: '!', no: '×', todo: '–' };
@@ -371,8 +373,9 @@
   // the picked fish magnified around its worse point: Spark's raw point, where it was moved to on SAM's outline, and the gap
   function inset(f) {
     const el = $('#inset');
-    el.hidden = !f || !f.points?.spark || f.snap_mm?.fork == null;
-    if (el.hidden) return;
+    const hide = !f || !f.points?.spark || f.snap_mm?.fork == null;
+    el.toggleAttribute('hidden', hide);  // an svg element has no .hidden property, only the attribute
+    if (hide) return;
     const k = (f.snap_mm.snout ?? 0) >= f.snap_mm.fork ? 'snout' : 'fork';
     const raw = f.points.spark[k], to = f.points[k], [W, H] = run.size, w = W / 8, h = w / 1.45;
     const cx = (raw[0] + to[0]) / 2, cy = (raw[1] + to[1]) / 2, fs = w / 16;
@@ -476,6 +479,7 @@
       ['Calibration', rc.calibration.tiles.length ? `${rc.calibration.tiles.length} tiles, corner error ${nf2.format(rc.calibration.corner_error_px)} px` : 'refused: no marker tile found, no lengths filed'],
       ['Fish', `${rc.fish.detected} found, ${rc.fish.accepted} accepted, ${rc.fish.flagged} flagged`],
       ['Rescued by SAM', rc.rescued.length ? rc.rescued.join(', ') : 'none'],
+      ['Final look', run.verifier ? `${run.verifier.model}: ${run.verifier.checked} accepted fish checked, ${run.verifier.doubts.length ? `doubts on fish ${run.verifier.doubts.map((d) => d.id).join(', ')} (queued for the officer, lengths unchanged)` : 'no doubts'}` : 'not run'],
       ['Frames checked', rc.frames.checked.length ? [rc.frames.best, ...rc.frames.checked].join(', ') : `frame ${rc.frames.best} only (a single still, so no cross-frame check)`],
       ['Cost', run.cost && run.cost.calls && run.cost.cached === run.cost.calls ? `$${rc.cost_usd.toFixed(3)} (all ${run.cost.calls} model calls replayed from the cache of the recorded run)` : `$${rc.cost_usd.toFixed(3)}`],
       ['Code', rc.freeze_tag ? (rc.frozen ? `${rc.freeze_tag}: code and thresholds match the freeze` : `${rc.describe} (code or thresholds changed since ${rc.freeze_tag})`) : rc.git_commit || 'uncommitted'],
