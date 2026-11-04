@@ -82,7 +82,7 @@ button.primary:disabled { background: var(--control); color: var(--muted); curso
 
 /* frame */
 .frame { position: relative; border-radius: var(--radius-control); overflow: hidden; background: var(--raised); width: fit-content; max-width: 100%; margin: 0 auto; }
-.frame img { display: block; max-width: 100%; max-height: min(40vh, 520px); width: auto; height: auto; }  /* the ledger's first rows stay on the first screen */
+.frame img { display: block; max-width: 100%; max-height: min(64vh, 760px); width: auto; height: auto; }  /* the fish are the product: the frame fills its card */
 .frame svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .frame .fishg { cursor: pointer; transition: opacity .15s; }
 .frame .fishg.dim { opacity: .35; }
@@ -120,7 +120,10 @@ td { padding: 11px 12px 11px 0; border-top: 1px solid var(--rule); vertical-alig
 td .unit { color: var(--muted); font-size: var(--fs-small); margin-left: 2px; }
 tbody tr { cursor: pointer; }
 tbody tr:hover td, tbody tr.on td { background: #f6f8fb; }
-td .why { display: block; color: var(--muted); font-size: 13px; }
+td .why { display: block; color: var(--muted); font-size: 13px; max-width: 60ch; margin-top: 4px; line-height: 1.4; }
+.ledger th { white-space: nowrap; }
+td.rule { white-space: nowrap; }
+td.rule sup { display: block; vertical-align: 0; margin-top: 2px; }
 td.rule { color: var(--muted); font-size: 13px; max-width: 320px; }
 
 /* receipt + kv */
@@ -168,7 +171,7 @@ td.rule { color: var(--muted); font-size: 13px; max-width: 320px; }
   .actions { width: 100%; }
   .actions .segmented { flex: 1; overflow-x: auto; }
   .actions button.primary { width: 100%; }
-  th:nth-child(4), td:nth-child(4), th:nth-child(7), td:nth-child(7) { display: none; }
+  .ledger th:nth-child(4), .ledger td:nth-child(4), .ledger th:nth-child(5), .ledger td:nth-child(5), .ledger th:nth-child(7), .ledger td:nth-child(7) { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
@@ -176,8 +179,8 @@ td.rule { color: var(--muted); font-size: 13px; max-width: 320px; }
 .sample-line { margin-top: 6px; color: var(--muted); font-size: 13px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .verdict { display: grid; grid-template-columns: repeat(3, max-content) 1fr; gap: 8px 48px; align-items: end; margin: 4px 0 10px; }
 .verdict > div { display: flex; flex-direction: column-reverse; }
-.verdict dd { margin: 0; font-size: var(--fs-kpi); font-weight: 500; line-height: 1.1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
-.verdict dd .of { font-size: 16px; color: var(--muted); font-weight: 400; }
+.verdict dd { margin: 0; font-size: 44px; font-weight: 500; line-height: 1.1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.verdict dd .of { font-size: 18px; color: var(--muted); font-weight: 400; }
 .verdict dd .small { font-size: 16px; font-weight: 500; }
 .verdict dt { color: var(--muted); font-size: 13px; margin-top: 2px; }
 .verdict .warn dd { color: var(--warning); }
@@ -227,6 +230,9 @@ td.rule sup, .cited sup { font-size: 11px; color: var(--muted); vertical-align: 
   .verdict { gap: 8px 16px; }
   .verdict dd { font-size: 26px; }
   .stages { display: flex; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+  .actions .segmented { display: flex; flex-wrap: wrap; overflow: visible; }
+  .actions .segmented button { flex: 1 1 auto; white-space: nowrap; }
+  td .why { display: none; }  /* on a phone the reason shows under the photo when the fish is picked */
   .st { flex: 0 0 78px; }
 }
 

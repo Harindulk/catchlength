@@ -27,6 +27,9 @@
   let lang = 'en';  // officer decisions per run folder: { approve, note, at, saved }
 
   // ---- views ------------------------------------------------------------------------------------------------
+  // a run replayed from the response cache cost nothing this time; say that instead of a bare $0.000
+  const spend = (r, usd) => (r.cost && r.cost.calls && r.cost.cached === r.cost.calls ? `${r.cost.calls} model calls, replayed` : `$${usd.toFixed(3)}`);
+
   function show(view) {
     for (const v of ['run', 'benchmark', 'about']) $(`#view-${v}`).hidden = v !== view;
     document.querySelectorAll('.rail a[data-view]').forEach((a) => {
@@ -139,7 +142,7 @@
     ledger(seen.has('measure') ? visible : [], seen);
     verdict(done ? run : null, upto ? `Turn ${upto} of ${run.log.length}` : 'Ready');
     const usd = done ? run.cost?.usd ?? 0 : log[log.length - 1]?.usd ?? 0;  // the spend so far, as the run builds it
-    $('#tl-sub').textContent = `${upto} of ${run.log.length} turns · $${usd.toFixed(3)}`;
+    $('#tl-sub').textContent = `${upto} of ${run.log.length} turns · ${spend(run, usd)}`;
     lf(done ? run.report?.lf_1cm : null);
     receipt(done ? run.receipt : null);
     cited(done ? run : null);
@@ -193,7 +196,7 @@
     const status = d ? (d.approve ? 'Signed off' : 'Sent back') : { awaiting_signoff: 'Waiting for sign-off', needs_review: 'With the officer', needs_refilm: 'Clip refused',
       signed_off: 'Signed off', sent_back: 'Sent back', running: 'Unfinished' }[r.status] || r.status;
     el.innerHTML = fig(f.detected, 'fish found') + fig(`${f.accepted}<span class="of"> of ${f.detected}</span>`, 'accepted')
-      + fig(f.flagged, 'to the officer', f.flagged ? 'warn' : '') + fig(`<span class="small">${esc(status)}</span>`, `${r.log.length} turns · $${r.cost.usd.toFixed(3)}`, 'status');
+      + fig(f.flagged, 'to the officer', f.flagged ? 'warn' : '') + fig(`<span class="small">${esc(status)}</span>`, `${r.log.length} turns · ${spend(r, r.cost.usd)}`, 'status');
   }
 
   function stageState(log, tool) {
