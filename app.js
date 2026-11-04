@@ -8,6 +8,7 @@
   const cm = (v) => (v == null ? '<span class="muted">–</span>' : `${nf1.format(v)}<span class="unit">cm</span>`);
   const cap = (t) => (t ? t.charAt(0).toUpperCase() + t.slice(1) : '');
   const NS = 'http://www.w3.org/2000/svg';
+  const COMMON = { 'Katsuwonus pelamis': 'Skipjack', 'Euthynnus affinis': 'Kawakawa', 'Rastrelliger kanagurta': 'Indian mackerel', 'Auxis thazard': 'Frigate tuna', 'Auxis rochei': 'Bullet tuna', unknown: 'Unknown' };
   const STAGES = [['inspect_clip', 'Plan'], ['calibrate', 'Calibrate'], ['segment', 'Segment'], ['find_missed', 'Check count'],
     ['rescue', 'Rescue'], ['measure', 'Measure'], ['classify', 'Species'], ['apply_rules', 'Rules'], ['submit_report', 'File']];
   const NAME = Object.fromEntries(STAGES.concat([['request_review', 'Hand to officer'], ['sign_off', 'Officer sign-off']]));
@@ -40,7 +41,7 @@
   window.addEventListener('hashchange', () => show(location.hash.slice(1) || 'run'));
 
   async function init() {
-    samples = await (await fetch('samples/index.json')).json();
+    samples = await (await fetch('samples/index.json', { cache: 'no-cache' })).json();
     const seg = $('#samples');
     seg.hidden = samples.length < 2;
     seg.innerHTML = samples.map((s, i) => `<button type="button" role="radio" aria-checked="${i === 0}" data-i="${i}">${esc(s.label)}</button>`).join('');
@@ -58,7 +59,7 @@
     if (document.body.classList.contains('running')) { busy(false); $('#run-btn').textContent = 'Run the agent'; }  // a replay cut short by a tab switch must not leave the button stuck
     document.querySelectorAll('#samples button').forEach((b) => b.setAttribute('aria-checked', String(+b.dataset.i === i)));
     dir = `samples/${samples[i].id}/`;
-    run = await (await fetch(dir + 'run.json')).json();
+    run = await (await fetch(dir + 'run.json', { cache: 'no-cache' })).json();
     selected = null;
     $('#notice').hidden = true;
     $('#sample-line').innerHTML = run.simulated
@@ -103,7 +104,7 @@
     busy(false);
     if (fail || !doneDir) { note(`Live run unavailable: ${fail || 'no result came back.'} Showing the recorded run instead.`); return replay(); }
     dir = doneDir;
-    run = await (await fetch(dir + 'run.json')).json();
+    run = await (await fetch(dir + 'run.json', { cache: 'no-cache' })).json();
     $('#frame-img').src = dir + 'frame.jpg?' + Date.now();
     render(run.log.length);
   }
@@ -145,6 +146,7 @@
     verdict(done ? run : null, upto ? `Turn ${upto} of ${run.log.length}` : 'Ready');
     const usd = done ? run.cost?.usd ?? 0 : log[log.length - 1]?.usd ?? 0;  // the spend so far, as the run builds it
     $('#tl-sub').textContent = `${upto} of ${run.log.length} turns · ${spend(run, usd)}`;
+    checks(log);
     lf(done ? run.report?.lf_1cm : null);
     receipt(done ? run.receipt : null);
     cited(done ? run : null);
@@ -199,6 +201,38 @@
       signed_off: 'Signed off', sent_back: 'Sent back', running: 'Unfinished' }[r.status] || r.status;
     el.innerHTML = fig(f.detected, 'fish found') + fig(`${f.accepted}<span class="of"> of ${f.detected}</span>`, 'accepted')
       + fig(f.flagged, 'to the officer', f.flagged ? 'warn' : '') + fig(`<span class="small">${esc(status)}</span>`, `${r.log.length} turns · ${spend(r, r.cost.usd)}`, 'status');
+  }
+
+  // The checks the tools ran, read from the log and the fish: limit, result, and whether it fired.
+  function checks(log) {
+    const R = (t) => [...log].reverse().find((l) => l.tool === t)?.result;
+    const rows = [];
+    const cal = R('calibrate');
+    if (cal) rows.push(cal.refused ? ['no', 'Marker tiles', 'flat, corners within 1.5 px', 'none found: refused to measure']
+      : ['ok', 'Marker tiles', 'corners within 1.5 px', `${cal.tiles.length} tiles, ${nf2.format(cal.corner_error_px)} px`]);
+    const seg = R('segment');
+    if (seg) rows.push(seg.found === seg.expected ? ['ok', 'Fish count', 'SAM matches the plan', `${seg.found} of ${seg.expected}`]
+      : ['warn', 'Fish count', 'SAM matches the plan', `SAM ${seg.found}, plan ${seg.expected}${R('find_missed') ? `; Spark recounted ${R('find_missed').count}` : ''}`]);
+    const resc = R('rescue');
+    if (resc) rows.push(['warn', 'Rescue', 'box + negative point to SAM', `kept ${resc.accepted.length}, rejected ${resc.rejected.length}`]);
+    if (R('measure')) {
+      const fish = run.fish.filter((f) => f.snap_mm), worst = fish.reduce((a, f) => Math.max(a, ...Object.values(f.snap_mm)), 0);
+      const over = fish.filter((f) => Math.max(...Object.values(f.snap_mm)) > 10).map((f) => f.id);
+      if (fish.length) rows.push([over.length ? 'warn' : 'ok', 'Spark points on SAM outline', 'within 10 mm', over.length ? `fish ${over.join(', ')} off by ${nf1.format(worst)} mm: to officer` : `all ${fish.length}, worst ${nf1.format(worst)} mm`]);
+      const tl = run.fish.filter((f) => /total length/.test(f.why || '')).map((f) => f.id);
+      rows.push([tl.length ? 'warn' : 'ok', 'Outline vs species length', 'within 3% (frigate, bullet)', tl.length ? `fish ${tl.join(', ')}: to officer` : 'all within']);
+      const multi = Object.keys(R('measure').cross_frame?.frames || {}).length;
+      rows.push(multi ? ['ok', 'Same fish, other frames', 'drift under 1 cm', `${multi} more frames`] : ['todo', 'Same fish, other frames', 'drift under 1 cm', 'single still: not run']);
+    }
+    const sp = R('classify');
+    if (sp) { const u = Object.values(sp.species).filter((s) => s === 'unknown').length; rows.push([u ? 'warn' : 'ok', 'Species', 'closed list, else unknown', u ? `${u} unknown` : 'all named; officer confirms']); }
+    const bad = log.filter((l) => l.tool === 'submit_report' && l.result?.refused);
+    if (bad.length) rows.push(['warn', 'Report check', 'counts explained, citations real', `refused ${bad.length}×, then fixed${/rules that don't exist/.test(bad[0].result.feedback) ? ' (a made-up citation)' : ''}`]);
+    const q = run.reviews?.length ?? 0;
+    if (log.some((l) => l.tool === 'submit_report' && l.result?.filed)) rows.push([q ? 'warn' : 'ok', 'Officer queue', 'anything unproven', q ? `${q} item${q > 1 ? 's' : ''} for the officer` : 'nothing queued']);
+    const icon = { ok: CHECK, warn: '!', no: '×', todo: '–' };
+    $('#checks').innerHTML = rows.length ? rows.map(([s, n, lim, res]) => `<li class="ck ${s}"><span class="ic" aria-label="${{ ok: 'passed', warn: 'fired', no: 'refused', todo: 'not run' }[s]}">${icon[s]}</span><span class="n">${esc(n)}<span class="lim">${esc(lim)}</span></span><span class="r">${esc(res)}</span></li>`).join('')
+      : '<li class="ck idle"><span class="n muted">Checks appear as the agent runs.</span></li>';
   }
 
   function stageState(log, tool) {
@@ -294,7 +328,7 @@
       const rule = (f.rules || []).find((x) => x.result !== 'info');
       const st = f.status === 'measured' ? '<span class="pill ok">accepted</span>' : f.status === 'needs_review' ? '<span class="pill warn">to officer</span>' : '<span class="pill n">found</span>';
       return `<tr data-id="${esc(f.id)}" class="${selected === f.id ? 'on' : ''}" tabindex="0" aria-selected="${selected === f.id}">
-        <td>${esc(f.id)}</td><td>${f.species ? `<i>${esc(f.species)}</i>` : '<span class="muted">–</span>'}</td>
+        <td class="id">${esc(f.id)}</td><td>${f.species ? (COMMON[f.species] ? `${COMMON[f.species]} <i class="lat">${esc(f.species)}</i>` : `<i>${esc(f.species)}</i>`) : '<span class="muted">–</span>'}</td>
         <td class="num strong">${cm(f.fork_cm)}</td><td class="num">${cm(f.axis_cm)}</td>
         <td class="num">${spread == null ? '<span class="muted">–</span>' : `±${nf1.format(spread / 2)}<span class="unit">cm</span>`}</td>
         <td>${st}${f.why ? `<span class="why">${esc(f.why)}</span>` : ''}</td>
@@ -378,7 +412,7 @@
   // ---- benchmark ------------------------------------------------------------------------------------------------
   async function benchmark() {
     const body = $('#bm-body');
-    const get = async (f) => { try { const r = await fetch(f); return r.ok ? r.json() : null; } catch { return null; } };
+    const get = async (f) => { try { const r = await fetch(f, { cache: 'no-cache' }); return r.ok ? r.json() : null; } catch { return null; } };
     const bm = await get('benchmark.json');
     const plan = `<article class="card"><header class="card-h"><h2>What the tape benchmark measures</h2><span class="sub">pass marks set before the shoot</span></header>
         <dl class="kv"><dt>Bias first</dt><dd>The bar is NARA's own photo-board method: 0.05 cm from the measuring board on 22 frigate tuna whose lengths spread only about 1.3 cm (IOTC-2025-WPM16-10rev1). So the headline is the bias on the 10 held-out fish (tags 4, 8 … 40), after a correction fitted only on the other fish. Target: under 0.5 cm either way.</dd>

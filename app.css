@@ -272,3 +272,23 @@ button.secondary:active { transform: translateY(1px); }
 @media (max-width: 760px) { .signoff input { width: 100%; } .signoff-actions { width: 100%; } .signoff-actions button { flex: 1; } }
 .marks { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 #bm-body { display: grid; gap: var(--gap); }
+
+/* start-here line, stage legend, checks panel (4 Nov) */
+.lede { margin-top: 6px; max-width: 72ch; color: var(--muted); font-size: 15px; }
+.tape-link { align-self: center; color: var(--data); font-weight: 500; text-decoration: none; padding: 0 6px; }
+.tape-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.legend { display: flex; gap: 6px 14px; flex-wrap: wrap; align-items: center; margin: -2px 0 2px; color: var(--muted); font-size: 12px; }
+.legend .k { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 4px; vertical-align: middle; background: var(--control); }
+.legend .k.ok { background: var(--text); } .legend .k.warn { background: var(--warning); } .legend .k.no { background: var(--negative); }
+.checks { list-style: none; padding: 0; margin: 0 0 18px; display: flex; flex-direction: column; }
+.ck { display: grid; grid-template-columns: 22px 1fr auto; gap: 2px 10px; align-items: baseline; padding: 7px 0; border-top: 1px solid var(--rule); font-size: 13px; }
+.ck:first-child { border-top: 0; }
+.ck .ic { font-weight: 600; text-align: center; border-radius: 4px; line-height: 18px; }
+.ck.ok .ic { color: var(--positive); } .ck.warn .ic { color: var(--pill-warning-ink); background: var(--pill-warning-bg); }
+.ck.no .ic { color: var(--pill-negative-ink); background: var(--pill-negative-bg); } .ck.todo .ic { color: var(--muted); }
+.ck .n { font-weight: 500; } .ck .lim { display: block; color: var(--muted); font-weight: 400; font-size: 12px; }
+.ck .r { text-align: right; font-variant-numeric: tabular-nums; max-width: 24ch; }
+.ck.warn .r { color: var(--pill-warning-ink); } .ck.no .r { color: var(--negative); }
+.tl-head { margin-top: 4px; }
+td.id { font-family: var(--mono); }
+i.lat { color: var(--muted); font-size: 12px; margin-left: 4px; }
