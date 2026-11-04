@@ -1,0 +1,1625 @@
+{
+ "source": "IMG_3136.MOV",
+ "status": "awaiting_signoff",
+ "plan": {
+  "best_frame": 5,
+  "expected_count": 5,
+  "issues": [
+   "glare on metal tray and wet fish bodies",
+   "fish touching/overlapping side-by-side in tray, not separated"
+  ],
+  "species_candidates": [
+   "jobfish snapper - Aphareus spp. / Pristipomoides spp.",
+   "barracuda - Sphyraena spp.",
+   "emperor - Lethrinus spp.",
+   "trevally/jack - Carangidae, possibly Gnathanodon speciosus",
+   "needlefish/garfish - Belonidae, Tylosurus spp."
+  ],
+  "tiles_visible": 20,
+  "usable": true
+ },
+ "best_frame": 5,
+ "size": [
+  1080,
+  1920
+ ],
+ "tiles": [
+  0,
+  1
+ ],
+ "log": [
+  {
+   "turn": 0,
+   "tool": "inspect_clip",
+   "args": {},
+   "result": {
+    "best_frame": 5,
+    "expected_count": 5,
+    "issues": [
+     "glare on metal tray and wet fish bodies",
+     "fish touching/overlapping side-by-side in tray, not separated"
+    ],
+    "species_candidates": [
+     "jobfish snapper - Aphareus spp. / Pristipomoides spp.",
+     "barracuda - Sphyraena spp.",
+     "emperor - Lethrinus spp.",
+     "trevally/jack - Carangidae, possibly Gnathanodon speciosus",
+     "needlefish/garfish - Belonidae, Tylosurus spp."
+    ],
+    "tiles_visible": 20,
+    "usable": true
+   },
+   "ms": 9,
+   "usd": 0.0
+  },
+  {
+   "turn": 1,
+   "tool": "calibrate",
+   "args": {},
+   "result": {
+    "tiles": [
+     0,
+     1
+    ],
+    "corner_error_mm": 1.27,
+    "corner_error_px": 2.15
+   },
+   "ms": 43,
+   "usd": 0.0
+  },
+  {
+   "turn": 2,
+   "tool": "segment",
+   "args": {},
+   "result": {
+    "found": 5,
+    "expected": 5,
+    "ids": [
+     "0",
+     "1",
+     "2",
+     "3",
+     "4"
+    ],
+    "note": "count matches the plan"
+   },
+   "ms": 5796,
+   "usd": 0.0053
+  },
+  {
+   "turn": 3,
+   "tool": "measure",
+   "args": {},
+   "result": {
+    "measured": 0,
+    "flagged": [
+     {
+      "id": "0",
+      "why": "Spark's snout point is 34 mm from the outline SAM drew (limit 10 mm); the two models disagree on where the fish ends"
+     },
+     {
+      "id": "1",
+      "why": "Spark's snout point is 46 mm from the outline SAM drew (limit 10 mm); the two models disagree on where the fish ends"
+     },
+     {
+      "id": "2",
+      "why": "Spark's snout point is 18 mm from the outline SAM drew (limit 10 mm); the two models disagree on where the fish ends"
+     },
+     {
+      "id": "3",
+      "why": "Spark's snout point is 26 mm from the outline SAM drew (limit 10 mm); the two models disagree on where the fish ends"
+     },
+     {
+      "id": "4",
+      "why": "Spark's snout point is 32 mm from the outline SAM drew (limit 10 mm); the two models disagree on where the fish ends"
+     }
+    ],
+    "cross_frame": {
+     "frames": {
+      "0": 5,
+      "2": 5
+     },
+     "best_frame_count": 5,
+     "note": "counts agree across frames"
+    }
+   },
+   "ms": 127108,
+   "usd": 0.0565
+  },
+  {
+   "turn": 4,
+   "tool": "classify",
+   "args": {},
+   "result": {
+    "species": {
+     "0": "unknown",
+     "1": "unknown",
+     "2": "unknown",
+     "3": "unknown",
+     "4": "unknown"
+    },
+    "flagged": []
+   },
+   "ms": 54378,
+   "usd": 0.0831
+  },
+  {
+   "turn": 5,
+   "tool": "request_review",
+   "args": {
+    "fish_id": "0",
+    "reason": "measure flagged: Spark snout 34mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species"
+   },
+   "result": {
+    "queued": 1
+   },
+   "ms": 0,
+   "usd": 0.0888
+  },
+  {
+   "turn": 6,
+   "tool": "request_review",
+   "args": {
+    "fish_id": "1",
+    "reason": "measure flagged: Spark snout 46mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species"
+   },
+   "result": {
+    "queued": 2
+   },
+   "ms": 0,
+   "usd": 0.0926
+  },
+  {
+   "turn": 7,
+   "tool": "request_review",
+   "args": {
+    "fish_id": "2",
+    "reason": "measure flagged: Spark snout 18mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species"
+   },
+   "result": {
+    "queued": 3
+   },
+   "ms": 0,
+   "usd": 0.0959
+  },
+  {
+   "turn": 8,
+   "tool": "request_review",
+   "args": {
+    "fish_id": "3",
+    "reason": "measure flagged: Spark snout 26mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species"
+   },
+   "result": {
+    "queued": 4
+   },
+   "ms": 0,
+   "usd": 0.0994
+  },
+  {
+   "turn": 9,
+   "tool": "request_review",
+   "args": {
+    "fish_id": "4",
+    "reason": "measure flagged: Spark snout 32mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species"
+   },
+   "result": {
+    "queued": 5
+   },
+   "ms": 0,
+   "usd": 0.103
+  },
+  {
+   "turn": 10,
+   "tool": "apply_rules",
+   "args": {},
+   "result": {
+    "results": {
+     "0": [
+      "info",
+      "no_rule_in_pack"
+     ],
+     "1": [
+      "info",
+      "no_rule_in_pack"
+     ],
+     "2": [
+      "info",
+      "no_rule_in_pack"
+     ],
+     "3": [
+      "info",
+      "no_rule_in_pack"
+     ],
+     "4": [
+      "info",
+      "no_rule_in_pack"
+     ]
+    }
+   },
+   "ms": 0,
+   "usd": 0.1071
+  },
+  {
+   "turn": 11,
+   "tool": "submit_report",
+   "args": {
+    "summary": "Clip IMG_3136.MOV frame 5: 5 fish segmented, calibration ok (tiles 0,1 err 1.27mm). All 5 lengths unsettled - outline vs snout-point mismatch 18-46mm >10mm limit; all 5 species unknown. Handed 5 fish to officer for manual length/species. Rules check: no pack rule applies [rule:no_rule_in_pack]."
+   },
+   "result": {
+    "filed": true,
+    "measured": 0,
+    "waiting_for": "officer sign-off"
+   },
+   "ms": 0,
+   "usd": 0.1122
+  }
+ ],
+ "reviews": [
+  {
+   "what": "0",
+   "reason": "measure flagged: Spark snout 34mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+   "by": "agent"
+  },
+  {
+   "what": "1",
+   "reason": "measure flagged: Spark snout 46mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+   "by": "agent"
+  },
+  {
+   "what": "2",
+   "reason": "measure flagged: Spark snout 18mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+   "by": "agent"
+  },
+  {
+   "what": "3",
+   "reason": "measure flagged: Spark snout 26mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+   "by": "agent"
+  },
+  {
+   "what": "4",
+   "reason": "measure flagged: Spark snout 32mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+   "by": "agent"
+  }
+ ],
+ "report": {
+  "summary": "Clip IMG_3136.MOV frame 5: 5 fish segmented, calibration ok (tiles 0,1 err 1.27mm). All 5 lengths unsettled - outline vs snout-point mismatch 18-46mm >10mm limit; all 5 species unknown. Handed 5 fish to officer for manual length/species. Rules check: no pack rule applies [rule:no_rule_in_pack].",
+  "fish": [
+   {
+    "id": "0",
+    "fork_cm": 33.2,
+    "axis_cm": 34.5,
+    "species": "unknown",
+    "species_conf": 0.98,
+    "tile": 1,
+    "status": "needs_review",
+    "why": "measure flagged: Spark snout 34mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+    "sam_conf": 0.9179486632347107,
+    "rules": [
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     },
+     {
+      "rule": null,
+      "result": "no_rule_in_pack",
+      "quote": "No rule in the pack covers unknown."
+     }
+    ],
+    "frames_mm": {
+     "0": 347.6,
+     "2": 347.7
+    },
+    "snap_px": {
+     "snout": 59.9,
+     "fork": 2.3
+    },
+    "snap_mm": {
+     "snout": 33.8,
+     "fork": 1.2
+    }
+   },
+   {
+    "id": "1",
+    "fork_cm": 39.4,
+    "axis_cm": 41.5,
+    "species": "unknown",
+    "species_conf": 0.98,
+    "tile": 1,
+    "status": "needs_review",
+    "why": "measure flagged: Spark snout 46mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+    "sam_conf": 0.9532163739204407,
+    "rules": [
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     },
+     {
+      "rule": null,
+      "result": "no_rule_in_pack",
+      "quote": "No rule in the pack covers unknown."
+     }
+    ],
+    "frames_mm": {
+     "0": 405.0,
+     "2": 414.4
+    },
+    "snap_px": {
+     "snout": 86.5,
+     "fork": 7.3
+    },
+    "snap_mm": {
+     "snout": 46.5,
+     "fork": 3.8
+    }
+   },
+   {
+    "id": "2",
+    "fork_cm": 31.1,
+    "axis_cm": 34.7,
+    "species": "unknown",
+    "species_conf": 0.99,
+    "tile": 1,
+    "status": "needs_review",
+    "why": "measure flagged: Spark snout 18mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+    "sam_conf": 0.9609756469726562,
+    "rules": [
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     },
+     {
+      "rule": null,
+      "result": "no_rule_in_pack",
+      "quote": "No rule in the pack covers unknown."
+     }
+    ],
+    "frames_mm": {
+     "0": 340.8,
+     "2": 347.2
+    },
+    "snap_px": {
+     "snout": 34.5,
+     "fork": 28.3
+    },
+    "snap_mm": {
+     "snout": 17.9,
+     "fork": 13.9
+    }
+   },
+   {
+    "id": "3",
+    "fork_cm": 17.8,
+    "axis_cm": 19.9,
+    "species": "unknown",
+    "species_conf": 0.96,
+    "tile": 0,
+    "status": "needs_review",
+    "why": "measure flagged: Spark snout 26mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+    "sam_conf": 0.9452055096626282,
+    "rules": [
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     },
+     {
+      "rule": null,
+      "result": "no_rule_in_pack",
+      "quote": "No rule in the pack covers unknown."
+     }
+    ],
+    "frames_mm": {
+     "0": 200.2,
+     "2": 200.4
+    },
+    "snap_px": {
+     "snout": 48.7,
+     "fork": 1.0
+    },
+    "snap_mm": {
+     "snout": 26.1,
+     "fork": 0.6
+    }
+   },
+   {
+    "id": "4",
+    "fork_cm": 32.9,
+    "axis_cm": 35.4,
+    "species": "unknown",
+    "species_conf": 0.97,
+    "tile": 0,
+    "status": "needs_review",
+    "why": "measure flagged: Spark snout 32mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+    "sam_conf": 0.9609756469726562,
+    "rules": [
+     {
+      "rule": "iotc-length-interval",
+      "result": "info",
+      "quote": "size samples with class intervals greater than 5 cm"
+     },
+     {
+      "rule": null,
+      "result": "no_rule_in_pack",
+      "quote": "No rule in the pack covers unknown."
+     }
+    ],
+    "frames_mm": {
+     "0": 355.6,
+     "2": 355.3
+    },
+    "snap_px": {
+     "snout": 61.3,
+     "fork": 12.7
+    },
+    "snap_mm": {
+     "snout": 31.9,
+     "fork": 6.7
+    }
+   }
+  ],
+  "lf_1cm": {},
+  "measured": 0,
+  "needs_review": 5,
+  "reviews": [
+   {
+    "what": "0",
+    "reason": "measure flagged: Spark snout 34mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+    "by": "agent"
+   },
+   {
+    "what": "1",
+    "reason": "measure flagged: Spark snout 46mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+    "by": "agent"
+   },
+   {
+    "what": "2",
+    "reason": "measure flagged: Spark snout 18mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+    "by": "agent"
+   },
+   {
+    "what": "3",
+    "reason": "measure flagged: Spark snout 26mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+    "by": "agent"
+   },
+   {
+    "what": "4",
+    "reason": "measure flagged: Spark snout 32mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+    "by": "agent"
+   }
+  ],
+  "tiles": [
+   0,
+   1
+  ],
+  "source": "IMG_3136.MOV"
+ },
+ "fish": [
+  {
+   "id": "0",
+   "fork_cm": 33.2,
+   "axis_cm": 34.5,
+   "species": "unknown",
+   "species_conf": 0.98,
+   "tile": 1,
+   "status": "needs_review",
+   "why": "measure flagged: Spark snout 34mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+   "sam_conf": 0.9179486632347107,
+   "rules": [
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    },
+    {
+     "rule": null,
+     "result": "no_rule_in_pack",
+     "quote": "No rule in the pack covers unknown."
+    }
+   ],
+   "frames_mm": {
+    "0": 347.6,
+    "2": 347.7
+   },
+   "snap_px": {
+    "snout": 59.9,
+    "fork": 2.3
+   },
+   "snap_mm": {
+    "snout": 33.8,
+    "fork": 1.2
+   },
+   "points": {
+    "snout": [
+     721.0,
+     693.0
+    ],
+    "fork": [
+     715.0,
+     1295.0
+    ],
+    "confidence": 0.6,
+    "spark": {
+     "snout": [
+      723.3177083333334,
+      633.10546875
+     ],
+     "fork": [
+      713.7434895833334,
+      1296.91796875
+     ]
+    }
+   },
+   "box": [
+    682.0,
+    693.0,
+    772.0,
+    1321.0
+   ],
+   "outline": [
+    [
+     721,
+     693
+    ],
+    [
+     715,
+     772
+    ],
+    [
+     705,
+     793
+    ],
+    [
+     696,
+     878
+    ],
+    [
+     696,
+     980
+    ],
+    [
+     691,
+     1110
+    ],
+    [
+     682,
+     1166
+    ],
+    [
+     682,
+     1182
+    ],
+    [
+     689,
+     1197
+    ],
+    [
+     689,
+     1235
+    ],
+    [
+     682,
+     1297
+    ],
+    [
+     688,
+     1319
+    ],
+    [
+     692,
+     1315
+    ],
+    [
+     695,
+     1297
+    ],
+    [
+     704,
+     1287
+    ],
+    [
+     717,
+     1297
+    ],
+    [
+     721,
+     1309
+    ],
+    [
+     737,
+     1320
+    ],
+    [
+     744,
+     1316
+    ],
+    [
+     745,
+     1307
+    ],
+    [
+     723,
+     1243
+    ],
+    [
+     722,
+     1225
+    ],
+    [
+     762,
+     1114
+    ],
+    [
+     770,
+     1049
+    ],
+    [
+     771,
+     1008
+    ],
+    [
+     760,
+     882
+    ],
+    [
+     748,
+     826
+    ],
+    [
+     726,
+     768
+    ]
+   ]
+  },
+  {
+   "id": "1",
+   "fork_cm": 39.4,
+   "axis_cm": 41.5,
+   "species": "unknown",
+   "species_conf": 0.98,
+   "tile": 1,
+   "status": "needs_review",
+   "why": "measure flagged: Spark snout 46mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+   "sam_conf": 0.9532163739204407,
+   "rules": [
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    },
+    {
+     "rule": null,
+     "result": "no_rule_in_pack",
+     "quote": "No rule in the pack covers unknown."
+    }
+   ],
+   "frames_mm": {
+    "0": 405.0,
+    "2": 414.4
+   },
+   "snap_px": {
+    "snout": 86.5,
+    "fork": 7.3
+   },
+   "snap_mm": {
+    "snout": 46.5,
+    "fork": 3.8
+   },
+   "points": {
+    "snout": [
+     323.0,
+     679.0
+    ],
+    "fork": [
+     324.0,
+     1432.0
+    ],
+    "confidence": 0.9,
+    "spark": {
+     "snout": [
+      327.53385416666663,
+      592.6263020833334
+     ],
+     "fork": [
+      316.7734375,
+      1433.2838541666665
+     ]
+    }
+   },
+   "box": [
+    251.0,
+    679.0,
+    400.0,
+    1473.0
+   ],
+   "outline": [
+    [
+     319,
+     679
+    ],
+    [
+     315,
+     686
+    ],
+    [
+     311,
+     709
+    ],
+    [
+     304,
+     803
+    ],
+    [
+     307,
+     863
+    ],
+    [
+     305,
+     896
+    ],
+    [
+     311,
+     948
+    ],
+    [
+     306,
+     1070
+    ],
+    [
+     307,
+     1130
+    ],
+    [
+     303,
+     1162
+    ],
+    [
+     307,
+     1217
+    ],
+    [
+     305,
+     1275
+    ],
+    [
+     292,
+     1325
+    ],
+    [
+     276,
+     1357
+    ],
+    [
+     251,
+     1429
+    ],
+    [
+     253,
+     1434
+    ],
+    [
+     268,
+     1421
+    ],
+    [
+     275,
+     1419
+    ],
+    [
+     297,
+     1393
+    ],
+    [
+     308,
+     1388
+    ],
+    [
+     323,
+     1423
+    ],
+    [
+     332,
+     1472
+    ],
+    [
+     339,
+     1460
+    ],
+    [
+     344,
+     1430
+    ],
+    [
+     349,
+     1304
+    ],
+    [
+     374,
+     1209
+    ],
+    [
+     378,
+     1202
+    ],
+    [
+     384,
+     1199
+    ],
+    [
+     388,
+     1186
+    ],
+    [
+     399,
+     1035
+    ],
+    [
+     399,
+     984
+    ],
+    [
+     390,
+     898
+    ],
+    [
+     378,
+     846
+    ],
+    [
+     335,
+     704
+    ],
+    [
+     326,
+     682
+    ]
+   ]
+  },
+  {
+   "id": "2",
+   "fork_cm": 31.1,
+   "axis_cm": 34.7,
+   "species": "unknown",
+   "species_conf": 0.99,
+   "tile": 1,
+   "status": "needs_review",
+   "why": "measure flagged: Spark snout 18mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+   "sam_conf": 0.9609756469726562,
+   "rules": [
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    },
+    {
+     "rule": null,
+     "result": "no_rule_in_pack",
+     "quote": "No rule in the pack covers unknown."
+    }
+   ],
+   "frames_mm": {
+    "0": 340.8,
+    "2": 347.2
+   },
+   "snap_px": {
+    "snout": 34.5,
+    "fork": 28.3
+   },
+   "snap_mm": {
+    "snout": 17.9,
+    "fork": 13.9
+   },
+   "points": {
+    "snout": [
+     216.0,
+     818.0
+    ],
+    "fork": [
+     230.0,
+     1421.0
+    ],
+    "confidence": 0.88,
+    "spark": {
+     "snout": [
+      200.75260416666669,
+      787.0234375
+     ],
+     "fork": [
+      209.8984375,
+      1440.9505208333335
+     ]
+    }
+   },
+   "box": [
+    113.0,
+    817.0,
+    309.0,
+    1492.0
+   ],
+   "outline": [
+    [
+     224,
+     817
+    ],
+    [
+     210,
+     821
+    ],
+    [
+     192,
+     834
+    ],
+    [
+     152,
+     876
+    ],
+    [
+     128,
+     919
+    ],
+    [
+     117,
+     963
+    ],
+    [
+     113,
+     1028
+    ],
+    [
+     122,
+     1172
+    ],
+    [
+     136,
+     1218
+    ],
+    [
+     164,
+     1253
+    ],
+    [
+     176,
+     1276
+    ],
+    [
+     172,
+     1316
+    ],
+    [
+     150,
+     1374
+    ],
+    [
+     130,
+     1442
+    ],
+    [
+     126,
+     1466
+    ],
+    [
+     129,
+     1491
+    ],
+    [
+     136,
+     1483
+    ],
+    [
+     143,
+     1465
+    ],
+    [
+     158,
+     1450
+    ],
+    [
+     162,
+     1437
+    ],
+    [
+     174,
+     1428
+    ],
+    [
+     200,
+     1392
+    ],
+    [
+     204,
+     1391
+    ],
+    [
+     235,
+     1425
+    ],
+    [
+     242,
+     1429
+    ],
+    [
+     247,
+     1427
+    ],
+    [
+     260,
+     1394
+    ],
+    [
+     261,
+     1381
+    ],
+    [
+     248,
+     1348
+    ],
+    [
+     234,
+     1300
+    ],
+    [
+     233,
+     1287
+    ],
+    [
+     237,
+     1277
+    ],
+    [
+     249,
+     1262
+    ],
+    [
+     294,
+     1174
+    ],
+    [
+     302,
+     1148
+    ],
+    [
+     308,
+     945
+    ],
+    [
+     302,
+     901
+    ],
+    [
+     294,
+     883
+    ],
+    [
+     281,
+     866
+    ],
+    [
+     240,
+     824
+    ]
+   ]
+  },
+  {
+   "id": "3",
+   "fork_cm": 17.8,
+   "axis_cm": 19.9,
+   "species": "unknown",
+   "species_conf": 0.96,
+   "tile": 0,
+   "status": "needs_review",
+   "why": "measure flagged: Spark snout 26mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+   "sam_conf": 0.9452055096626282,
+   "rules": [
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    },
+    {
+     "rule": null,
+     "result": "no_rule_in_pack",
+     "quote": "No rule in the pack covers unknown."
+    }
+   ],
+   "frames_mm": {
+    "0": 200.2,
+    "2": 200.4
+   },
+   "snap_px": {
+    "snout": 48.7,
+    "fork": 1.0
+   },
+   "snap_mm": {
+    "snout": 26.1,
+    "fork": 0.6
+   },
+   "points": {
+    "snout": [
+     604.0,
+     826.0
+    ],
+    "fork": [
+     573.0,
+     1155.0
+    ],
+    "confidence": 0.75,
+    "spark": {
+     "snout": [
+      588.0,
+      780.0
+     ],
+     "fork": [
+      574.0,
+      1155.0
+     ]
+    }
+   },
+   "box": [
+    532.0,
+    826.0,
+    636.0,
+    1195.0
+   ],
+   "outline": [
+    [
+     604,
+     826
+    ],
+    [
+     578,
+     841
+    ],
+    [
+     564,
+     856
+    ],
+    [
+     552,
+     876
+    ],
+    [
+     556,
+     904
+    ],
+    [
+     558,
+     965
+    ],
+    [
+     550,
+     1050
+    ],
+    [
+     569,
+     1094
+    ],
+    [
+     571,
+     1113
+    ],
+    [
+     532,
+     1177
+    ],
+    [
+     534,
+     1183
+    ],
+    [
+     544,
+     1180
+    ],
+    [
+     579,
+     1152
+    ],
+    [
+     596,
+     1183
+    ],
+    [
+     605,
+     1193
+    ],
+    [
+     610,
+     1194
+    ],
+    [
+     611,
+     1173
+    ],
+    [
+     589,
+     1109
+    ],
+    [
+     614,
+     1062
+    ],
+    [
+     620,
+     1056
+    ],
+    [
+     624,
+     1060
+    ],
+    [
+     628,
+     1060
+    ],
+    [
+     630,
+     1056
+    ],
+    [
+     635,
+     1004
+    ],
+    [
+     635,
+     910
+    ],
+    [
+     624,
+     853
+    ],
+    [
+     612,
+     829
+    ]
+   ]
+  },
+  {
+   "id": "4",
+   "fork_cm": 32.9,
+   "axis_cm": 35.4,
+   "species": "unknown",
+   "species_conf": 0.97,
+   "tile": 0,
+   "status": "needs_review",
+   "why": "measure flagged: Spark snout 32mm from SAM outline (limit 10mm), models disagree on endpoints, no reliable fork length; classify returned unknown, cannot settle species",
+   "sam_conf": 0.9609756469726562,
+   "rules": [
+    {
+     "rule": "iotc-length-interval",
+     "result": "info",
+     "quote": "size samples with class intervals greater than 5 cm"
+    },
+    {
+     "rule": null,
+     "result": "no_rule_in_pack",
+     "quote": "No rule in the pack covers unknown."
+    }
+   ],
+   "frames_mm": {
+    "0": 355.6,
+    "2": 355.3
+   },
+   "snap_px": {
+    "snout": 61.3,
+    "fork": 12.7
+   },
+   "snap_mm": {
+    "snout": 31.9,
+    "fork": 6.7
+   },
+   "points": {
+    "snout": [
+     448.0,
+     703.0
+    ],
+    "fork": [
+     464.0,
+     1322.0
+    ],
+    "confidence": 0.88,
+    "spark": {
+     "snout": [
+      448.38802083333337,
+      641.6940104166666
+     ],
+     "fork": [
+      469.9361979166667,
+      1310.8216145833335
+     ]
+    }
+   },
+   "box": [
+    394.0,
+    703.0,
+    556.0,
+    1373.0
+   ],
+   "outline": [
+    [
+     450,
+     703
+    ],
+    [
+     444,
+     703
+    ],
+    [
+     436,
+     710
+    ],
+    [
+     421,
+     746
+    ],
+    [
+     406,
+     796
+    ],
+    [
+     395,
+     853
+    ],
+    [
+     394,
+     903
+    ],
+    [
+     403,
+     1001
+    ],
+    [
+     397,
+     1114
+    ],
+    [
+     405,
+     1143
+    ],
+    [
+     427,
+     1180
+    ],
+    [
+     433,
+     1210
+    ],
+    [
+     404,
+     1337
+    ],
+    [
+     403,
+     1364
+    ],
+    [
+     406,
+     1372
+    ],
+    [
+     414,
+     1368
+    ],
+    [
+     435,
+     1333
+    ],
+    [
+     440,
+     1328
+    ],
+    [
+     456,
+     1322
+    ],
+    [
+     484,
+     1329
+    ],
+    [
+     507,
+     1363
+    ],
+    [
+     515,
+     1357
+    ],
+    [
+     514,
+     1332
+    ],
+    [
+     495,
+     1269
+    ],
+    [
+     486,
+     1212
+    ],
+    [
+     495,
+     1183
+    ],
+    [
+     500,
+     1179
+    ],
+    [
+     504,
+     1183
+    ],
+    [
+     508,
+     1179
+    ],
+    [
+     531,
+     1123
+    ],
+    [
+     547,
+     1048
+    ],
+    [
+     555,
+     974
+    ],
+    [
+     554,
+     910
+    ],
+    [
+     540,
+     850
+    ],
+    [
+     508,
+     783
+    ],
+    [
+     460,
+     713
+    ]
+   ]
+  }
+ ],
+ "cost": {
+  "usd": 0.1122,
+  "calls": 26,
+  "cached": 3
+ },
+ "rules_cited": {
+  "iotc-length-interval": {
+   "id": "iotc-length-interval",
+   "species": [
+    "*"
+   ],
+   "measure": "fork length",
+   "threshold_cm": null,
+   "source_title": "IOTC Working Party on Data Collection and Statistics, report (IOTC-2025-WPDCS21-R)",
+   "gazette_no": null,
+   "date": "2025",
+   "url": "https://iotc.org/sites/default/files/documents/2026/03/IOTC-2025-WPDCS21_RE.pdf",
+   "quote": "size samples with class intervals greater than 5 cm",
+   "status": "reported",
+   "check": "length-frequency bins must be 5 cm or narrower; CatchLength uses 1 cm"
+  }
+ },
+ "verifier": null,
+ "auditor": null,
+ "receipt": {
+  "clip_sha256": "312705a20270fcb8b179bcb951eb39b5775c86a2859686d80c1f79b8d01edb29",
+  "finished_utc": "2026-11-04T12:27:49+00:00",
+  "models": [
+   "muse-spark-1.3",
+   "sam-3.1"
+  ],
+  "git_commit": "f67fe7d",
+  "freeze_tag": "freeze-2026-11-03",
+  "frozen": false,
+  "describe": "freeze-2026-11-03-22-gf67fe7d",
+  "thresholds": {
+   "calibration_mm": 5,
+   "fl_over_outline": [
+    0.8,
+    1.0
+   ],
+   "tl_tolerance": 0.03,
+   "snap_mm": 10,
+   "drift_mm": 10,
+   "match_mm": 40,
+   "rescue_area_x_median": [
+    0.3,
+    3.0
+   ],
+   "rescue_iou": 0.2,
+   "species_conf": 0.5,
+   "max_refusals": 3
+  },
+  "calibration": {
+   "tiles": [
+    0,
+    1
+   ],
+   "corner_error_mm": 1.2746517658233643,
+   "corner_error_px": 2.1473686695098877
+  },
+  "fish": {
+   "detected": 5,
+   "accepted": 0,
+   "flagged": 5
+  },
+  "rescued": [],
+  "frames": {
+   "best": 5,
+   "checked": [
+    0,
+    2
+   ]
+  },
+  "point_snap": {
+   "limit_mm": 10,
+   "fish": 5,
+   "median_mm": 15.9,
+   "max_mm": 46.5,
+   "worst_fish": "1",
+   "over_limit": 5
+  },
+  "csv_sha256": "7c06acd8783010d7cefde6803c76783851a89f3fa4b2e641288cd9e63046cae3",
+  "cost_usd": 0.1122
+ },
+ "seller": {
+  "title": "Size receipt",
+  "purpose": "Evidence for the sale: what was measured and how. It doesn't set a price.",
+  "signed_off": false,
+  "status": "awaiting_signoff",
+  "fish": [
+   {
+    "id": "0",
+    "species": "unknown",
+    "name": "unknown",
+    "fork_cm": null,
+    "est_weight_kg": null,
+    "note": "waiting for the fisheries officer's check"
+   },
+   {
+    "id": "1",
+    "species": "unknown",
+    "name": "unknown",
+    "fork_cm": null,
+    "est_weight_kg": null,
+    "note": "waiting for the fisheries officer's check"
+   },
+   {
+    "id": "2",
+    "species": "unknown",
+    "name": "unknown",
+    "fork_cm": null,
+    "est_weight_kg": null,
+    "note": "waiting for the fisheries officer's check"
+   },
+   {
+    "id": "3",
+    "species": "unknown",
+    "name": "unknown",
+    "fork_cm": null,
+    "est_weight_kg": null,
+    "note": "waiting for the fisheries officer's check"
+   },
+   {
+    "id": "4",
+    "species": "unknown",
+    "name": "unknown",
+    "fork_cm": null,
+    "est_weight_kg": null,
+    "note": "waiting for the fisheries officer's check"
+   }
+  ],
+  "curves": {},
+  "weights_note": "Weights are estimated from length with a published curve, not weighed. One fish can be heavier or lighter than the curve says.",
+  "measured_utc": "2026-11-04T12:27:49+00:00",
+  "clip_sha256": "312705a20270fcb8b179bcb951eb39b5775c86a2859686d80c1f79b8d01edb29",
+  "csv_sha256": "7c06acd8783010d7cefde6803c76783851a89f3fa4b2e641288cd9e63046cae3",
+  "code": "freeze-2026-11-03-22-gf67fe7d"
+ },
+ "wall_s": 225.8
+}

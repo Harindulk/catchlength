@@ -518,12 +518,13 @@
         <p class="sub">Four frames of a Spanish mackerel and a black sea bass on a measuring board, from FWC's "How to Measure a Fish" (<a href="https://youtu.be/2Va-ANxdQhM" target="_blank" rel="noopener">CC BY</a>). It tests behaviour, not length: no tiles for scale, no tape reading. Spark called the sea bass "unknown" but the spotted mackerel a kawakawa at 0.85-0.88, a look-alike outside its five species, which is why species stays officer-confirmed. Cost $${pc.cost_usd.toFixed(2)}.</p></article>` : '') + plan;
       return;
     }
-    const L = bm.length_accepted_only, A = bm.length, P = bm.pass_marks;
+    const A = bm.length, P = bm.pass_marks;
+    const L = bm.length_accepted_only.n >= 5 ? bm.length_accepted_only : A;  // under 5 accepted fish the headline counts every fish
     const mark = (ok, label) => `<span class="pill ${ok ? 'ok' : 'no'}">${label} ${ok ? 'met' : 'missed'}</span>`;
     const H = bm.held_out.held_out_corrected, NB = bm.nara_bar, sgn = (v) => (v > 0 ? '+' : '') + nf2.format(v);
     const worst = bm.pairs.filter((p) => p.agent_cm != null).sort((a, b) => Math.abs(b.agent_cm - b.tape_cm) - Math.abs(a.agent_cm - a.tape_cm)).slice(0, 3);
     const tl = await get('benchmark_tl.json');
-    $('#bm-finding').innerHTML = `<b>Mean difference from the tape ${sgn(L.bias)} cm</b>, 95% of fish between ${sgn(L.loa95[0])} and ${sgn(L.loa95[1])} cm · n = ${L.n} accepted fish, ${bm.flagged} to the officer · <span class="muted">uncorrected, every fish counted</span>`;
+    $('#bm-finding').innerHTML = `<b>Mean difference from the tape ${sgn(L.bias)} cm</b>, 95% of fish between ${sgn(L.loa95[0])} and ${sgn(L.loa95[1])} cm · n = ${L.n} ${L === A ? `fish (${bm.accepted} accepted, ${bm.flagged} to the officer)` : `accepted fish, ${bm.flagged} to the officer`} · <span class="muted">uncorrected</span>`;
     body.innerHTML = `<article class="card"><div class="marks">${H.n >= 5 ? mark(NB.met, 'Held-out bias under 0.5 cm') : `<span class="pill n">Held-out set: ${H.n} fish, too few to judge</span>`} ${!P.length && L.mae != null && L.mae <= 2 ? `<span class="pill n">Stop floor needs 40 fish (mean error ${nf1.format(L.mae)} cm is under 2)</span>` : mark(P.length, 'Stop floor (2 cm, 40 fish)')} ${mark(P.count, 'Count')}</div><div class="kpis">
       <div class="kpi"><div class="v">${sgn(L.bias)}<span class="unit">cm</span></div><div class="l">mean difference, fork length</div></div>
       <div class="kpi"><div class="v">${sgn(L.loa95[0])} to ${sgn(L.loa95[1])}<span class="unit">cm</span></div><div class="l">95% limits of agreement</div></div>
