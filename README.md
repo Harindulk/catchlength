@@ -59,6 +59,14 @@ Declared before the shoot: the ground truth is fork length on a measuring board;
 
 How much error the camera and the marker tiles add on their own, before any model is involved: on 112 synthetic fish in 30 scenes degraded like a 1080p phone frame from about 1 m (blur, sensor noise, JPEG), measured from each fish's true outline, the mean length error is 0.16 cm (90th percentile 0.31 cm, worst 0.53 cm). This is a synthetic test of the geometry only (`scripts/geometry_budget.py`); the field benchmark measures the whole agent.
 
+## Stress test on public footage
+
+Before field use we ran it on four frames of real fish from the Florida Fish and Wildlife Conservation Commission's "How to Measure a Fish" ([youtu.be/2Va-ANxdQhM](https://youtu.be/2Va-ANxdQhM), CC BY): a Spanish mackerel and a black sea bass on a measuring board, filmed at an angle and partly under the presenter's hands, with no marker tiles. This tests behaviour, not length: the clip has no tiles for scale and no tape reading we could check against. Script: `scripts/public_check.py`; results: `data/public_check.json` ($0.27).
+
+- With no tiles in view the agent refused to measure on all four frames, filed no lengths and handed each run to the officer.
+- SAM 3.1 outlined every real fish in view. It also outlined the fish drawn on a printed species chart lying on the table, finding 14 "fish" in a frame with 2. At a stall, keep posters and printed fish pictures out of the shot.
+- Neither fish is on CatchLength's five-species list. Spark called the black sea bass "unknown" (0.97), but called the spotted Spanish mackerel a kawakawa at 0.85-0.88 confidence, a look-alike from the same family. A confident wrong name passes the 0.5 confidence cut, which is why species stays an officer-confirmed field.
+
 ## When it goes wrong
 
 | What goes wrong | What the agent does |
