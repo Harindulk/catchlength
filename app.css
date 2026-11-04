@@ -2,55 +2,71 @@
    Face: a cool meter-grey ground; the one chart hue (--data) only on the fish themselves and the agent's points.
    Grid: canvas = viewport - rail (56) - 2 x 32 gutter; cards in a row split it with one 12px gap. */
 :root {
-  --ground: #f2f4f7;
+  /* Framed sheet (taste-skill app sheet, seed 775205665). Face: the frame takes a harbour teal-grey; the white sheet holds
+     the work; the one data hue is ocean teal, on the fish and nowhere in the chrome. */
+  --frame: #e6eeef;
+  --ground: #ffffff;
   --surface: #ffffff;
-  --raised: #eeeeee;
-  --border: #e6e6e6;
-  --rule: #f0f0f0;
-  --control: #d4d4d4;
-  --text: #0a0a0a;
-  --muted: #6b6b6b;
-  --accent: #141414;
-  --data: #1d5fbf;
-  --positive: #2e7d32;
+  --raised: #f4f6f8;
+  --active: #ebedee;
+  --border: #e8eaec;
+  --rule: #f0f1f2;
+  --control: #cdced1;
+  --text: #131416;
+  --muted: #5d5f60;
+  --accent: #131416;
+  --data: #1b6c80;
+  --data-photo: #4fd1e6;  /* the same teal, lifted so outlines read on the dark sheet in the photo */
+  --positive: #1e7b4f;
   --negative: #c4242a;
   --warning: #92400e;
   --pill-positive-bg: #dcfae5; --pill-positive-ink: #04250e;
   --pill-negative-bg: #ffedea; --pill-negative-ink: #831c1e;
   --pill-warning-bg: #fffbeb; --pill-warning-ink: #92400e;
-  --pill-neutral-bg: #eeeeee; --pill-neutral-ink: #3d3d3d;
-  --radius-card: 8px;
+  --pill-neutral-bg: #ebedee; --pill-neutral-ink: #353736;
+  --radius-card: 10px;
   --radius-control: 6px;
-  --gap: 12px;
+  --radius-sheet: 16px;
+  --sheet-inset: 8px;
+  --topbar: 48px;
+  --gap: 20px;
   --pad: 24px;
-  --rail: 56px;
-  --gutter: 32px;
-  --fs-title: 24px;
+  --rail: 60px;
+  --gutter: 28px;
+  --fs-title: 22px;
   --fs-section: 16px;
-  --fs-kpi: 30px;
+  --fs-kpi: 28px;
   --fs-body: 14px;
   --fs-small: 12px;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
-body { background: var(--ground); color: var(--text); font: 400 var(--fs-body)/1.5 "Geist", Inter, system-ui, sans-serif; }
+body { background: var(--frame); color: var(--text); font: 400 var(--fs-body)/1.5 "IBM Plex Sans", Inter, system-ui, sans-serif; }
 h1, h2, p, dl, ol { margin: 0; }
 button, a { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 4px; }
 
 /* rail */
-.rail { position: fixed; inset: 0 auto 0 0; width: var(--rail); display: flex; flex-direction: column; align-items: center;
-  gap: 6px; padding: 12px 0; border-right: 1px solid var(--border); background: var(--ground); z-index: 2; }
+.topbar { position: fixed; inset: 0 0 auto 0; height: var(--topbar); display: flex; align-items: center; gap: 12px; padding: 0 20px 0 18px;
+  background: var(--frame); z-index: 3; }
+.topbar .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; color: var(--text); text-decoration: none; }
+.topbar .brand svg { width: 24px; height: 24px; color: var(--data); }
+.topbar .scope { color: var(--muted); font-size: 13px; }
+.topbar .scope::before { content: "/"; margin: 0 10px 0 2px; color: var(--control); }
+.topbar .meta { margin-left: auto; color: var(--muted); font-size: 12px; font-family: var(--mono); }
+.rail { position: fixed; inset: var(--topbar) auto 0 0; width: var(--rail); display: flex; flex-direction: column; align-items: center;
+  gap: 6px; padding: 4px 0 12px; background: var(--frame); z-index: 2; }
 .rail a { width: 40px; height: 40px; display: grid; place-items: center; border-radius: var(--radius-control); color: var(--muted); text-decoration: none; }
 .rail a svg { width: 18px; height: 18px; }
 .rail a span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-.rail a:hover { background: var(--raised); color: var(--text); }
-.rail a[aria-current="page"] { color: var(--text); background: var(--raised); }
-.rail .mark { color: var(--text); margin-bottom: 14px; }
-.rail .mark svg { width: 22px; height: 22px; }
+.rail a:hover { background: var(--active); color: var(--text); }
+.rail a[aria-current="page"] { color: var(--text); background: var(--surface); }
 
 /* canvas */
-main { margin-left: var(--rail); padding: 28px var(--gutter) 48px; max-width: 1600px; }
+main { margin: var(--topbar) var(--sheet-inset) var(--sheet-inset) var(--rail); min-height: calc(100vh - var(--topbar) - var(--sheet-inset));
+  padding: 24px var(--gutter) 48px; background: var(--ground); border: 1px solid var(--border); border-radius: var(--radius-sheet); }
+main > .view { max-width: 1560px; }
 .view { display: flex; flex-direction: column; gap: var(--gap); }
 .view[hidden] { display: none; }
 .title-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
@@ -86,10 +102,10 @@ button.primary:disabled { background: var(--control); color: var(--muted); curso
 .frame svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .frame .fishg { cursor: pointer; transition: opacity .15s; }
 .frame .fishg.dim { opacity: .35; }
-.frame .fish { fill: var(--data); fill-opacity: .10; stroke: var(--data); stroke-width: 2.5; vector-effect: non-scaling-stroke; transition: fill-opacity .15s; }
+.frame .fish { fill: var(--data-photo); fill-opacity: .12; stroke: var(--data-photo); stroke-width: 2.5; vector-effect: non-scaling-stroke; transition: fill-opacity .15s; }
 .frame .fishg:hover .fish, .frame .fishg.on .fish { fill-opacity: .28; }
-.frame .fish.flagged { stroke: var(--warning); fill: var(--warning); }
-.frame .lbl { font-family: "Geist", sans-serif; font-weight: 500; fill: #fff; paint-order: stroke; stroke: var(--text); stroke-width: 6px; }
+.frame .fish.flagged { stroke: #f5a524; fill: #f5a524; }  /* the warning amber, lifted for the dark sheet */
+.frame .lbl { font-family: var(--mono); font-weight: 500; fill: #fff; paint-order: stroke; stroke: var(--text); stroke-width: 6px; }
 .frame .pt { fill: #fff; stroke: var(--text); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 .frame .fl { stroke: #fff; stroke-width: 1.5; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
 .frame .fishg.on .fl { stroke-width: 2.5; stroke-dasharray: none; }
@@ -162,10 +178,11 @@ td.rule { color: var(--muted); font-size: 13px; max-width: 320px; }
   :root { --gutter: 16px; --pad: 16px; }
   .rail { inset: auto 0 0 0; width: auto; height: 60px; flex-direction: row; justify-content: space-around; border-right: 0;
     border-top: 1px solid var(--border); padding: 0 8px; background: var(--surface); }
-  .rail .mark { display: none; }
+  main { margin: var(--topbar) 0 0; border: 0; border-radius: 0; }
+  .topbar .scope, .topbar .meta { display: none; }
   .rail a { width: auto; height: 52px; padding: 0 14px; display: flex; flex-direction: column; gap: 2px; }
   .rail a span { position: static; width: auto; height: auto; clip: auto; font-size: 11px; }
-  main { margin-left: 0; padding-bottom: 96px; }
+  main { padding-bottom: 96px; }
   .two { grid-template-columns: 1fr; }
   .title-row { align-items: stretch; }
   .actions { width: 100%; }
