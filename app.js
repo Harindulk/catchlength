@@ -55,6 +55,7 @@
 
   async function load(i) {
     clearTimeout(timer);
+    if (document.body.classList.contains('running')) { busy(false); $('#run-btn').textContent = 'Run the agent'; }  // a replay cut short by a tab switch must not leave the button stuck
     document.querySelectorAll('#samples button').forEach((b) => b.setAttribute('aria-checked', String(+b.dataset.i === i)));
     dir = `samples/${samples[i].id}/`;
     run = await (await fetch(dir + 'run.json')).json();
@@ -78,9 +79,10 @@
     const btn = $('#run-btn');
     const id = samples[+(document.querySelector('#samples [aria-checked="true"]')?.dataset.i ?? 0)].id;
     let res;
+    const recorded = () => { note(run.simulated ? 'Replaying the scripted stand-in run (no model calls).' : 'Replaying this run as it was recorded on Muse Spark 1.3 and SAM 3.1. Live runs need the local server (see the README).'); return replay(); };
     try { res = await fetch('api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sample: id }) }); }
-    catch { return replay(); }
-    if (!res.ok || !(res.headers.get('content-type') || '').includes('event-stream')) return replay();
+    catch { return recorded(); }
+    if (!res.ok || !(res.headers.get('content-type') || '').includes('event-stream')) return recorded();
     busy(true, 'Running live…');
     const turns = [];
     const reader = res.body.getReader(), dec = new TextDecoder();
