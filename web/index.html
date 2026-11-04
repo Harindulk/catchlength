@@ -7,7 +7,7 @@
 <meta name="description" content="A verifiable fish-sampling agent: it measures every fish on a market sheet, checks its own work, and is graded against a tape measure.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=18">
+<link rel="stylesheet" href="app.css?v=20">
 </head>
 <body>
 <header class="topbar">
@@ -64,7 +64,7 @@
     <div class="grid run-grid">
       <article class="card frame-card" aria-labelledby="frame-h">
         <header class="card-h"><h2 id="frame-h">Best frame</h2><span class="sub" id="frame-sub"></span></header>
-        <div class="frame" id="frame"><img id="frame-img" alt=""><svg id="overlay" aria-hidden="true"></svg></div>
+        <div class="frame" id="frame"><img id="frame-img" alt=""><svg id="overlay" role="group" aria-label="Fish outlines: pick one for its numbers"></svg></div>
         <p class="frame-cap" id="frame-cap"></p>
       </article>
 
@@ -82,7 +82,7 @@
         <table class="ledger" id="ledger">
           <thead><tr>
             <th scope="col">Fish</th><th scope="col">Species</th><th scope="col" class="num">Fork length</th>
-            <th scope="col" class="num">Outline</th><th scope="col" class="num">Across frames</th>
+            <th scope="col" class="num">Outline (about total length)</th><th scope="col" class="num">Across frames</th>
             <th scope="col">Status</th><th scope="col">Rule</th>
           </tr></thead>
           <tbody></tbody>
@@ -124,7 +124,7 @@
         <p>Sri Lanka already measures coastal tuna from photographs, but a person still draws a line on every fish and names every species by hand. CatchLength does that work from a 20-second phone clip of fish laid next to printed marker sheets, and it can't skip checking its own work.</p>
         <p>Theme: <em>Build for Your World.</em> "Bring Meta's models into your domain. Solve a problem you know firsthand, free up time and mental space, and make something possible that wasn't before."</p>
         <h2>How it checks itself</h2>
-        <p>The checks live inside the agent's tools, so the model can't skip them. Calibration refuses a bent or missing sheet. A count that disagrees with the plan sends Muse Spark's boxes back to SAM 3.1 with negative points on the neighbouring fish. Every fish is measured two ways and in several frames; when they disagree it is flagged, never averaged. A tool refused three times hands the job to the officer, who signs off on the report. The tape measurements it is graded on are never shown to it.</p>
+        <p>The checks live inside the agent's tools, so the model can't skip them. Calibration refuses a bent or missing sheet. A count that disagrees with the plan sends Muse Spark's boxes back to SAM 3.1 with negative points on the neighbouring fish (tested on scripted runs; on the real models SAM 3.1 separated touching fish on its own, so this never had to fire). Every fish is measured two ways and in several frames; when they disagree it is flagged, never averaged. A tool refused three times hands the job to the officer, who signs off on the report. The tape measurements it is graded on are never shown to it.</p>
         <h2>Rules it cites</h2>
         <p>No minimum landing size for the tunas and mackerel sampled here was found in the gazetted regulations we reviewed, so the report says "no rule found" for each of them. It cites the lobster and mud crab rules where they apply, and IOTC's rule that size data must be binned at 5 cm or finer.</p>
       </article>
@@ -133,16 +133,31 @@
         <dl class="kv">
           <dt>Muse Spark 1.3</dt><dd>Runs the agent loop (one tool per turn), plans the clip, finds missed and merged fish, places snout and fork points, names the species from a closed list.</dd>
           <dt>SAM 3.1</dt><dd>Segments every fish from the concept "fish", then again from Spark's boxes and negative points when a fish was missed or two were merged.</dd>
-          <dt>Muse Spark Open</dt><dd>Optional, code ready, not yet run: an independent auditor that re-checks accepted fish and can only flag them for the officer.</dd>
+          <dt>Muse Wonder 1.0</dt><dd>Built, not yet run: a last look at the filed report. It can only add fish to the officer's queue, never change a length, a species or a status.</dd>
+          <dt>Muse Spark Open</dt><dd>Built, not yet run: the same bounded check by the open-weights model on Baseten, as an independent auditor.</dd>
         </dl>
-        <h2>Before the hackathon</h2>
-        <p>The idea and the application text. The museum fish photographs used for tests and the simulated sample are Smithsonian (USNM) specimens, public domain via Wikimedia Commons, and are marked wherever they appear.</p>
-        <h2>Source</h2>
-        <p>MIT licence. Repository link added at submission.</p>
+        <h2>Built during the hackathon (27 Oct to 4 Nov 2026)</h2>
+        <ul class="plain">
+          <li>The agent loop, its tools and every check: calibration, count, two-way measurement, cross-frame drift, species, the rule pack and the report check</li>
+          <li>The marker tiles (A4 print), the synthetic scenes and the geometry test</li>
+          <li>This console, the officer sign-off, the size receipt and the audit receipt</li>
+          <li>The tape benchmark and its grader, and the stress test on public footage</li>
+        </ul>
+        <h2>Existed before</h2>
+        <ul class="plain">
+          <li>The idea and the application text</li>
+          <li>The museum fish photographs: Smithsonian (USNM) specimens, public domain via Wikimedia Commons, used only for tests and the synthetic scenes, and marked wherever they appear</li>
+        </ul>
+        <h2>Links</h2>
+        <ul class="plain">
+          <li><a href="https://github.com/Harindulk/catchlength" rel="noopener">Source on GitHub</a>, MIT licence</li>
+          <li><a href="https://iotc.org/sites/default/files/documents/2025/10/IOTC-2025-WPM16-10rev1-Sri_Lanka_photo.pdf" rel="noopener">NARA's photo-board method, IOTC-2025-WPM16-10rev1</a> (PDF)</li>
+          <li><a href="https://youtu.be/2Va-ANxdQhM" rel="noopener">FWC, "How to Measure a Fish"</a>, the public footage used for the stress test (CC BY)</li>
+        </ul>
       </article>
     </div>
   </section>
 </main>
-<script src="app.js?v=26"></script>
+<script src="app.js?v=28"></script>
 </body>
 </html>

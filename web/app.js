@@ -42,29 +42,46 @@
   }
   window.addEventListener('hashchange', () => show(location.hash.slice(1) || 'run'));
 
+  const getJson = async (url) => { const r = await fetch(url, { cache: 'no-cache' }); if (!r.ok) throw new Error(`${r.status} ${url}`); return r.json(); };
+
+  // a file that did not load: say which, and offer to try again, instead of leaving the cards blank
+  function fail(msg, retry) {
+    const n = $('#notice');
+    n.hidden = false;
+    n.innerHTML = `${esc(msg)} <button type="button" class="secondary">Retry</button>`;
+    n.querySelector('button').addEventListener('click', retry);
+  }
+
   async function init() {
-    samples = await (await fetch('samples/index.json', { cache: 'no-cache' })).json();
-    const seg = $('#samples');
-    seg.hidden = samples.length < 2;
-    seg.innerHTML = samples.map((s, i) => `<button type="button" role="radio" aria-checked="${i === 0}" data-i="${i}">${esc(s.label)}</button>`).join('');
-    seg.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) load(+b.dataset.i); });
+    $('#samples').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) load(+b.dataset.i); });
     $('#run-btn').textContent = RUN_LABEL;
     $('#run-btn').addEventListener('click', live);
     $('#signoff').addEventListener('submit', (e) => { e.preventDefault(); decide(true); });
     $('#sendback-btn').addEventListener('click', () => decide(false));
     $('#signoff-lang').addEventListener('change', (e) => { lang = e.target.value; signoff(true); });
     show(location.hash.slice(1) || 'run');
+    await loadIndex();
+  }
+
+  async function loadIndex() {
+    try { samples = await getJson('samples/index.json'); }
+    catch { return fail('The sample list (samples/index.json) did not load.', loadIndex); }
+    const seg = $('#samples');
+    seg.hidden = samples.length < 2;
+    seg.innerHTML = samples.map((s, i) => `<button type="button" role="radio" aria-checked="${i === 0}" data-i="${i}">${esc(s.label)}</button>`).join('');
     await load(0);
   }
 
   async function load(i) {
     clearTimeout(timer);
     if (document.body.classList.contains('running')) { busy(false); $('#run-btn').textContent = RUN_LABEL; }  // a replay cut short by a tab switch must not leave the button stuck
-    document.querySelectorAll('#samples button').forEach((b) => b.setAttribute('aria-checked', String(+b.dataset.i === i)));
-    dir = `samples/${samples[i].id}/`;
-    run = await (await fetch(dir + 'run.json', { cache: 'no-cache' })).json();
-    selected = null;
     $('#notice').hidden = true;
+    const d = `samples/${samples[i].id}/`;
+    try { run = await getJson(d + 'run.json'); }
+    catch { return fail(`The sample "${samples[i].label}" did not load (${d}run.json).`, () => load(i)); }
+    dir = d;
+    document.querySelectorAll('#samples button').forEach((b) => b.setAttribute('aria-checked', String(+b.dataset.i === i)));
+    selected = null;
     $('#sample-line').innerHTML = run.simulated
       ? `<span class="pill warn">Simulated</span> Museum reference fish at known lengths, scripted model stand-ins. Not a field result.`
       : run.synthetic
@@ -80,7 +97,7 @@
 
   // ---- a live run on the server, streamed turn by turn; falls back to the recording -----------------------------
   async function live() {
-    const btn = $('#run-btn');
+    if (!run) return;  // nothing loaded yet: the notice above says why
     const id = samples[+(document.querySelector('#samples [aria-checked="true"]')?.dataset.i ?? 0)].id;
     let res;
     const recorded = () => { note(run.simulated ? 'Replaying the scripted stand-in run (no model calls).' : 'Replaying this run as it was recorded on Muse Spark 1.3 and SAM 3.1. Live runs need the local server (see the README).'); return replay(); };
@@ -106,8 +123,9 @@
     }
     busy(false);
     if (fail || !doneDir) { note(`Live run unavailable: ${fail || 'no result came back.'} Showing the recorded run instead.`); return replay(); }
+    try { run = await getJson(doneDir + 'run.json'); }
+    catch { note('The live run finished but its result did not load. Showing the recorded run instead.'); return replay(); }
     dir = doneDir;
-    run = await (await fetch(dir + 'run.json', { cache: 'no-cache' })).json();
     $('#frame-img').src = dir + 'frame.jpg?' + Date.now();
     render(run.log.length);
   }
@@ -145,12 +163,13 @@
     timeline(log, animate);
     stages(log, done);
     overlay(visible, seen.has('measure'));
-    ledger(seen.has('measure') ? visible : [], seen);
+    const calRefused = [...log].reverse().find((l) => l.tool === 'calibrate')?.result?.refused;
+    ledger(seen.has('measure') ? visible : [], calRefused ? 'No lengths filed: calibration refused.' : seen.has('segment') ? 'Measuring…' : 'Each fish appears here once it has been measured.');
     verdict(done ? run : null, upto ? `Turn ${upto} of ${run.log.length}` : 'Ready');
     const usd = done ? run.cost?.usd ?? 0 : log[log.length - 1]?.usd ?? 0;  // the spend so far, as the run builds it
     $('#tl-sub').textContent = `${upto} of ${run.log.length} turns · ${spend(run, usd)}`;
     checks(log);
-    lf(done ? run.report?.lf_1cm : null);
+    lf(done ? run.report?.lf_1cm || {} : null);
     receipt(done ? run.receipt : null);
     cited(done ? run : null);
     signoff(done);
@@ -312,19 +331,29 @@
       const t = document.createElementNS(NS, 'text');
       t.setAttribute('x', f.box[0]); t.setAttribute('y', Math.max(fs, f.box[1] - fs / 3)); t.setAttribute('class', 'lbl'); t.setAttribute('font-size', fs); t.textContent = f.id;
       g.appendChild(t);
+      g.setAttribute('tabindex', '0'); g.setAttribute('role', 'button'); g.setAttribute('data-id', f.id);
+      g.setAttribute('aria-label', `Fish ${f.id}${measured ? `, ${f.status === 'measured' ? 'accepted' : 'to the officer'}` : ''}`);
+      g.setAttribute('aria-pressed', String(selected === f.id));
       g.addEventListener('click', () => pick(f.id));
+      g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(f.id, '.fishg'); } });
       svg.appendChild(g);
     }
     const s = run.fish.find((f) => f.id === selected);
     $('#frame-cap').innerHTML = s && measured
-      ? `<b>Fish ${esc(s.id)}</b> · fork length ${cm(s.fork_cm)} · outline ${cm(s.axis_cm)}${s.snap_mm && s.snap_mm.fork != null ? ` · Spark's points ${s.snap_mm.snout}/${s.snap_mm.fork} mm from SAM's outline` : ''} · ${esc(s.species || 'species pending')} · ${s.status === 'measured' ? 'accepted' : esc(s.why || 'with the officer')}`
+      ? `<b>Fish ${esc(s.id)}</b> · fork length ${cm(s.fork_cm)} · outline ${cm(s.axis_cm)}${snapText(s) ? ` · ${snapText(s)}` : ''} · ${esc(s.species || 'species pending')} · ${s.status === 'measured' ? 'accepted' : esc(s.why || 'with the officer')}`
       : measured ? '<span class="muted">Dashed lines run from snout tip to tail fork. Pick a fish for its numbers.</span>' : '';
   }
 
-  function ledger(fish, seen) {
+  // how far Spark's two points sat from SAM's outline, against the run's own limit
+  function snapText(f) {
+    if (!f.snap_mm || f.snap_mm.fork == null) return '';
+    return `Spark's snout point ${nf1.format(f.snap_mm.snout)} mm and fork point ${nf1.format(f.snap_mm.fork)} mm from SAM's outline (limit ${run.receipt?.thresholds?.snap_mm ?? 10} mm)`;
+  }
+
+  function ledger(fish, emptyMsg) {
     const body = $('#ledger tbody');
     $('#fish-sub').textContent = fish.length ? `${fish.length} fish · fork length is snout tip to tail fork, measured on the sheet's plane` : '';
-    if (!fish.length) { body.innerHTML = `<tr class="idle"><td colspan="7" class="empty">${seen.has('segment') ? 'Measuring…' : 'Each fish appears here once it has been measured.'}</td></tr>`; return; }
+    if (!fish.length) { body.innerHTML = `<tr class="idle"><td colspan="7" class="empty">${esc(emptyMsg)}</td></tr>`; return; }
     body.innerHTML = fish.map((f) => {
       const fr = Object.values(f.frames_mm || {});
       const spread = fr.length && f.axis_cm != null ? (Math.max(...fr, f.axis_cm * 10) - Math.min(...fr, f.axis_cm * 10)) / 10 : null;
@@ -334,12 +363,12 @@
         <td class="id">${esc(f.id)}</td><td>${f.species ? (COMMON[f.species] ? `${COMMON[f.species]} <i class="lat">${esc(f.species)}</i>` : `<i>${esc(f.species)}</i>`) : '<span class="muted">–</span>'}</td>
         <td class="num strong">${cm(f.fork_cm)}</td><td class="num">${cm(f.axis_cm)}</td>
         <td class="num">${spread == null ? '<span class="muted">–</span>' : `±${nf1.format(spread / 2)}<span class="unit">cm</span>`}</td>
-        <td>${st}${f.why ? `<span class="why">${esc(f.why)}</span>` : ''}</td>
-        <td class="rule">${rule ? `${esc(RULE_SHORT[rule.result] || rule.result)}${rule.rule ? ` <sup>${esc(rule.rule)}</sup>` : ''}` : '<span class="muted">–</span>'}</td></tr>`;
+        <td>${st}${f.why ? `<span class="why">${esc(f.why)}</span>` : ''}${selected === f.id && snapText(f) ? `<span class="why detail">${snapText(f)}</span>` : ''}</td>
+        <td class="rule">${rule ? `${esc(RULE_SHORT[rule.result] || rule.result)}` : '<span class="muted">–</span>'}</td></tr>`;
     }).join('');
     body.querySelectorAll('tr[data-id]').forEach((tr) => {
       tr.addEventListener('click', () => pick(tr.dataset.id));
-      tr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(tr.dataset.id); } });
+      tr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(tr.dataset.id, 'tr'); } });
     });
   }
 
@@ -352,9 +381,10 @@
       ${x.status === 'reported' ? '<span class="muted">· from a secondary source, not yet checked against the gazette text</span>' : ''}</li>`).join('')}</ul>`;
   }
 
-  function pick(id) {
+  function pick(id, refocus) {
     selected = selected === id ? null : id;
     render(run.log.length);
+    if (refocus) document.querySelector(`${refocus}[data-id="${CSS.escape(id)}"]`)?.focus();  // the render rebuilt the row or outline the keyboard was on
   }
 
   // ---- small charts --------------------------------------------------------------------------------------------
@@ -369,7 +399,8 @@
   function lf(bins) {
     const el = $('#lf');
     el.className = 'chart';
-    if (!bins || !Object.keys(bins).length) { el.innerHTML = '<p class="empty">Appears when the report is filed.</p>'; return; }
+    if (!bins) { el.innerHTML = '<p class="empty">Appears when the report is filed.</p>'; return; }
+    if (!Object.keys(bins).length) { el.innerHTML = '<p class="empty">No accepted fish, so nothing to bin.</p>'; return; }
     const ks = Object.keys(bins).map(Number), lo = Math.min(...ks), hi = Math.max(...ks);
     const xs = []; for (let k = lo; k <= hi; k++) xs.push(k);
     const W = 520, H = 200, L = 28, B = 22, top = niceMax(Math.max(...Object.values(bins)));
@@ -400,7 +431,7 @@
       ['Clip SHA-256', rc.clip_sha256 ? rc.clip_sha256.slice(0, 16) + '…' : (run.synthetic ? '– (synthetic scene, a still image, no clip file)' : '– (simulated, no clip file)')],
       ['Finished', rc.finished_utc.replace('T', ' ').replace('+00:00', ' UTC')],
       ['Models', rc.models.join(', ')],
-      ['Calibration', `${rc.calibration.tiles.length} tiles, corner error ${rc.calibration.corner_error_px?.toFixed(2)} px`],
+      ['Calibration', rc.calibration.tiles.length ? `${rc.calibration.tiles.length} tiles, corner error ${nf2.format(rc.calibration.corner_error_px)} px` : 'refused: no marker tile found, no lengths filed'],
       ['Fish', `${rc.fish.detected} found, ${rc.fish.accepted} accepted, ${rc.fish.flagged} flagged`],
       ['Rescued by SAM', rc.rescued.length ? rc.rescued.join(', ') : 'none'],
       ['Frames checked', rc.frames.checked.length ? [rc.frames.best, ...rc.frames.checked].join(', ') : `frame ${rc.frames.best} only (a single still, so no cross-frame check)`],
@@ -418,7 +449,7 @@
     const get = async (f) => { try { const r = await fetch(f, { cache: 'no-cache' }); return r.ok ? r.json() : null; } catch { return null; } };
     const bm = await get('benchmark.json');
     const plan = `<article class="card"><header class="card-h"><h2>What the tape benchmark measures</h2><span class="sub">pass marks set before the shoot</span></header>
-        <dl class="kv"><dt>Bias first</dt><dd>The bar is NARA's own photo-board method: 0.05 cm from the measuring board on 22 frigate tuna whose lengths spread only about 1.3 cm (IOTC-2025-WPM16-10rev1). So the headline is the bias on the 10 held-out fish (tags 4, 8 … 40), after a correction fitted only on the other fish. Target: under 0.5 cm either way.</dd>
+        <dl class="kv"><dt>Bias first</dt><dd>The bar is NARA's own photo-board method: 0.05 cm from the measuring board on 22 frigate tuna whose lengths spread only about 1.3 cm (IOTC-2025-WPM16-10rev1). The headline is the uncorrected mean difference and the 95% limits of agreement on every fish. A second mark is the bias on the 10 held-out fish (tags 4, 8 … 40) after a correction fitted only on the other fish: under 0.5 cm either way.</dd>
         <dt>Length</dt><dd>Mean error as a share of fish length, the share within 1 cm, and limits of agreement, accepted fish shown apart from all fish. 2.0 cm on 40 or more fish is the floor below which we stop, not a mark of accuracy: on a 27 cm tuna it is 7%.</dd>
         <dt>Count</dt><dd>The agent's count equals the fish on the sheet in 90% of clean clips.</dd>
         <dt>Species</dt><dd>Right 90% of the time, from a closed list of five coastal species, "unknown" allowed.</dd>
