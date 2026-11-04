@@ -49,7 +49,7 @@ The workflow it automates is Sri Lanka's own photo-board sampling, presented by 
 
 ## Benchmark
 
-Field results from fish measured at the Peliyagoda fish market on 4 November 2026 will be added here. The console's Benchmark tab reads `web/benchmark.json`.
+Field results from fish tape-measured on 4 November 2026 will be added here. The console's Benchmark tab reads `web/benchmark.json`.
 
 We hold it to NARA's own method. Their photo-board lengths differed from the measuring board by 0.05 cm on average, on 22 frigate tuna whose lengths had a standard deviation of only about 1.3 cm (IOTC-2025-WPM16-10rev1). Random error smears a length-frequency table; bias shifts the whole thing, so the report leads with bias: the mean agent-minus-tape difference on the 10 held-out fish, after a correction fitted only on the other fish. The target, set on 3 November before the shoot, is under 0.5 cm either way. Mean error is reported as a share of fish length (2 cm on a 27 cm tuna is 7%) and as the share of fish within 1 cm. The older pass mark, a mean error of 2.0 cm or less on 40 or more fish, is only the point where we would stop the project.
 
