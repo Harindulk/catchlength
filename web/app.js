@@ -386,14 +386,20 @@
         <dt>Worst fish</dt><dd>The fish with the largest errors are listed by name, with what the agent did about them.</dd></dl></article>`;
     if (!bm) {
       const g = await get('geometry_budget.json');
-      $('#bm-finding').innerHTML = 'No tape benchmark yet. <span class="muted">Fish are tape-measured at Peliyagoda on Wed 4 Nov; the agent never sees those numbers.</span>';
+      $('#bm-finding').innerHTML = 'No tape benchmark yet. <span class="muted">Fish are tape-measured on Wed 4 Nov; the agent never sees those numbers.</span>';
+      const pc = await get('public_check.json');
       body.innerHTML = (g ? `<article class="card"><header class="card-h"><h2>What the camera and tiles add on their own</h2><span class="pill n">Simulated</span></header>
         <div class="kpis">
           <div class="kpi"><div class="v">${nf2.format(g.mae_cm)}<span class="unit">cm</span></div><div class="l">mean error</div></div>
           <div class="kpi"><div class="v">${nf2.format(g.p90_cm)}<span class="unit">cm</span></div><div class="l">90th percentile</div></div>
           <div class="kpi"><div class="v">${nf2.format(g.worst_cm)}<span class="unit">cm</span></div><div class="l">worst fish</div></div>
           <div class="kpi"><div class="v">${g.n_fish}</div><div class="l">fish in ${g.n_scenes} scenes</div></div></div>
-        <p class="sub">Museum reference fish pasted at known lengths, blurred, noised and compressed like a 1080p phone frame from about 1 m, then measured through the marker tiles with each fish's true outline. This is the floor the geometry sets; it says nothing yet about SAM 3.1's outlines or Muse Spark's points. Bias ${nf2.format(g.bias_cm)} cm.</p></article>` : '') + plan;
+        <p class="sub">Museum reference fish pasted at known lengths, blurred, noised and compressed like a 1080p phone frame from about 1 m, then measured through the marker tiles with each fish's true outline. This is the floor the geometry sets; it says nothing yet about SAM 3.1's outlines or Muse Spark's points. Bias ${nf2.format(g.bias_cm)} cm.</p></article>` : '') + (pc ? `<article class="card"><header class="card-h"><h2>Stress test on public footage</h2><span class="pill n">Real fish, no tiles</span></header>
+        <div class="kpis">
+          <div class="kpi"><div class="v">${pc.frames.filter((f) => f.lengths === 0).length}<span class="unit">of ${pc.frames.length}</span></div><div class="l">frames refused: no tiles, no lengths filed</div></div>
+          <div class="kpi"><div class="v">${pc.frames.reduce((n, f) => n + f.by_eye, 0)}</div><div class="l">real fish in view, all outlined by SAM 3.1</div></div>
+          <div class="kpi"><div class="v">${pc.frames.reduce((n, f) => n + Math.max(0, f.sam - f.by_eye), 0)}</div><div class="l">printed fish pictures SAM also outlined</div></div></div>
+        <p class="sub">Four frames of a Spanish mackerel and a black sea bass on a measuring board, from FWC's "How to Measure a Fish" (<a href="https://youtu.be/2Va-ANxdQhM" rel="noopener">CC BY</a>). It tests behaviour, not length: no tiles for scale, no tape reading. Spark called the sea bass "unknown" but the spotted mackerel a kawakawa at 0.85-0.88, a look-alike outside its five species, which is why species stays officer-confirmed. Cost $${pc.cost_usd.toFixed(2)}.</p></article>` : '') + plan;
       return;
     }
     const L = bm.length_accepted_only, A = bm.length, P = bm.pass_marks;

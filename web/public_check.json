@@ -1,0 +1,146 @@
+{
+ "source": "FWC Saltwater Fishing, 'How to Measure a Fish', CC BY, https://youtu.be/2Va-ANxdQhM",
+ "cost_usd": 0.2711,
+ "frames": [
+  {
+   "frame": "t50",
+   "by_eye": 2,
+   "sam": 2,
+   "lengths": 0,
+   "status": "needs_review",
+   "species": [
+    [
+     "Euthynnus affinis",
+     0.85
+    ],
+    [
+     "unknown",
+     0.15
+    ]
+   ]
+  },
+  {
+   "frame": "t56",
+   "by_eye": 2,
+   "sam": 14,
+   "lengths": 0,
+   "status": "needs_review",
+   "species": [
+    [
+     "unknown",
+     0.9
+    ],
+    [
+     "unknown",
+     0.95
+    ],
+    [
+     "unknown",
+     0.95
+    ],
+    [
+     "unknown",
+     0.1
+    ],
+    [
+     "Euthynnus affinis",
+     0.88
+    ],
+    [
+     "unknown",
+     0.05
+    ],
+    [
+     "unknown",
+     0.15
+    ],
+    [
+     "Euthynnus affinis",
+     0.88
+    ],
+    [
+     "unknown",
+     0.92
+    ],
+    [
+     "unknown",
+     0.9
+    ],
+    [
+     "unknown",
+     0.95
+    ],
+    [
+     "unknown",
+     0.1
+    ],
+    [
+     "unknown",
+     0.97
+    ],
+    [
+     "unknown",
+     0.0
+    ]
+   ]
+  },
+  {
+   "frame": "t80",
+   "by_eye": 1,
+   "sam": 7,
+   "lengths": 0,
+   "status": "needs_review",
+   "species": [
+    [
+     "unknown",
+     0.95
+    ],
+    [
+     "unknown",
+     0.95
+    ],
+    [
+     "unknown",
+     0.9
+    ],
+    [
+     "unknown",
+     0.1
+    ],
+    [
+     "unknown",
+     0.95
+    ],
+    [
+     "unknown",
+     0.95
+    ],
+    [
+     "unknown",
+     0.1
+    ]
+   ]
+  },
+  {
+   "frame": "t86",
+   "by_eye": 1,
+   "sam": 3,
+   "lengths": 0,
+   "status": "needs_review",
+   "species": [
+    [
+     "unknown",
+     0.96
+    ],
+    [
+     "unknown",
+     0.92
+    ],
+    [
+     "unknown",
+     0.97
+    ]
+   ]
+  }
+ ]
+}
