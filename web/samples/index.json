@@ -1,1 +1,1 @@
-[{"id": "museum", "label": "Flags a fish"}, {"id": "touching", "label": "Fish touching"}, {"id": "no-tile", "label": "Refuses: no tile"}]
+[{"id": "field-refused", "label": "Real clip: refused under the frozen limit"}, {"id": "museum", "label": "Flags a fish"}, {"id": "touching", "label": "Fish touching"}, {"id": "no-tile", "label": "Refuses: no tile"}]
