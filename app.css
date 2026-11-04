@@ -139,7 +139,6 @@ tbody tr:hover td, tbody tr.on td { background: #f6f8fb; }
 td .why { display: block; color: var(--muted); font-size: 13px; max-width: 60ch; margin-top: 4px; line-height: 1.4; }
 .ledger th { white-space: nowrap; }
 td.rule { white-space: nowrap; }
-td.rule sup { display: block; vertical-align: 0; margin-top: 2px; }
 td.rule { color: var(--muted); font-size: 13px; max-width: 320px; }
 
 /* receipt + kv */
@@ -185,9 +184,9 @@ td.rule { color: var(--muted); font-size: 13px; max-width: 320px; }
   main { padding-bottom: 96px; }
   .two { grid-template-columns: 1fr; }
   .title-row { align-items: stretch; }
-  .actions { width: 100%; }
-  .actions .segmented { flex: 1; overflow-x: auto; }
-  .actions button.primary { width: 100%; }
+  .actions { width: 100%; flex-direction: column; align-items: stretch; }  /* tabs, then the button, then the tape link, each full width */
+  td { padding-top: 12px; padding-bottom: 12px; }  /* a one-line row reaches 44 px */
+  .chart .axis { font-size: 16px; }  /* the SVG shrinks to about two thirds, so this lands near 11 px */
   .ledger th:nth-child(4), .ledger td:nth-child(4), .ledger th:nth-child(5), .ledger td:nth-child(5), .ledger th:nth-child(7), .ledger td:nth-child(7) { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
@@ -230,7 +229,7 @@ body.running #run-btn { cursor: progress; }
 td.strong { font-weight: 500; }
 tbody tr:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
 tr.idle td { cursor: default; }
-td.rule sup, .cited sup { font-size: 11px; color: var(--muted); vertical-align: 2px; }
+.cited sup { font-size: 11px; color: var(--muted); vertical-align: 2px; }
 .cited { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--rule); font-size: 13px; }
 .cited h3 { font-size: 13px; font-weight: 500; margin: 0 0 8px; }
 .cited ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
@@ -246,11 +245,20 @@ td.rule sup, .cited sup { font-size: 11px; color: var(--muted); vertical-align: 
 @media (max-width: 760px) {
   .verdict { gap: 8px 16px; }
   .verdict dd { font-size: 26px; }
-  .stages { display: flex; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
-  .actions .segmented { display: flex; flex-wrap: wrap; overflow: visible; }
+  .stages { display: flex; overflow-x: auto; gap: 6px; padding-bottom: 4px; min-width: 0; }  /* a flex item's min-width is auto, which would widen the page */
+  .actions .segmented { display: flex; flex-wrap: wrap; }
   .actions .segmented button { flex: 1 1 auto; white-space: nowrap; }
-  td .why { display: none; }  /* on a phone the reason shows under the photo when the fish is picked */
+  td .why { display: none; }  /* on a phone the reason shows under the photo, and in the row once the fish is picked */
+  tr.on td .why { display: block; }
   .st { flex: 0 0 78px; }
+  /* phone order: verdict, photo, checks (the timeline scrolls inside its card), sign-off, then the fish and the receipts */
+  .run-grid { order: 1; }
+  .signoff { order: 2; }  /* the notice keeps its place under the button that raised it */
+  #view-run > .card, #view-run > .two { order: 3; }
+  .timeline { max-height: 320px; }
+  /* thumb-sized controls */
+  .segmented button, button.primary, button.secondary, .signoff select, .signoff input { min-height: 44px; }
+  .tape-link { min-height: 44px; display: inline-flex; align-items: center; }
 }
 
 /* officer sign-off: the screen's main job once a report is filed */
@@ -292,3 +300,12 @@ button.secondary:active { transform: translateY(1px); }
 .tl-head { margin-top: 4px; }
 td.id { font-family: var(--mono); }
 i.lat { color: var(--muted); font-size: 12px; margin-left: 4px; }
+
+/* a picked fish: its snap distances in the row, a focus ring on its outline; a failed load gets a Retry */
+td .detail { color: var(--text); }
+.frame .fishg:focus { outline: none; }
+.frame .fishg:focus-visible .fish { stroke-width: 5; fill-opacity: .28; }
+.notice button.secondary { height: 30px; padding: 0 12px; margin-left: 8px; background: var(--surface); }
+.prose ul.plain { list-style: none; margin: 0 0 12px; padding: 0; max-width: 68ch; font-size: 15px; display: flex; flex-direction: column; gap: 6px; }
+.prose a { color: var(--text); text-underline-offset: 3px; }
+.prose a:hover { color: var(--data); }

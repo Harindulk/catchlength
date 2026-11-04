@@ -7,7 +7,7 @@
 <meta name="description" content="Each fish's fork length and an estimated weight from a published curve, with the formula and its source, as evidence for the sale.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=17">
+<link rel="stylesheet" href="app.css?v=20">
 <style>
   body { padding: 24px 16px 48px; }
   .slip { max-width: 520px; margin: 0 auto; background: var(--surface); border-radius: var(--radius-card); padding: var(--pad); }
@@ -23,6 +23,7 @@
   .how a { color: var(--text); }
   .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; }
   .actions [hidden] { display: none; }
+  .rows .alt { min-height: 44px; padding: 0 16px; border: 0; border-radius: var(--radius-control); background: var(--raised); font: inherit; cursor: pointer; }
   .actions a, .actions button { min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: var(--radius-control); border: 0; cursor: pointer; text-decoration: none; font-weight: 500; }
   .actions .go { background: var(--accent); color: var(--surface); }
   .actions .alt { background: var(--raised); }
@@ -51,7 +52,8 @@
   if (!/^[\w-]+$/.test(id)) return;
   $('#print').onclick = () => print();
   let run;
-  try { run = await (await fetch(`samples/${id}/run.json`)).json(); } catch { $('#rows').innerHTML = '<li>This run could not be loaded.</li>'; return; }
+  try { const r = await fetch(`samples/${id}/run.json`); if (!r.ok) throw new Error(r.status); run = await r.json(); }
+  catch { $('#rows').innerHTML = `<li><span>This run (${esc(id)}) could not be loaded.</span><button class="alt" type="button" onclick="location.reload()">Retry</button></li>`; return; }
   const r = run.seller;
   if (!r) { $('#rows').innerHTML = '<li>This run has no size receipt.</li>'; return; }
   const kind = run.simulated ? 'Simulated sample, not a real catch. ' : run.synthetic ? 'Synthetic test scene, not a real catch. ' : '';
