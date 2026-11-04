@@ -6,6 +6,8 @@ Sri Lanka already measures coastal tuna from photographs. NARA, the national aqu
 
 Built for the Meta Global AI Developer Hackathon (Indie track), theme Build for Your World. All code in this repository was written from 27 October 2026.
 
+![CatchLength console: a recorded run on Muse Spark 1.3 and SAM 3.1. Teal outlines are accepted fish; the amber one went to the officer.](docs/console.jpg)
+
 ## How it checks itself
 
 The checks sit inside the agent's tools, so the model can't skip them.
@@ -15,7 +17,7 @@ The checks sit inside the agent's tools, so the model can't skip them.
 - Each fish is measured twice: an outline length on the sheet's plane and a snout-to-fork length from Spark's points. If the two disagree, the fish is flagged for the officer.
 - Spark's snout and fork points are moved onto the outline SAM drew, and the fork length is measured between the moved points. A point that sat more than 1 cm from the outline on the sheet, inside or outside the fish, means the two models disagree about where the fish ends by more than the 1 cm length classes its report uses (IOTC allows classes up to 5 cm), so the fish is flagged instead of snapped. (Until 3 November the limit was 8 image pixels. On the first real run Spark's points sat 5-8 mm from clean tail forks and snapped onto the right notch, yet every fish was flagged, and a pixel limit means a different distance at every resolution and camera height. The change is in the `freeze-2026-11-03` record.)
 - The fish are measured again in two other frames, and a length that moves by more than 1 cm is flagged.
-- For species with a published length-length relationship (frigate and bullet tuna, IOTC-2021-WPNT11-14), the outline must be within 3% of the total length that relationship predicts from the fork length, or the fish is flagged.
+- For species with a published length-length relationship (frigate and bullet tuna, IOTC-2021-WPNT11-14), the outline must be within 3% (a tolerance we chose around that published regression) of the total length that relationship predicts from the fork length, or the fish is flagged.
 - No minimum landing size for the tunas and mackerel sampled here was found in the sources we reviewed (Sri Lanka's gazetted fisheries regulations, `data/rules.json`), and the report says "no rule found" for each of them. Rules come only from a pack with a source for each, and model-written text that cites any other rule is refused.
 - A tool refused three times hands the job to the officer, and a filed report waits for the officer's sign-off.
 - A benchmark compares the agent's lengths with the same fish measured by hand on a measuring board. The agent never sees those numbers.
@@ -30,8 +32,8 @@ Every run ends with an audit receipt: the clip's hash, the models used, the cali
 |---|---|
 | Muse Spark 1.3 | Runs the agent loop (one tool per turn); plans the clip; finds missed and merged fish; places snout and fork points; names the species from a closed list |
 | SAM 3.1 | Segments every fish from the concept "fish", then again from Spark's boxes and negative points |
-| Muse Wonder 1.0 (optional, `--verify`) | A last look at the filed report. It can only add fish to the officer's queue; it can't change a length, a species or a status |
-| Muse Spark Open on Baseten (optional, `--audit-open`) | The same bounded check by the open-weights model, hosted separately, as an independent auditor |
+| Muse Wonder 1.0 (optional, `--verify`; built, not yet run on a live key) | A last look at the filed report. It can only add fish to the officer's queue; it can't change a length, a species or a status |
+| Muse Spark Open on Baseten (optional, `--audit-open`; built, not yet run) | The same bounded check by the open-weights model, hosted separately, as an independent auditor |
 
 ## Prior art
 
