@@ -257,7 +257,7 @@ tr.idle td { cursor: default; }
   #view-run > .card, #view-run > .two { order: 3; }
   .timeline { max-height: 320px; }
   /* thumb-sized controls */
-  .segmented button, button.primary, button.secondary, .signoff select, .signoff input { min-height: 44px; }
+  .segmented button, .guide button, button.primary, button.secondary, .signoff select, .signoff input { min-height: 44px; }
   .tape-link { min-height: 44px; display: inline-flex; align-items: center; }
 }
 
@@ -309,3 +309,14 @@ td .detail { color: var(--text); }
 .prose ul.plain { list-style: none; margin: 0 0 12px; padding: 0; max-width: 68ch; font-size: 15px; display: flex; flex-direction: column; gap: 6px; }
 .prose a { color: var(--text); text-underline-offset: 3px; }
 .prose a:hover { color: var(--data); }
+
+/* the states a reviewer should see, one click each; the cards they land on clear the fixed top bar */
+.guide { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 14px; }
+.guide button { height: 30px; padding: 0 12px; border: 1px solid var(--control); border-radius: 999px; background: var(--surface); color: var(--text); font: inherit; font-size: 13px; cursor: pointer; }
+.guide button:hover { border-color: var(--text); }
+.guide button[hidden] { display: none; }
+#frame, #checks { scroll-margin-top: calc(var(--topbar) + 12px); }
+
+/* the officer's script: Plex has no Sinhala or Tamil, so a judge's machine would otherwise show boxes */
+:lang(si) { font-family: "Noto Sans Sinhala", "IBM Plex Sans", sans-serif; }
+:lang(ta) { font-family: "Noto Sans Tamil", "IBM Plex Sans", sans-serif; }

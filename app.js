@@ -54,6 +54,7 @@
 
   async function init() {
     $('#samples').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) load(+b.dataset.i); });
+    $('#guide').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) go(b.dataset.go); });
     $('#run-btn').textContent = RUN_LABEL;
     $('#run-btn').addEventListener('click', live);
     $('#signoff').addEventListener('submit', (e) => { e.preventDefault(); decide(true); });
@@ -69,6 +70,7 @@
     const seg = $('#samples');
     seg.hidden = samples.length < 2;
     seg.innerHTML = samples.map((s, i) => `<button type="button" role="radio" aria-checked="${i === 0}" data-i="${i}">${esc(s.label)}</button>`).join('');
+    $('#guide [data-go="real"]').hidden = !samples.some((s) => /^real fish/i.test(s.label));
     await load(0);
   }
 
@@ -93,6 +95,26 @@
     $('#overlay').setAttribute('viewBox', `0 0 ${w} ${h}`);
     $('#frame-sub').textContent = `frame ${run.best_frame} · ${run.tiles.length} marker ${run.tiles.length === 1 ? 'tile' : 'tiles'}`;
     render(run.log.length);
+    return true;
+  }
+
+  // ---- the states a reviewer should see, each one click away ----------------------------------------------------
+  async function go(what) {
+    if (what === 'benchmark') { location.hash = 'benchmark'; return; }
+    if ((location.hash.slice(1) || 'run') !== 'run') { location.hash = 'run'; show('run'); }
+    const cur = +($('#samples [aria-checked="true"]')?.dataset.i ?? 0);
+    if (what === 'real' || what === 'refusal') {
+      const i = samples.findIndex((s) => (what === 'real' ? /^real fish/i : /refus/i).test(s.label));
+      if (i >= 0 && i !== cur) await load(i);
+    }
+    if (what === 'flagged') {  // the first sample with a fish the agent handed over, starting from the one on screen
+      for (const i of [cur, ...samples.keys()]) {
+        if (i !== cur && !(await load(i))) continue;
+        const f = run.fish.find((x) => x.status === 'needs_review');
+        if (f) { selected = f.id; render(run.log.length); break; }
+      }
+    }
+    $({ real: '#frame', flagged: '#frame', refusal: '#checks', checks: '#checks' }[what])?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   // ---- a live run on the server, streamed turn by turn; falls back to the recording -----------------------------
@@ -189,6 +211,7 @@
       ? `${d.approve ? '<b>Signed off</b>' : '<b>Sent back to the agent</b>'} at ${esc(d.at)}${d.note ? `: “${esc(d.note)}”` : ''}${d.saved ? '' : ' <span class="muted">(recorded run: not saved)</span>'}`
       : T[lang].filed(f.accepted, f.flagged);
     $('#signoff-text').lang = d ? 'en' : lang;
+    box.lang = d ? 'en' : lang;  // the buttons and the note field take the officer's script too
     $('#signoff-btn').textContent = T[lang].ok;
     $('#sendback-btn').textContent = T[lang].back;
     $('#signoff-note').placeholder = T[lang].note;
@@ -449,7 +472,7 @@
     const get = async (f) => { try { const r = await fetch(f, { cache: 'no-cache' }); return r.ok ? r.json() : null; } catch { return null; } };
     const bm = await get('benchmark.json');
     const plan = `<article class="card"><header class="card-h"><h2>What the tape benchmark measures</h2><span class="sub">pass marks set before the shoot</span></header>
-        <dl class="kv"><dt>Bias first</dt><dd>The bar is NARA's own photo-board method: 0.05 cm from the measuring board on 22 frigate tuna whose lengths spread only about 1.3 cm (IOTC-2025-WPM16-10rev1). The headline is the uncorrected mean difference and the 95% limits of agreement on every fish. A second mark is the bias on the 10 held-out fish (tags 4, 8 … 40) after a correction fitted only on the other fish: under 0.5 cm either way.</dd>
+        <dl class="kv"><dt>Frozen first</dt><dd>The code and every threshold were frozen as <code>freeze-2026-11-03</code> before any field fish was measured, and each run's audit receipt says whether they still match. The only thing fitted on field fish is the bias correction, fitted on the non-held-out fish and scored on the 10 held out.</dd><dt>Bias first</dt><dd>The bar is NARA's own photo-board method: 0.05 cm from the measuring board on 22 frigate tuna whose lengths spread only about 1.3 cm (IOTC-2025-WPM16-10rev1). The headline is the uncorrected mean difference and the 95% limits of agreement on every fish. A second mark is the bias on the 10 held-out fish (tags 4, 8 … 40) after a correction fitted only on the other fish: under 0.5 cm either way.</dd>
         <dt>Length</dt><dd>Mean error as a share of fish length, the share within 1 cm, and limits of agreement, accepted fish shown apart from all fish. 2.0 cm on 40 or more fish is the floor below which we stop, not a mark of accuracy: on a 27 cm tuna it is 7%.</dd>
         <dt>Count</dt><dd>The agent's count equals the fish on the sheet in 90% of clean clips.</dd>
         <dt>Species</dt><dd>Right 90% of the time, from a closed list of five coastal species, "unknown" allowed.</dd>
@@ -469,7 +492,7 @@
           <div class="kpi"><div class="v">${pc.frames.filter((f) => f.lengths === 0).length}<span class="unit">of ${pc.frames.length}</span></div><div class="l">frames refused: no tiles, no lengths filed</div></div>
           <div class="kpi"><div class="v">${pc.frames.reduce((n, f) => n + f.by_eye, 0)}</div><div class="l">real fish in view, all outlined by SAM 3.1</div></div>
           <div class="kpi"><div class="v">${pc.frames.reduce((n, f) => n + Math.max(0, f.sam - f.by_eye), 0)}</div><div class="l">printed fish pictures SAM also outlined</div></div></div>
-        <p class="sub">Four frames of a Spanish mackerel and a black sea bass on a measuring board, from FWC's "How to Measure a Fish" (<a href="https://youtu.be/2Va-ANxdQhM" rel="noopener">CC BY</a>). It tests behaviour, not length: no tiles for scale, no tape reading. Spark called the sea bass "unknown" but the spotted mackerel a kawakawa at 0.85-0.88, a look-alike outside its five species, which is why species stays officer-confirmed. Cost $${pc.cost_usd.toFixed(2)}.</p></article>` : '') + plan;
+        <p class="sub">Four frames of a Spanish mackerel and a black sea bass on a measuring board, from FWC's "How to Measure a Fish" (<a href="https://youtu.be/2Va-ANxdQhM" target="_blank" rel="noopener">CC BY</a>). It tests behaviour, not length: no tiles for scale, no tape reading. Spark called the sea bass "unknown" but the spotted mackerel a kawakawa at 0.85-0.88, a look-alike outside its five species, which is why species stays officer-confirmed. Cost $${pc.cost_usd.toFixed(2)}.</p></article>` : '') + plan;
       return;
     }
     const L = bm.length_accepted_only, A = bm.length, P = bm.pass_marks;
