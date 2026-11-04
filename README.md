@@ -113,6 +113,12 @@ Estimated at under $0.40 per clip at standard prices (SAM 3.1 is $2.50 per 1,000
 
 Limits: a closed list of five coastal species (skipjack, kawakawa, Indian mackerel, frigate and bullet tuna), anything else is "unknown"; fish laid flat on a flat surface; daylight; no Sinhala voice input (Muse Voice Transcribe doesn't support Sinhala). The officer's sign-off panel can switch to Sinhala or Tamil; that wording is a draft and still needs a native speaker's check.
 
+## Next steps
+
+- A fixed camera over the landing table. With the tiles fixed to the table once, every tray placed under it is measured with no setup, the same idea as the electronic-monitoring cameras already used on fishing vessels. Nothing here is built yet.
+- Read the measuring board NARA's samplers already carry as the scale, so the paper tiles become optional.
+- Larger species (yellowfin tuna, seer fish) once there are sourced length relationships for them and a wider frame.
+
 ## Before the hackathon
 
 The idea and the application text. The museum fish photographs in `data/sources/` are Smithsonian (USNM) specimens, public domain via Wikimedia Commons (each file and its source is listed in `data/sources/sources.txt`). They are used only for tests and the simulated sample, which is labelled wherever it appears.
