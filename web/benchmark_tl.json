@@ -1,0 +1,18 @@
+{
+ "n": 1,
+ "mean_diff_cm": -5.0,
+ "loa95": [
+  -5.0,
+  -5.0
+ ],
+ "mae_cm": 5.0,
+ "within_1cm": 0.0,
+ "pairs": [
+  {
+   "key": "B1-2",
+   "tape_tl_cm": 21.6,
+   "agent_outline_cm": 16.6
+  }
+ ],
+ "note": "outline length vs taped total length, accepted fish, no correction"
+}
