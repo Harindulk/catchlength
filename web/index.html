@@ -6,8 +6,9 @@
 <title>CatchLength · fish sampling agent</title>
 <meta name="description" content="A verifiable fish-sampling agent: it measures every fish on a market sheet, checks its own work, and is graded against a tape measure.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=20">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Sinhala:wght@400;500&family=Noto+Sans+Tamil:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css?v=21">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M2.5 12c3-4.2 7.2-5.4 11.5-5.4 2.2 0 4.1.9 5.2 2.1L21.5 6v12l-2.3-2.7c-1.1 1.2-3 2.1-5.2 2.1-4.3 0-8.5-1.2-11.5-5.4z' fill='%231b6c80'/></svg>">
 </head>
 <body>
 <header class="topbar">
@@ -44,6 +45,14 @@
         <a class="tape-link" href="#benchmark">Against the tape →</a>
       </div>
     </header>
+    <nav class="guide" id="guide" aria-label="Start here">
+      <span class="sub">Start here</span>
+      <button type="button" data-go="real" hidden>Real fish</button>
+      <button type="button" data-go="refusal">The refusal</button>
+      <button type="button" data-go="flagged">A flagged fish</button>
+      <button type="button" data-go="checks">Its checks</button>
+      <button type="button" data-go="benchmark">Against the tape</button>
+    </nav>
     <dl class="verdict" id="verdict" aria-live="polite"></dl>
     <ol class="stages" id="stages" aria-label="Agent progress"></ol>
     <p class="legend" aria-hidden="true"><span class="k ok"></span>passed <span class="k warn"></span>a check fired <span class="k no"></span>refused <span class="k todo"></span>not needed</p>
@@ -150,14 +159,14 @@
         </ul>
         <h2>Links</h2>
         <ul class="plain">
-          <li><a href="https://github.com/Harindulk/catchlength" rel="noopener">Source on GitHub</a>, MIT licence</li>
-          <li><a href="https://iotc.org/sites/default/files/documents/2025/10/IOTC-2025-WPM16-10rev1-Sri_Lanka_photo.pdf" rel="noopener">NARA's photo-board method, IOTC-2025-WPM16-10rev1</a> (PDF)</li>
-          <li><a href="https://youtu.be/2Va-ANxdQhM" rel="noopener">FWC, "How to Measure a Fish"</a>, the public footage used for the stress test (CC BY)</li>
+          <li><a href="https://github.com/Harindulk/catchlength" target="_blank" rel="noopener">Source on GitHub</a>, MIT licence</li>
+          <li><a href="https://iotc.org/sites/default/files/documents/2025/10/IOTC-2025-WPM16-10rev1-Sri_Lanka_photo.pdf" target="_blank" rel="noopener">NARA's photo-board method, IOTC-2025-WPM16-10rev1</a> (PDF)</li>
+          <li><a href="https://youtu.be/2Va-ANxdQhM" target="_blank" rel="noopener">FWC, "How to Measure a Fish"</a>, the public footage used for the stress test (CC BY)</li>
         </ul>
       </article>
     </div>
   </section>
 </main>
-<script src="app.js?v=28"></script>
+<script src="app.js?v=29"></script>
 </body>
 </html>

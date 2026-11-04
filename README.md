@@ -4,6 +4,8 @@ A verifiable agent for Sri Lanka's port fish sampling. It plans the job, measure
 
 Sri Lanka already measures coastal tuna from photographs. NARA, the national aquatic research agency, presented its photo-board method to the IOTC in 2025 ([IOTC-2025-WPM16-10rev1](https://iotc.org/sites/default/files/documents/2025/10/IOTC-2025-WPM16-10rev1-Sri_Lanka_photo.pdf)): field staff lay fish on a 60 cm board, take a photo, then draw a line on each fish from the snout to the tip of the tail (its total length) in FishMesh-2 and name its species by hand. CatchLength could replace that drawing and naming. It measures fork length, the measure IOTC length-frequency data uses, and checks it against the total length the species' published relationship predicts, so it gives both. You film about 20 seconds of fish laid next to printed marker sheets, and an agent built on Meta's models plans the job, finds every fish, measures each one twice, hands anything it can't settle to a person, and files a length-frequency report that cites the rule behind every check.
 
+Fork length in 1 cm classes is the format this data already travels in. Sri Lanka's port samplers record fork length to the nearest 1 cm into NARA's PELAGOS database for the length-frequency return that IOTC Resolution 15/02 requires ([Dalpathadu 2026, Aquat. Living Resour. 39:8](https://www.alr-journal.org/10.1051/alr/2026002)); IOTC's reporting guidelines recommend 1 cm classes for fork length ([Guidelines for the reporting of fisheries statistics to the IOTC](https://iotc.org/sites/default/files/Guidelines_Data_Reporting_IOTC1.pdf)); and the IOTC Secretariat drops frigate, bullet and kawakawa samples reported in classes wider than 2 cm ([IOTC-2020-WPDCS16-16](https://iotc.org/sites/default/files/documents/2020/11/IOTC-2020-WPDCS16-16_-_Size_data_anomalies.pdf), Table A1).
+
 Built for the Meta Global AI Developer Hackathon (Indie track), theme Build for Your World. All code in this repository was written from 27 October 2026.
 
 ![CatchLength console: a recorded run on Muse Spark 1.3 and SAM 3.1. Teal outlines are accepted fish; the amber one went to the officer.](docs/console.jpg)
@@ -12,10 +14,27 @@ Built for the Meta Global AI Developer Hackathon (Indie track), theme Build for 
 
 The checks sit inside the agent's tools, so the model can't skip them.
 
+```mermaid
+flowchart LR
+  C[20 s phone clip] --> P[inspect_clip<br>Spark plans, picks the frame]
+  P --> K[calibrate<br>marker tiles flat?]
+  K -- bent or missing --> R[refused: no lengths]
+  K --> S[segment<br>SAM 3.1 outlines every fish]
+  S -- count short --> F[find_missed + rescue<br>Spark's boxes back to SAM]
+  S --> M[measure<br>two ways, three frames, points snapped to the outline]
+  F --> M
+  M --> X[classify<br>closed list or unknown]
+  X --> A[apply_rules<br>sourced pack only]
+  A --> T[submit_report<br>citations checked]
+  T --> O[officer sign-off]
+  M -- the two disagree --> O
+  R -- three refusals --> O
+```
+
 - Calibration refuses a clip when the marker tiles are missing or bent (corner error over 1.5 px).
 - If SAM 3.1 finds fewer fish than Muse Spark expects, Spark returns boxes for the missed or merged fish, and they go back to SAM as box prompts with negative points on the neighbouring fish. A new mask is kept only if its size looks like one fish and it doesn't overlap one already found. (This loop is tested on scripted runs. In our real-model scenes SAM 3.1 separated touching and even overlapping fish on its own, so the rescue never had to fire.)
 - Each fish is measured twice: an outline length on the sheet's plane and a snout-to-fork length from Spark's points. If the two disagree, the fish is flagged for the officer.
-- Spark's snout and fork points are moved onto the outline SAM drew, and the fork length is measured between the moved points. A point that sat more than 1 cm from the outline on the sheet, inside or outside the fish, means the two models disagree about where the fish ends by more than the 1 cm length classes its report uses (IOTC allows classes up to 5 cm), so the fish is flagged instead of snapped. (Until 3 November the limit was 8 image pixels. On the first real run Spark's points sat 5-8 mm from clean tail forks and snapped onto the right notch, yet every fish was flagged, and a pixel limit means a different distance at every resolution and camera height. The change is in the `freeze-2026-11-03` record.)
+- Spark's snout and fork points are moved onto the outline SAM drew, and the fork length is measured between the moved points. A point that sat more than 1 cm from the outline on the sheet, inside or outside the fish, means the two models disagree about where the fish ends by more than the 1 cm length classes its report uses (the class IOTC's reporting guidelines recommend for fork length), so the fish is flagged instead of snapped. (Until 3 November the limit was 8 image pixels. On the first real run Spark's points sat 5-8 mm from clean tail forks and snapped onto the right notch, yet every fish was flagged, and a pixel limit means a different distance at every resolution and camera height. The change is in the `freeze-2026-11-03` record.)
 - The fish are measured again in two other frames, and a length that moves by more than 1 cm is flagged.
 - For species with a published length-length relationship (frigate and bullet tuna, IOTC-2021-WPNT11-14), the outline must be within 3% (a tolerance we chose around that published regression) of the total length that relationship predicts from the fork length, or the fish is flagged.
 - No minimum landing size for the tunas and mackerel sampled here was found in the sources we reviewed (Sri Lanka's gazetted fisheries regulations, `data/rules.json`), and the report says "no rule found" for each of them. Rules come only from a pack with a source for each, and model-written text that cites any other rule is refused.
@@ -122,9 +141,11 @@ Limits: a closed list of five coastal species (skipjack, kawakawa, Indian macker
 - Read the measuring board NARA's samplers already carry as the scale, so the paper tiles become optional.
 - Larger species (yellowfin tuna, seer fish) once there are sourced length relationships for them and a wider frame.
 
-## Before the hackathon
+## What was built when
 
-The idea and the application text. The museum fish photographs in `data/sources/` are Smithsonian (USNM) specimens, public domain via Wikimedia Commons (each file and its source is listed in `data/sources/sources.txt`). They are used only for tests and the simulated sample, which is labelled wherever it appears.
+Built during the hackathon (27 October to 4 November 2026): the agent loop, its ten tools and every check (calibration, count, two-way measurement, cross-frame drift, species, the rule pack, the report check); the marker tiles, the synthetic scenes and the geometry test; the console, the officer sign-off, the size receipt and the audit receipt; the tape benchmark and its grader; the stress test on public footage; the tests.
+
+Existed before: the idea and the application text. The museum fish photographs in `data/sources/` are Smithsonian (USNM) specimens, public domain via Wikimedia Commons (each file and its source is listed in `data/sources/sources.txt`); they are used only for tests and the simulated sample, which is labelled wherever it appears. Meta's models are used as they ship, and the length relationships come from the published IOTC papers cited in `config/species.json`.
 
 ## Licence
 
