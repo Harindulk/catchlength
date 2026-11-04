@@ -72,9 +72,21 @@ The step it could replace is the line-drawing and species-naming in Sri Lanka's 
 
 ## Benchmark
 
-Field results from fish tape-measured on 4 November 2026 will be added here. The console's Benchmark tab reads `web/benchmark.json`.
+Twelve store-bought fish, tape-measured on 4 November 2026, in one session at a seafood store in Colombo. The console's Benchmark tab reads `web/benchmark.json`; the per-fish pairs are in it.
 
-What happened on the first real clips, in order. Four tray clips were filmed at a seafood store in Colombo on 4 November (phone held about 1 m above a steel tray, two laminated tiles on the floor beside it). Under the frozen code (`freeze-2026-11-03`) calibration refused all four: the tile corners fitted a flat sheet to 1.5 to 4.6 image pixels against a 1.5 px limit that had been set on synthetic renders. On the sheet those same fits were 0.9 to 1.7 mm, a tenth of a length class, so the limit was changed to 5 mm on the sheet (commit `edf12c6`, after the freeze; every receipt from the re-run says the code changed since the freeze) and the clips were run again. No threshold that touches a length changed, and no parameter was fitted on these fish. [Re-run results follow.]
+| | |
+|---|---|
+| Fish with a tape reading | 12 (three trays; two more fish were filmed but not taped) |
+| Mean difference, agent minus tape, all 12 | **+2.2 cm**, 95% limits of agreement −5.4 to +9.7 cm; mean error 3.5 cm (13% of length); 25% within 1 cm |
+| Accepted by the agent on its own | 1 fish (−3.8 cm); the other 11 were flagged to the officer by the snout-to-outline or fork-vs-outline check |
+| Count | exact on 1 of 3 clips (the two misses: an untaped fish in the tray counted correctly as a fish) |
+| Species | 0 of 12: none of these fish is on the five-species list, so every name was "unknown" or wrong, and none was accepted |
+| Largest errors | tape 33.0 vs agent 40.5 cm; 33.3 vs 39.4; 26.7 vs 31.1 (all flagged) |
+| Held-out bias | not scored: no held-out fish was accepted |
+
+Two honest caveats. The ground truth is an inch tape laid along each fish and read from the video frames (there was no written sheet), so it is good to about ±1 cm, not the ±0.3 cm of a measuring board. And the fish lay in a steel tray about 3 cm above the floor where the tiles were, so they sat closer to the camera than the calibration plane; the three largest fish, which sat deepest in the tray, read 15 to 22% long, which is the direction that bias predicts. A fish that lay on the floor beside the tray (the garfish, tag 10) read 33.2 cm against 33.3 on the tape. Fish on the sheet with the tiles, as the method asks, is the fix; the number above is reported uncorrected.
+
+What happened on the first real clips, in order. Four tray clips were filmed at a seafood store in Colombo on 4 November (phone held about 1 m above a steel tray, two laminated tiles on the floor beside it). Under the frozen code (`freeze-2026-11-03`) calibration refused all four: the tile corners fitted a flat sheet to 1.5 to 4.6 image pixels against a 1.5 px limit that had been set on synthetic renders. On the sheet those same fits were 0.9 to 1.7 mm, a tenth of a length class, so the limit was changed to 5 mm on the sheet (commit `edf12c6`, after the freeze; every receipt from the re-run says the code changed since the freeze) and the clips were run again. No threshold that touches a length changed, and no parameter was fitted on these fish. The table above is that re-run.
 
 We hold it to NARA's own method. Their photo-board lengths differed from the measuring board by 0.05 cm on average, on 22 frigate tuna whose lengths had a standard deviation of only about 1.3 cm (IOTC-2025-WPM16-10rev1). Random error smears a length-frequency table; bias shifts the whole thing, so the report leads with bias: the mean agent-minus-tape difference on the 10 held-out fish, after a correction fitted only on the other fish. The target, set on 3 November before the shoot, is under 0.5 cm either way. Mean error is reported as a share of fish length (2 cm on a 27 cm tuna is 7%) and as the share of fish within 1 cm. The older pass mark, a mean error of 2.0 cm or less on 40 or more fish, is only the point where we would stop the project.
 
