@@ -253,7 +253,7 @@
     const R = (t) => [...log].reverse().find((l) => l.tool === t)?.result;
     const rows = [];
     const cal = R('calibrate');
-    if (cal) rows.push(cal.refused ? ['no', 'Marker tiles', 'flat: corners fit the sheet within 5 mm', /no marker tile/i.test(cal.feedback || '') ? 'none found: refused to measure' : `${esc((cal.feedback || '').split(':')[0])}: refused`]
+    if (cal) rows.push(cal.refused ? ['no', 'Marker tiles', 'flat: corners fit the sheet within 5 mm', /no marker tile/i.test(cal.feedback || '') ? 'none found: refused to measure' : `${(cal.feedback || '').split(':')[0]}: refused`]
       : ['ok', 'Marker tiles', 'corners fit the sheet within 5 mm', `${cal.tiles.length} tiles, ${cal.corner_error_mm != null ? nf2.format(cal.corner_error_mm) + ' mm' : nf2.format(cal.corner_error_px) + ' px'}`]);
     const seg = R('segment');
     if (seg) rows.push(seg.found === seg.expected ? ['ok', 'Fish count', 'SAM matches the plan', `${seg.found} of ${seg.expected}`]
