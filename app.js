@@ -365,6 +365,25 @@
     $('#frame-cap').innerHTML = s && measured
       ? `<b>Fish ${esc(s.id)}</b> · fork length ${cm(s.fork_cm)} · outline ${cm(s.axis_cm)}${snapText(s) ? ` · ${snapText(s)}` : ''} · ${esc(s.species || 'species pending')} · ${s.status === 'measured' ? 'accepted' : esc(s.why || 'with the officer')}`
       : measured ? '<span class="muted">Dashed lines run from snout tip to tail fork. Pick a fish for its numbers.</span>' : '';
+    inset(s && measured ? s : null);
+  }
+
+  // the picked fish magnified around its worse point: Spark's raw point, where it was moved to on SAM's outline, and the gap
+  function inset(f) {
+    const el = $('#inset');
+    el.hidden = !f || !f.points?.spark || f.snap_mm?.fork == null;
+    if (el.hidden) return;
+    const k = (f.snap_mm.snout ?? 0) >= f.snap_mm.fork ? 'snout' : 'fork';
+    const raw = f.points.spark[k], to = f.points[k], [W, H] = run.size, w = W / 8, h = w / 1.45;
+    const cx = (raw[0] + to[0]) / 2, cy = (raw[1] + to[1]) / 2, fs = w / 16;
+    el.setAttribute('viewBox', `${cx - w / 2} ${cy - h / 2} ${w} ${h}`);
+    el.setAttribute('aria-label', `Zoom on fish ${f.id}: Spark's ${k} point sat ${nf1.format(f.snap_mm[k])} mm from SAM's outline`);
+    el.innerHTML = `<image href="${esc($('#frame-img').getAttribute('src'))}" width="${W}" height="${H}"/>
+      <polygon points="${f.outline.map((q) => q.join(',')).join(' ')}" class="fish${f.status === 'needs_review' ? ' flagged' : ''}"/>
+      <line x1="${f.points.snout[0]}" y1="${f.points.snout[1]}" x2="${f.points.fork[0]}" y2="${f.points.fork[1]}" class="fl"/>
+      <line x1="${raw[0]}" y1="${raw[1]}" x2="${to[0]}" y2="${to[1]}" class="gap"/>
+      <circle cx="${raw[0]}" cy="${raw[1]}" r="${fs / 2.2}" class="raw"/><circle cx="${to[0]}" cy="${to[1]}" r="${fs / 3}" class="pt"/>
+      <text x="${cx - w / 2 + fs * 0.6}" y="${cy - h / 2 + fs * 1.5}" class="lbl" font-size="${fs}">${nf1.format(f.snap_mm[k])} mm gap</text>`;
   }
 
   // how far Spark's two points sat from SAM's outline, against the run's own limit
