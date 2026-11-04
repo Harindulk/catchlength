@@ -25,6 +25,8 @@
     ta: { ok: 'அறிக்கையை அங்கீகரி', back: 'திருப்பி அனுப்பு', note: 'முகவருக்குக் குறிப்பு (விருப்பத்தேர்வு)',
       filed: (a, f) => `<b>அறிக்கை தாக்கல் செய்யப்பட்டது.</b> ${a} மீன்கள் ஏற்கப்பட்டன${f ? `, ${f} மீன்களை முதலில் நீங்கள் பார்க்க வேண்டும்` : ''}. அங்கீகரிக்கவும், அல்லது குறிப்புடன் திருப்பி அனுப்பவும்.` },
   };
+  const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+  const RUN_LABEL = LOCAL ? 'Run the agent' : 'Replay recorded run';
   let lang = 'en';  // officer decisions per run folder: { approve, note, at, saved }
 
   // ---- views ------------------------------------------------------------------------------------------------
@@ -46,6 +48,7 @@
     seg.hidden = samples.length < 2;
     seg.innerHTML = samples.map((s, i) => `<button type="button" role="radio" aria-checked="${i === 0}" data-i="${i}">${esc(s.label)}</button>`).join('');
     seg.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) load(+b.dataset.i); });
+    $('#run-btn').textContent = RUN_LABEL;
     $('#run-btn').addEventListener('click', live);
     $('#signoff').addEventListener('submit', (e) => { e.preventDefault(); decide(true); });
     $('#sendback-btn').addEventListener('click', () => decide(false));
@@ -56,7 +59,7 @@
 
   async function load(i) {
     clearTimeout(timer);
-    if (document.body.classList.contains('running')) { busy(false); $('#run-btn').textContent = 'Run the agent'; }  // a replay cut short by a tab switch must not leave the button stuck
+    if (document.body.classList.contains('running')) { busy(false); $('#run-btn').textContent = RUN_LABEL; }  // a replay cut short by a tab switch must not leave the button stuck
     document.querySelectorAll('#samples button').forEach((b) => b.setAttribute('aria-checked', String(+b.dataset.i === i)));
     dir = `samples/${samples[i].id}/`;
     run = await (await fetch(dir + 'run.json', { cache: 'no-cache' })).json();
@@ -127,7 +130,7 @@
   function busy(on, label) {
     const btn = $('#run-btn');
     btn.disabled = on;
-    btn.textContent = on ? label : 'Run again';
+    btn.textContent = on ? label : (LOCAL ? 'Run again' : 'Replay again');
     document.body.classList.toggle('running', on);
   }
 
