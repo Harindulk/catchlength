@@ -109,6 +109,11 @@ button.primary:disabled { background: var(--control); color: var(--muted); curso
 .frame .pt { fill: #fff; stroke: var(--text); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 .frame .fl { stroke: #fff; stroke-width: 1.5; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
 .frame .fishg.on .fl { stroke-width: 2.5; stroke-dasharray: none; }
+/* the picked fish, magnified around its worse point: Spark's raw point, where it was moved to on SAM's outline, the gap */
+.frame .inset { position: absolute; inset: auto 10px 10px auto; width: 34%; max-width: 380px; height: auto; aspect-ratio: 1.45; border: 2px solid #fff; border-radius: 6px; background: var(--raised); box-shadow: 0 2px 10px rgba(0, 0, 0, .45); }
+.frame .inset[hidden] { display: none; }
+.frame .raw { fill: none; stroke: #f5a524; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.frame .gap { stroke: #f5a524; stroke-width: 2; vector-effect: non-scaling-stroke; }
 .frame-cap { margin-top: 12px; min-height: 21px; font-size: 13px; font-variant-numeric: tabular-nums; }
 .frame-cap .unit { color: var(--muted); font-size: 12px; margin-left: 1px; }
 

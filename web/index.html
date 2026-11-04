@@ -7,7 +7,7 @@
 <meta name="description" content="A verifiable fish-sampling agent: it measures every fish on a market sheet, checks its own work, and is graded against a tape measure.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Sinhala:wght@400;500&family=Noto+Sans+Tamil:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=21">
+<link rel="stylesheet" href="app.css?v=22">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M2.5 12c3-4.2 7.2-5.4 11.5-5.4 2.2 0 4.1.9 5.2 2.1L21.5 6v12l-2.3-2.7c-1.1 1.2-3 2.1-5.2 2.1-4.3 0-8.5-1.2-11.5-5.4z' fill='%231b6c80'/></svg>">
 </head>
 <body>
@@ -73,7 +73,7 @@
     <div class="grid run-grid">
       <article class="card frame-card" aria-labelledby="frame-h">
         <header class="card-h"><h2 id="frame-h">Best frame</h2><span class="sub" id="frame-sub"></span></header>
-        <div class="frame" id="frame"><img id="frame-img" alt=""><svg id="overlay" role="group" aria-label="Fish outlines: pick one for its numbers"></svg></div>
+        <div class="frame" id="frame"><img id="frame-img" alt=""><svg id="overlay" role="group" aria-label="Fish outlines: pick one for its numbers"></svg><svg id="inset" class="inset" role="img" hidden></svg></div>
         <p class="frame-cap" id="frame-cap"></p>
       </article>
 
@@ -167,6 +167,6 @@
     </div>
   </section>
 </main>
-<script src="app.js?v=29"></script>
+<script src="app.js?v=30"></script>
 </body>
 </html>
