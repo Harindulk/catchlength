@@ -360,13 +360,13 @@
     const el = $('#receipt');
     if (!rc) { el.innerHTML = '<dt>Status</dt><dd class="muted">Appears when the report is filed.</dd>'; return; }
     const rows = [
-      ['Clip SHA-256', rc.clip_sha256 ? rc.clip_sha256.slice(0, 16) + '…' : '– (simulated, no clip file)'],
+      ['Clip SHA-256', rc.clip_sha256 ? rc.clip_sha256.slice(0, 16) + '…' : (run.synthetic ? '– (synthetic scene, a still image, no clip file)' : '– (simulated, no clip file)')],
       ['Finished', rc.finished_utc.replace('T', ' ').replace('+00:00', ' UTC')],
       ['Models', rc.models.join(', ')],
       ['Calibration', `${rc.calibration.tiles.length} tiles, corner error ${rc.calibration.corner_error_px?.toFixed(2)} px`],
       ['Fish', `${rc.fish.detected} found, ${rc.fish.accepted} accepted, ${rc.fish.flagged} flagged`],
       ['Rescued by SAM', rc.rescued.length ? rc.rescued.join(', ') : 'none'],
-      ['Frames checked', [rc.frames.best, ...rc.frames.checked].join(', ')],
+      ['Frames checked', rc.frames.checked.length ? [rc.frames.best, ...rc.frames.checked].join(', ') : `frame ${rc.frames.best} only (a single still, so no cross-frame check)`],
       ['Cost', run.cost && run.cost.calls && run.cost.cached === run.cost.calls ? `$${rc.cost_usd.toFixed(3)} (all ${run.cost.calls} model calls replayed from the cache of the recorded run)` : `$${rc.cost_usd.toFixed(3)}`],
       ['Code', rc.freeze_tag ? (rc.frozen ? `${rc.freeze_tag}: code and thresholds match the freeze` : `${rc.describe} (code or thresholds changed since ${rc.freeze_tag})`) : rc.git_commit || 'uncommitted'],
       ['CSV SHA-256', rc.csv_sha256.slice(0, 16) + '…'],
