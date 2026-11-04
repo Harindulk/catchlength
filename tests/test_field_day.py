@@ -60,9 +60,27 @@ def test_field_day_runs_tags_and_grades(tmp_path, monkeypatch):
     (day / "ground_truth.csv").write_text("\n".join(rows) + "\n")
     res = field_day.main(day, runs, out, lambda: pytest.fail("a tagged run must not re-run"), manual_s=300)
     assert res == json.loads(out.read_text())
+    assert not (out.parent / "benchmark_tl.json").exists()  # no total_cm column on this sheet
+
     assert res["n_matched"] == 5 and not res["unmatched"] and res["count"]["exact_rate"] == 1.0
     assert res["length"]["mae"] < 1.5 and res["species"]["accuracy"] == 1.0
     assert res["held_out"]["held_out_raw"]["n"] + res["held_out"]["fit"]["n"] == res["accepted"]
     assert res["tape_repeat"] == {"n": 1, "mean_abs_diff_cm": 0.5, "tem_cm": 0.35}
     assert res["timing"]["manual_s_per_fish"] == 30.0 and res["timing"]["agent_s_per_fish"] > 0
     assert "freeze_tag" in res["code"]
+
+    # the sheet as printed tonight: fork and total length, each taped twice on some fish
+    total = [round(L * 0.1, 1) for L in LENGTHS]  # 0.1 cm per pixel in the synthetic scene
+    rows = ["batch,tag,species,fork_cm,fork_cm_2,total_cm,total_cm_2,notes"] + [
+        f"B1,{i + 1},balaya,{f},,{t},," for i, (f, t) in enumerate(zip(fork, total))]
+    rows[3] = f"B1,3,balaya,{fork[2]},,,,"  # tag 3 with no taped total length is left out of the total comparison
+    (day / "ground_truth.csv").write_text("\n".join(rows) + "\n")
+    res = field_day.main(day, runs, out, lambda: pytest.fail("a tagged run must not re-run"))
+    tl = json.loads((out.parent / "benchmark_tl.json").read_text())
+    assert tl["n"] == res["accepted"] - 1 and abs(tl["mean_diff_cm"]) < 1.5 and tl["loa95"][0] < tl["mean_diff_cm"] < tl["loa95"][1]
+
+    # back to a sheet without total_cm: the stale benchmark_tl.json goes away
+    rows = ["batch,tag,species,fork_cm,fork_cm_2,notes"] + [f"B1,{i + 1},balaya,{f},," for i, f in enumerate(fork)]
+    (day / "ground_truth.csv").write_text("\n".join(rows) + "\n")
+    field_day.main(day, runs, out, lambda: pytest.fail("a tagged run must not re-run"))
+    assert not (out.parent / "benchmark_tl.json").exists()

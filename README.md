@@ -97,10 +97,11 @@ echo "MODEL_API_KEY=..." > .env          # a Meta Model API key; never commit it
 
 Print `print/catchlength_A4_tiles.pdf` at 100% and check that each sheet's bar measures 100 mm. Lay at least two tiles flat on the same surface as the fish.
 
-Grade a field day (runs every clip, writes a tags file per clip to fill in from its overlay, then grades):
+Grade a field day (runs every clip, writes a tags file per clip to fill in from its overlay, then grades). `ground_truth.csv` in the day folder has the header `batch,tag,species,fork_cm,fork_cm_2,total_cm,total_cm_2,notes` (template in `print/ground_truth_template.csv`); when `total_cm` is filled it also writes `web/benchmark_tl.json`. Then `publish_run.py` copies a graded run into `web/samples/` and puts it first in the sample list, so the console opens on it:
 
 ```bash
 .venv/bin/python scripts/field_day.py data/raw/<day> --manual-s 300 --film-s 90
+.venv/bin/python scripts/publish_run.py runs/<clip> --id field-tray1 --label "Real fish, tape-checked"
 ```
 
 Or grade runs directly:

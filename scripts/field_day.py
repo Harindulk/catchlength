@@ -1,4 +1,4 @@
-"""Sunday in one command. python scripts/field_day.py data/raw/2026-11-01 [--manual-s 300 --film-s 90]
+"""Field day in one command. python scripts/field_day.py data/raw/<day> [--manual-s 300 --film-s 90]
 1. Runs the agent on every video in the folder (.mp4/.mov/.m4v, not subfolders: put b-roll and to-camera clips in
    broll/). Stills and the sheet photo are left alone. Cached, so re-running is free -> runs/<clip>/.
 2. For each run without tags.json, writes a stub listing its fish ids: fill each with "<batch>-<tag>" by looking at
@@ -6,7 +6,8 @@
    and set "batch" (or "skip" for a clip that isn't a measured batch).
 3. When every run is tagged, grades them against ground_truth.csv -> web/benchmark.json, with the held-out bias
    split, tape repeatability and the stopwatch comparison (--manual-s: 10 fish by hand; --film-s: laying out and
-   filming the same 10)."""
+   filming the same 10). If the sheet has a total_cm column, also compares the outline with the taped total length
+   (scripts/tl_compare.py) -> web/benchmark_tl.json. The summary leads with mean difference and 95% limits."""
 import argparse
 import json
 import sys
@@ -20,6 +21,7 @@ from catchlength.agent import Run, run_agent  # noqa: E402
 from catchlength.api import Client  # noqa: E402
 from catchlength.audit import grade, read_gt  # noqa: E402
 from catchlength.cli import code_version, load_frames, save  # noqa: E402
+from scripts.tl_compare import compare as compare_tl  # noqa: E402
 
 VIDEO = {".mp4", ".mov", ".m4v"}
 
@@ -67,6 +69,15 @@ def main(day: Path, runs_dir: Path = ROOT / "runs", out: Path = ROOT / "web/benc
     res["code"] = code_version()
     out.write_text(json.dumps(res, indent=1))
     L, H = res["length_accepted_only"], res["held_out"]
+    tl_line = "total length: no total_cm column on the sheet"
+    if any("total_cm" in r for r in gt):
+        tl = compare_tl(gt, [{"tags": meta[r]["tags"], "fish": rj[r]["fish"]} for r in graded])
+        out.with_name("benchmark_tl.json").write_text(json.dumps(tl, indent=1))
+        tl_line = (f"total length (outline vs tape, {tl['n']} fish): mean diff {tl.get('mean_diff_cm')} cm, 95% limits {tl.get('loa95')}"
+                   f" -> {out.with_name('benchmark_tl.json')}")
+    else:
+        out.with_name("benchmark_tl.json").unlink(missing_ok=True)  # a stale one from an earlier sheet must not stay published
+    print(f"fork length (accepted, {L['n']} fish): mean diff {L.get('bias')} cm, 95% limits {L.get('loa95')}; {tl_line}")
     print(f"{res['n_measured']} fish: MAE {L['mae']} cm on accepted, within 2 cm {L.get('within_2cm')}, "
           f"count exact {res['count']['exact_rate']}, species {res['species']['accuracy']}, pass marks {res['pass_marks']}\n"
           f"held out ({H['held_out_raw']['n']} fish): MAE {H['held_out_raw']['mae']} raw, {H['held_out_corrected']['mae']} "

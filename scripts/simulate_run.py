@@ -1,6 +1,6 @@
 """A SIMULATED sample for building the console before field data exists: museum reference images (public domain,
 pre-hackathon) at known lengths, with a scripted stand-in for Muse Spark and SAM 3.1. Clearly labelled; replaced by
-real Peliyagoda runs after 1 Nov. python scripts/simulate_run.py web/samples/simulated"""
+real field runs. python scripts/simulate_run.py web/samples/simulated"""
 import json
 import sys
 import tempfile
