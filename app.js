@@ -445,15 +445,15 @@
     const mark = (ok, label) => `<span class="pill ${ok ? 'ok' : 'no'}">${label} ${ok ? 'met' : 'missed'}</span>`;
     const H = bm.held_out.held_out_corrected, NB = bm.nara_bar, sgn = (v) => (v > 0 ? '+' : '') + nf2.format(v);
     const worst = bm.pairs.filter((p) => p.agent_cm != null).sort((a, b) => Math.abs(b.agent_cm - b.tape_cm) - Math.abs(a.agent_cm - a.tape_cm)).slice(0, 3);
-    $('#bm-finding').innerHTML = H.n
-      ? `<b>Held-out bias ${sgn(H.bias)} cm</b> on ${H.n} fish (target under 0.5 cm; NARA's photo method: 0.05 cm) · mean error ${nf1.format(L.mae)} cm, ${nf1.format(L.mae_pct)}% of length · ${bm.flagged} handed to the officer`
-      : `<b>No held-out fish measured yet</b> · mean error ${nf1.format(L.mae)} cm, ${nf1.format(L.mae_pct)}% of length, on ${L.n} accepted fish · ${bm.flagged} handed to the officer`;
-    body.innerHTML = `<article class="card"><div class="marks">${mark(NB.met, 'Bias under 0.5 cm')} ${mark(P.length, 'Kill floor (2 cm, 40 fish)')} ${mark(P.count, 'Count')} ${mark(P.species, 'Species')}</div><div class="kpis">
-      <div class="kpi"><div class="v">${H.n ? sgn(H.bias) : '–'}<span class="unit">cm</span></div><div class="l">bias, ${H.n} held-out fish</div></div>
+    const tl = await get('benchmark_tl.json');
+    $('#bm-finding').innerHTML = `<b>Mean difference from the tape ${sgn(L.bias)} cm</b>, 95% of fish between ${sgn(L.loa95[0])} and ${sgn(L.loa95[1])} cm · n = ${L.n} accepted fish, ${bm.flagged} to the officer · <span class="muted">uncorrected, every fish counted</span>`;
+    body.innerHTML = `<article class="card"><div class="marks">${H.n >= 5 ? mark(NB.met, 'Held-out bias under 0.5 cm') : `<span class="pill n">Held-out set: ${H.n} fish, too few to judge</span>`} ${!P.length && L.mae != null && L.mae <= 2 ? `<span class="pill n">Stop floor needs 40 fish (mean error ${nf1.format(L.mae)} cm is under 2)</span>` : mark(P.length, 'Stop floor (2 cm, 40 fish)')} ${mark(P.count, 'Count')}</div><div class="kpis">
+      <div class="kpi"><div class="v">${sgn(L.bias)}<span class="unit">cm</span></div><div class="l">mean difference, fork length</div></div>
+      <div class="kpi"><div class="v">${sgn(L.loa95[0])} to ${sgn(L.loa95[1])}<span class="unit">cm</span></div><div class="l">95% limits of agreement</div></div>
       <div class="kpi"><div class="v">${nf1.format(L.mae_pct)}<span class="unit">%</span></div><div class="l">mean error as share of length</div></div>
       <div class="kpi"><div class="v">${Math.round(L.within_1cm * 100)}<span class="unit">%</span></div><div class="l">within 1 cm of the tape</div></div>
       <div class="kpi"><div class="v">${bm.count.exact_rate == null ? '–' : Math.round(bm.count.exact_rate * 100)}<span class="unit">%</span></div><div class="l">clips counted exactly</div></div>
-      <div class="kpi"><div class="v">${bm.species.accuracy == null ? '–' : Math.round(bm.species.accuracy * 100)}<span class="unit">%</span></div><div class="l">species right</div></div></div>
+</div>${tl && tl.n ? `<p class="sub"><b>Total length</b> (what NARA measures): the outline against the taped total length, ${tl.n} fish, mean difference ${sgn(tl.mean_diff_cm)} cm, 95% between ${sgn(tl.loa95[0])} and ${sgn(tl.loa95[1])} cm, ${Math.round(tl.within_1cm * 100)}% within 1 cm.</p>` : ''}<p class="sub">A small pilot: store-bought fish, one session, not a port trial. NARA validated its photo method with the same comparison on 22 fish (IOTC-2025-WPM16-10rev1). Species is not scored here: it stays an officer-confirmed field.</p>
       <div class="chart" id="scatter"></div><p class="sub">Each dot is one fish: tape on the x axis, agent on the y axis. Dashed line = perfect agreement. Hollow dots were handed to the officer. Accepted fish: mean error ${nf1.format(L.mae)} cm, bias ${nf1.format(L.bias)} cm before correction, 95% of errors between ${nf1.format(L.loa95[0])} and ${nf1.format(L.loa95[1])} cm. All fish: mean error ${nf1.format(A.mae)} cm.</p></article>
       <div class="grid two">
       <article class="card"><header class="card-h"><h2>Largest errors</h2><span class="sub">shown, never dropped</span></header>
