@@ -51,7 +51,7 @@ Every run ends with an audit receipt: the clip's hash, the models used, the cali
 |---|---|
 | Muse Spark 1.3 | Runs the agent loop (one tool per turn); plans the clip; finds missed and merged fish; places snout and fork points; names the species from a closed list |
 | SAM 3.1 | Segments every fish from the concept "fish", then again from Spark's boxes and negative points |
-| Muse Wonder 1.0 (optional, `--verify`; built, not yet run on a live key) | A last look at the filed report. It can only add fish to the officer's queue; it can't change a length, a species or a status |
+| Muse Wonder 1.0 (optional, `--verify`) | A last look at the filed report. It can only add fish to the officer's queue; it can't change a length, a species or a status. Ran on the recorded scenes: no doubts on the touching scene; two doubts on the five-fish scene (fish 3 and 4: "line extends past the fork notch", "no visible fork"), both queued for the officer. Those outlines read 29.6 and 33.1 cm against true lengths of 30.0 and 33.0 cm, so the doubts were cautious rather than right, which is the direction a bounded verifier should fail in |
 | Muse Spark Open on Baseten (optional, `--audit-open`; built, not yet run) | The same bounded check by the open-weights model, hosted separately, as an independent auditor |
 
 ## Prior art
